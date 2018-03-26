@@ -43,10 +43,6 @@ export default new Router({
           path: 'PersonalInfo',
           name: 'PersonalInfo',
           component: PersonalInfo
-        },
-        {
-          path: '*',
-          redirect: '/'
         }
       ]
     }

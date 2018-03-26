@@ -4,16 +4,16 @@
       <div class = "leftNav">
         <ul>
         <li>
-            <router-link to = 'Home/StudentInfo'>学生信息</router-link>
+            <router-link to = '/Home/StudentInfo'>学生信息</router-link>
         </li>
         <li>
-            <router-link to = 'Home/AttendedInfo'>考勤信息</router-link>
+            <router-link to = '/Home/AttendedInfo'>考勤信息</router-link>
         </li>
         <li>
-            <router-link to = 'Home/Statistics'>成绩统计</router-link>
+            <router-link to = '/Home/Statistics'>成绩统计</router-link>
         </li>
         <li>
-            <router-link to = 'Home/PersonalInfo'>个人中心</router-link>
+            <router-link to = '/Home/PersonalInfo'>个人中心</router-link>
         </li>
       </ul>
       </div>
