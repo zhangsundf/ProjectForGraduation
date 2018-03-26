@@ -1,20 +1,24 @@
 <template>
 
-   <div class = "leftNav">
-      <ul>
+   <div class = "main">
+      <div class = "leftNav">
+        <ul>
         <li>
             <router-link to = 'Home/StudentInfo'>学生信息</router-link>
         </li>
         <li>
-            <router-link to = 'Home/AttendanceInfo'>考勤信息</router-link>
+            <router-link to = 'Home/AttendedInfo'>考勤信息</router-link>
         </li>
         <li>
             <router-link to = 'Home/Statistics'>成绩统计</router-link>
         </li>
         <li>
-            <router-link to = 'Home/PersonnalInfo'>个人中心</router-link>
+            <router-link to = 'Home/PersonalInfo'>个人中心</router-link>
         </li>
       </ul>
+      </div>
+
+      <router-view class = "show"/>
    </div>
 
 
@@ -31,37 +35,37 @@ export default {
 }
 </script>
 <style scoped>
-   .mainNav{
-     position:absolute;
-     display: flex;
-     flex-direction: column;
+ .main{
+     /* flex-direction: row; */
      width: 100%;
+     margin-top: 50px;
      height: 100%;
-     top:0px;
-   }
-
-   ul li{
-     list-style: none;
    }
 
    .leftNav{
-     flex:1;
      position: relative;
-     width: 50px;
-     display: flex;
-     background-color: grey;
-   }
-   .leftNav ul{
-     flex: 1;
-     display: flex;
      flex-direction: column;
+     width: 60px;
+     background-color: grey;
+     height: 100%;
+     padding-top:10%;
+     float: left;
    }
 
-  .leftNav ul li{
-    flex: 1;
+  .leftNav ul  li{
+    list-style-type:none;
+    position: relative;
     width: 40px;
     height:40px;
-    margin: 20px 0px;
+    border:1px solid green;
+    left:-30px;
+    margin-bottom:40px;
+  }
+  .show{
+    position: relative;
+    margin-left: 60px;
+    height: 100%;
+    background-color: cornflowerblue;
 
   }
 

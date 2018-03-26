@@ -1,15 +1,15 @@
 <template>
 <div class = "home">
-  <left-nav></left-nav>
   <top-nav></top-nav>
-  <show-info></show-info>
+  <left-nav></left-nav>
+
+  <!-- <show-info></show-info> -->
 </div>
 </template>
 
 <script>
 import LeftNav from './LeftNav'
 import TopNav from './TopNav'
-import ShowInfo from './ShowInfo'
 export default {
   name:'Home',
   data(){
@@ -19,18 +19,16 @@ export default {
   },
   components:{
     LeftNav,
-    TopNav,
-    ShowInfo
+    TopNav
   }
 }
 </script>
-<style scoped>
+<style >
 .home{
  position: absolute;
- width: 100%;
  height: 100%;
- margin: 0;
- padding: 0;
+ width: 100%;
+ flex-direction: column;
  overflow: hidden;
 }
 </style>
