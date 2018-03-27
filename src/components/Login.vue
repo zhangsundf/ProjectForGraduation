@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'Login',
   data () {
@@ -25,10 +26,10 @@ export default {
   methods:{
 
     login(name){
-      this.$store.commit('GETUSERNAME',name)
+      sessionStorage.clear()
+      this.$store.commit('SETUSERNAME',name)
       this.$router.push('/Home')
       //console.log(this.$store.state.user)
-
 
     }
   }

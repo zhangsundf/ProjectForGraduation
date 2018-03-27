@@ -1,19 +1,20 @@
 <template>
 
    <div class = "main">
+
       <div class = "leftNav">
         <ul>
         <li>
-            <router-link to = '/Home/StudentInfo'>学生信息</router-link>
+            <router-link to = "/Home/StudentInfo">学生信息</router-link>
         </li>
         <li>
-            <router-link to = '/Home/AttendedInfo'>考勤信息</router-link>
+            <router-link to = "/Home/AttendedInfo">考勤信息</router-link>
         </li>
         <li>
-            <router-link to = '/Home/Statistics'>成绩统计</router-link>
+            <router-link to = "/Home/Statistics">成绩统计</router-link>
         </li>
         <li>
-            <router-link to = '/Home/PersonalInfo'>个人中心</router-link>
+            <router-link to = "/Home/PersonalInfo">个人中心</router-link>
         </li>
       </ul>
       </div>
@@ -25,21 +26,27 @@
 </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
   name:'LeftNav',
   data(){
     return {
-
+     param: ''
     }
-  }
+  },
+// mounted(){
+//    axios.get('http://127.0.0.1:3000/all').then((val)=>{
+//      this.param = val.data;
+//    })
+// }
 }
 </script>
 <style scoped>
  .main{
-     /* flex-direction: row; */
+     position: relative;
      width: 100%;
-     margin-top: 50px;
      height: 100%;
+     overflow: hidden;
    }
 
    .leftNav{
@@ -63,9 +70,10 @@ export default {
   }
   .show{
     position: relative;
-    margin-left: 60px;
+    left: 60px;
+    padding-top:20px;
     height: 100%;
-    background-color: cornflowerblue;
+    background-color: antiquewhite;
 
   }
 

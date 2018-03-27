@@ -5,7 +5,7 @@ import App from './App'
 import Vuex from 'vuex'
 import router from './router'
 import store from './store/store.js'
-
+import axios from 'axios'
 
 Vue.config.productionTip = false
 
@@ -14,6 +14,7 @@ new Vue({
   el: '#app',
   router,
    store,
+   axios,
   components: { App },
   template: '<App/>'
 })

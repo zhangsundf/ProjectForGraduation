@@ -1,15 +1,113 @@
 <template>
   <div class = "AttendedInfo">
-    这是一个AttendedInfo展示界面
+    <div class = "createTable" v-show = "!isshow">
+    <label for = "startDate">起始日期</label>
+    <input type = "date" id = "startDate" v-model = "start" :min="mindate" >
+    <label for = "endDate">结束日期</label>
+    <input type = "date" id = "endDate" v-model = "end" :min = "start">
+    <button @click = "createDate(start,end)">创建表格</button>
+    </div>
+    <div class = "shouAttended" v-show = "isshow">
+        <table>
+          <tr class = "tableHeader">
+            <th> 序号</th>
+            <th> 学号</th>
+            <th> 姓名</th>
+            <th> 班级</th>
+            <th v-for = "n in diff_arr" class = "workdate">{{n}}</th>
+          </tr>
+          <tbody class = "tbody">
+            <tr v-for = "(item, index) in $store.state.studentinfo">
+
+              <td>{{index + 1}}</td>
+              <td>{{item.studentId}}</td>
+              <td>{{item.name}}</td>
+              <td>{{item.grade}}</td>
+              <td v-for = "n in duration" class = "workdate"></td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
-  name: 'AttendedInfo'
+  name: 'AttendedInfo',
+  data(){
+    return {
+      start: '',
+      end: '',
+      isshow : false,
+      diff_arr:[],
+      mindate:'',
+      student:[],
+      duration:'' //控制执行多少个td（工作日）
+    }
+  },
+  mounted(){
+    let date = new Date()
+    let year = date.getFullYear()
+    let month = date.getMonth() + 1
+    let day = date.getDate()
+    month = String(month).length == 1 ? '0'+ String(month) : String(month)
+    day = String(day).length == 1 ? '0'+ String(day) : String(day)
+    this.mindate = year+'-'+month+'-'+day
+    this.start = this.mindate
+  },
+
+  methods:{
+    createDate(start,end) {
+      var startdate = new Date(start),
+          enddate = new Date(end),
+          start_time = startdate.getTime(),
+          end_time = enddate.getTime(),
+          timeDiff = end_time - start_time
+          if(timeDiff == 0){
+            alert("结束日期不能等于开始日期")
+            return
+          }
+
+          else{
+              for(var i = 0; i < timeDiff; i += 86400000){
+                  var ds = new Date(start_time + i)
+                  this.diff_arr.push((ds.getMonth() + 1)+'-'+ ds.getDate())
+              }
+              this.$store.commit('SETCONTINUEDATE',this.diff_arr)
+              this.duration = this.diff_arr.length
+              this.isshow = true
+
+          }
+       return
+  }
+}
 }
 </script>
-<style>
-
+<style scoped>
+.shouAttended{
+  position: relative;
+  width: 90%;
+  height: 90%;
+  margin: 0 auto;
+  border:2px solid sandybrown;
+}
+.tableHeader{
+  width: 100%;
+  height: 40px;
+  background-color: darkgray;
+}
+table{
+  width: 100%;
+}
+.workdate{
+  background-color: salmon;
+}
+.tbody{
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+  background-color: seagreen;
+}
 </style>
 
 

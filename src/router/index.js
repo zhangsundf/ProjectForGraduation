@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
 import Home from '@/components/Home'
+import NotFound from '@/components/NotFound'
 import StudentInfo from '@/components/AllInfo/StudentInfo'
 import AttendedInfo from '@/components/AllInfo/AttendedInfo'
 import Statistics from '@/components/AllInfo/Statistics'
@@ -43,7 +44,14 @@ export default new Router({
           path: 'PersonalInfo',
           name: 'PersonalInfo',
           component: PersonalInfo
+        },
+        {
+          path: '*',
+          name: 'NotFound',
+          component: NotFound
         }
+
+
       ]
     }
   ]
