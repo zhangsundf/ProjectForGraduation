@@ -8,7 +8,7 @@
         <label for = "password">密码&nbsp;</label>
         <input type = "password" id = "password" class = "inputText" v-model = "password"/><br/>
         <br/>
-        <button class = "submit" value = "登录" @click = "login(username)">登录</button>
+        <button class = "submit" value = "登录" @click = "login(username,password)">登录</button>
         {{username}}--{{$store.state.user}}
   </div>
 </template>
@@ -25,9 +25,12 @@ export default {
   },
   methods:{
 
-    login(name){
+    login(name,pass){
       sessionStorage.clear()
-      this.$store.commit('SETUSERNAME',name)
+      this.$store.commit('SETUSERNAME',{
+            'name':name,
+            'pass':pass
+        })
       this.$router.push('/Home')
       //console.log(this.$store.state.user)
 

@@ -5,6 +5,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 const state = {
     user:'',
+    pass: '',
     isLogin: false,
     studentinfo: [],
     continueDate: []
@@ -14,9 +15,11 @@ const state = {
 const mutations = {
   //登陆
     SETUSERNAME(state,param){
-      sessionStorage.setItem('username',param)
+      sessionStorage.setItem('username',param.name)
+      sessionStorage.setItem('username',param.pass)
       sessionStorage.setItem('isLogin', true)
-      state.user = param
+      state.user = param.name
+      state.pass = param.pass
       state.isLogin = true
    },
    //退出
