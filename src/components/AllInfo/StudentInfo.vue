@@ -1,6 +1,5 @@
 <template>
   <div class = "StudentInfo">
-      <h3>当前位置:>> 学生信息</h3>
       <div class = "showinfo">
       <table>
         <tr class = "tableHeader">
@@ -22,34 +21,34 @@
         </tr>
         </tbody>
       </table>
-      <h1>GONGAAAAAA</h1>
+      <h3>没有更多数据了</h3>
       </div>
-  </div>
+
+    </div>
 </template>
+
 <script>
 import axios from 'axios'
 export default {
-  name: 'StudentInfo',
+  name:'StudentInfo',
   data(){
     return {
-      studentList: []
+      studentList :[]
     }
   },
-  mounted(){
-    axios.get('http://127.0.0.1:3000/all').then((val)=>{
-           this.$store.commit('SETSTUDENTINFO',val.data)
-           this.studentList = val.data;
-     } )
-  },
-  methods:{
-  }
+  // mounted(){
+  //   axios.get('http://127.0.0.1:1230/all').then((val)=>{
+  //          this.$store.commit('SETSTUDENTINFO',val.data)
+  //          this.studentList = val.data;
+  //    })
+  //   },
+
 }
 </script>
 <style>
-
 .showinfo{
   width: 90%;
-  height: 80%;
+  height: 90%;
   border: 2px solid black;
   overflow: hidden;
   display:flex;
@@ -68,7 +67,7 @@ table{
 }
 
 .tbody{
-  width: 1100%;
+  width: 100%;
   overflow: hidden;
   overflow-y: scroll;
 }

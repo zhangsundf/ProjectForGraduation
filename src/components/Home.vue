@@ -1,7 +1,7 @@
 <template>
 <div class = "home">
-  <top-nav></top-nav>
   <left-nav></left-nav>
+  <main-panel></main-panel>
 
   <!-- <show-info></show-info> -->
 </div>
@@ -9,7 +9,7 @@
 
 <script>
 import LeftNav from './LeftNav'
-import TopNav from './TopNav'
+import mainPanel from './main'
 export default {
   name:'Home',
   data(){
@@ -19,7 +19,7 @@ export default {
   },
   components:{
     LeftNav,
-    TopNav
+    mainPanel
   }
 }
 </script>

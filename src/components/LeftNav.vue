@@ -1,25 +1,31 @@
 <template>
 
-   <div class = "main">
+   <div class = "menu">
 
-      <div class = "leftNav">
-        <ul>
+
+      <ul class = "menu-list">
+        <li class = "Avatar">
+          <p class = "img is-36x36">
+            <img src = "../assets/tiger.png">
+          </p>
+        </li>
         <li>
             <router-link to = "/Home/StudentInfo">学生信息</router-link>
         </li>
+
         <li>
             <router-link to = "/Home/AttendedInfo">考勤信息</router-link>
         </li>
+
         <li>
             <router-link to = "/Home/Statistics">成绩统计</router-link>
         </li>
+
         <li>
             <router-link to = "/Home/PersonalInfo">个人中心</router-link>
         </li>
       </ul>
-      </div>
-
-      <router-view class = "show"/>
+      <!-- <router-view class = "show"/> -->
    </div>
 
 
@@ -42,40 +48,36 @@ export default {
 }
 </script>
 <style scoped>
- .main{
+ .menu{
      position: relative;
-     width: 100%;
+     width: 12%;
      height: 100%;
-     overflow: hidden;
+     background-color:steelblue;
+     float: left;
+     /* overflow: hidden; */
    }
 
-   .leftNav{
+.Avatar{
+  width: 100%;
+  height: 100px;
+  margin: 100px 0 50px 0;
+}
+.menu-list li{
+  border-bottom: 1px solid cadetblue;
+  padding: 10px;
+}
+   /* .leftNav{
      position: relative;
      flex-direction: column;
      width: 60px;
      background-color: grey;
      height: 100%;
      padding-top:10%;
-     float: left;
-   }
+     /* float: left;
+     } */
 
-  .leftNav ul  li{
-    list-style-type:none;
-    position: relative;
-    width: 40px;
-    height:40px;
-    border:1px solid green;
-    left:-30px;
-    margin-bottom:40px;
-  }
-  .show{
-    position: relative;
-    left: 60px;
-    padding-top:20px;
-    height: 100%;
-    background-color: antiquewhite;
 
-  }
+
 
 
 
