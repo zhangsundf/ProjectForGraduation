@@ -8,8 +8,8 @@ const state = {
     pass: '',
     isLogin: false,
     studentinfo: [],
-    continueDate: []
-
+    continueDate: [],
+    currentPanel:'首页'
 }
 
 const mutations = {
@@ -35,7 +35,19 @@ const mutations = {
     SETCONTINUEDATE(state,param){
      state.continueDate = param
      sessionStorage.setItem('continunedate',param)
-   }
+   },
+
+   SETCURRENTPANEL(state,param){
+     state.currentPanel = param
+     sessionStorage.setItem("currentPanel",param)
+   },
+   //一个存储左侧点击了什么的数组，在右侧card头部显示
+  //  SETTABLIST(state, param){
+  //    if (state.tabList.indexOf(param) == -1){
+  //         state.tabList.push(param)
+  //         sessionStorage.setItem("tabList",state.tabList)
+  //    }
+  //  }
 }
 
 export default new Vuex.Store({

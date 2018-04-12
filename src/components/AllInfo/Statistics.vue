@@ -3,7 +3,7 @@
     <div class = "setStandards">
 
         <label for = "attended">考勤</label>
-        <input type = "text" v-model = "attended" id = "attended" placeholder="例：20" v-focus><span>%</span>
+        <input type = "text" v-model = "attended" id = "attended" placeholder="例：20"><span>%</span>
         <label for = "usualGrade">平时成绩</label>
         <input type = "text" v-model = "usualGrade" id = "usualGrade" placeholder="例：20"><span>%</span>
         <label for = "documents">文档</label>

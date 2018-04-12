@@ -18,6 +18,7 @@ import brands from '@fortawesome/fontawesome-free-brands'
 import VueResource from 'vue-resource'
 import qs from 'qs'
 import {post,get,crossOrigin} from './util/http'
+import toggleClass from './util/getSibling'
 
 fontawesome.library.add(solid)
 fontawesome.library.add(regular)
@@ -26,24 +27,27 @@ fontawesome.library.add(brands)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 
-Vue.use(plugin)
+//Vue.use(plugin)
 Vue.use(ElementUI)
 Vue.use(ElementUI, { size: 'small' });
 Vue.use(bulma)
 Vue.use(VueResource)
 Vue.use(qs)
+Vue.use(toggleClass)
 //Vue.use(axios)
 Vue.config.productionTip = false
 
 Vue.prototype.$post = post
 Vue.prototype.$get = get
 Vue.prototype.$crossOrigin = crossOrigin
+var bus = new Vue()
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
    store,
    plugin,
+   bus,
   components: { App },
   template: '<App/>'
 })

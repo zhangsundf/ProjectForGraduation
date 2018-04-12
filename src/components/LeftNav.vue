@@ -3,26 +3,27 @@
    <div class = "menu">
 
 
-      <ul class = "menu-list">
+      <ul class = "menu-list is-boxed">
         <li class = "Avatar">
           <p class = "img is-36x36">
             <img src = "../assets/tiger.png">
           </p>
+          <span> {{username}}</span>
         </li>
-        <li>
-            <router-link to = "/Home/StudentInfo">学生信息</router-link>
-        </li>
-
-        <li>
-            <router-link to = "/Home/AttendedInfo">考勤信息</router-link>
+        <li class = "link"  @click = "showPanel('link1',1)">
+            <a id = "link1">学生信息</a>
         </li>
 
-        <li>
-            <router-link to = "/Home/Statistics">成绩统计</router-link>
+        <li class = "link"  @click = "showPanel('link2',2)">
+           <a id = "link2">考勤信息</a>
         </li>
 
-        <li>
-            <router-link to = "/Home/PersonalInfo">个人中心</router-link>
+        <li class = "link" @click = "showPanel('link3',3)">
+            <a id = "link3">成绩统计</a>
+        </li>
+
+        <li class = "link"  @click = "showPanel('link4',4)">
+            <a id = "link4">个人中心</a>
         </li>
       </ul>
       <!-- <router-view class = "show"/> -->
@@ -33,18 +34,25 @@
 </template>
 <script>
 import axios from 'axios'
-export default {
-  name:'LeftNav',
-  data(){
-    return {
-     param: ''
-    }
+  export default {
+    name:'LeftNav',
+    data(){
+      return {
+      param: '',
+      username:''
+      }
+    },
+  mounted(){
+  this.username = this.$store.state.user
+
   },
-// mounted(){
-//    axios.get('http://127.0.0.1:3000/all').then((val)=>{
-//      this.param = val.data;
-//    })
-// }
+  methods:{
+    showPanel(val,index){
+        this.$store.commit("SETCURRENTPANEL",val)
+        this.toggleClass("link",index,"is-active")
+    }
+  }
+
 }
 </script>
 <style scoped>
@@ -62,19 +70,16 @@ export default {
   height: 100px;
   margin: 100px 0 50px 0;
 }
-.menu-list li{
+.menu-list li:not(.Avatar){
   border-bottom: 1px solid cadetblue;
   padding: 10px;
 }
-   /* .leftNav{
-     position: relative;
-     flex-direction: column;
-     width: 60px;
-     background-color: grey;
-     height: 100%;
-     padding-top:10%;
-     /* float: left;
-     } */
+li:hover, a:hover{
+  background-color: silver;
+}
+.is-active{
+ background-color:silver;
+}
 
 
 
