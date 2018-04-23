@@ -1,9 +1,7 @@
 <template>
 <div class = "home">
-  <left-nav></left-nav>
-  <main-panel></main-panel>
-
-  <!-- <show-info></show-info> -->
+  <left-nav  @getCurrentLink = "getCurrentLink"></left-nav>
+  <main-panel :curlink = "link"></main-panel>
 </div>
 </template>
 
@@ -14,12 +12,29 @@ export default {
   name:'Home',
   data(){
     return {
-
+      cur: 'showNews'
     }
   },
   components:{
     LeftNav,
     mainPanel
+  },
+  methods:{
+    getCurrentLink (arg){
+      this.cur = arg
+      return this.cur
+    }
+  },
+  computed:{
+    link:{
+      get (){
+       return this.cur
+      },
+      set (val){
+        this.cur = val
+        return this.cur
+      }
+    }
   }
 }
 </script>

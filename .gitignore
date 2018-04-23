@@ -14,4 +14,5 @@ yarn-error.log*
 *.sln
 element-ui.html
 element.vue
+lodash.html
 

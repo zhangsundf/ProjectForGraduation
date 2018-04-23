@@ -1,13 +1,13 @@
 <template>
   <div class = "AttendedInfo">
     <div class = "createTable" v-show = "!isshow">
-    <label for = "startDate">起始日期</label>
-    <input type = "date" id = "startDate" v-model = "start" :min="mindate" >
-    <label for = "endDate">结束日期</label>
-    <input type = "date" id = "endDate" v-model = "end" :min = "start">
-    <button @click = "createDate(start,end)">创建表格</button>
+      <label for = "startDate">起始日期</label>
+      <input type = "date" id = "startDate" v-model = "start" :min="mindate" >
+      <label for = "endDate">结束日期</label>
+      <input type = "date" id = "endDate" v-model = "end" :min = "start">
+      <button @click = "createDate(start,end)">创建表格</button>
     </div>
-    <div class = "shouAttended" v-show = "isshow">
+    <div class = "showAttended" v-show = "isshow">
         <table>
           <tr class = "tableHeader">
             <th> 序号</th>
@@ -17,8 +17,7 @@
             <th v-for = "n in diff_arr" class = "workdate">{{n}}</th>
           </tr>
           <tbody class = "tbody">
-            <tr v-for = "(item, index) in $store.state.studentinfo">
-
+            <tr v-for = "(item, index) in this.getStudentInfo">
               <td>{{index + 1}}</td>
               <td>{{item.studentId}}</td>
               <td>{{item.name}}</td>
@@ -31,7 +30,7 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 export default {
   name: 'AttendedInfo',
   data(){
@@ -44,6 +43,10 @@ export default {
       student:[],
       duration:'' //控制执行多少个td（工作日）
     }
+  },
+  computed: {
+    ...mapGetters(['getStudentInfo'])
+
   },
   mounted(){
     let date = new Date()
@@ -84,30 +87,40 @@ export default {
 }
 </script>
 <style scoped>
-.shouAttended{
-  position: relative;
-  width: 90%;
-  height: 90%;
-  margin: 0 auto;
-  border:2px solid sandybrown;
-}
-.tableHeader{
-  width: 100%;
-  height: 40px;
-  background-color: darkgray;
-}
-table{
-  width: 100%;
-}
-.workdate{
-  background-color: salmon;
-}
-.tbody{
-  width: 100%;
-  height: 500px;
-  overflow: hidden;
-  background-color: seagreen;
-}
+  .AttendedInfo{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+  }
+  .table{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    flex: 1;
+  }
+  .tableHeader{
+    position: relative;
+    width: 100%;
+    height: 40px;
+    text-align: center;
+    background-color: darkgray;
+    border-right: 1px solid wheat;
+    padding-left: 3%;
+  }
+
+ td{
+    text-align: center;
+    border: 1px solid gray;
+  }
+  .tbody{
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    /* background-color: seagreen; */
+  }
 </style>
 
 

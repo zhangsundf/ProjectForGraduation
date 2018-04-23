@@ -10,19 +10,19 @@
           </p>
           <span> {{username}}</span>
         </li>
-        <li class = "link"  @click = "showPanel('link1',1)">
+        <li class = "link"  @click = "showPanel('studentInfo',1)">
             <a id = "link1">学生信息</a>
         </li>
 
-        <li class = "link"  @click = "showPanel('link2',2)">
+        <li class = "link"  @click = "showPanel('attendedInfo',2)">
            <a id = "link2">考勤信息</a>
         </li>
 
-        <li class = "link" @click = "showPanel('link3',3)">
+        <li class = "link" @click = "showPanel('statistics',3)">
             <a id = "link3">成绩统计</a>
         </li>
 
-        <li class = "link"  @click = "showPanel('link4',4)">
+        <li class = "link"  @click = "showPanel('personalInfo',4)">
             <a id = "link4">个人中心</a>
         </li>
       </ul>
@@ -48,8 +48,8 @@ import axios from 'axios'
   },
   methods:{
     showPanel(val,index){
-        this.$store.commit("SETCURRENTPANEL",val)
         this.toggleClass("link",index,"is-active")
+        this.$emit("getCurrentLink",val)
     }
   }
 

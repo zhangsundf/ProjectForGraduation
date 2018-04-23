@@ -1,7 +1,6 @@
 <template>
   <div class = "Statistics">
     <div class = "setStandards">
-
         <label for = "attended">考勤</label>
         <input type = "text" v-model = "attended" id = "attended" placeholder="例：20"><span>%</span>
         <label for = "usualGrade">平时成绩</label>
@@ -13,12 +12,12 @@
         <label for = "betweenGroup">组间互评</label>
         <input type = "text" v-model = "betweenGroup" id = "betweenGroup" placeholder="例：20"><span>%</span>
         <button @click = "checkTotal">设置比重</button>
-
     </div>
 
     <div class = "showScore">
       <table>
         <tr class = "tableHeader">
+          <th>序号</th>
           <th>学号</th>
           <th>姓名</th>
           <th>班级</th>
@@ -30,7 +29,8 @@
           <th>总分</th>
         </tr>
         <tbody>
-          <tr v-for = "item in $store.state.studentinfo" class = "showItem">
+          <tr v-for = "(item,index) in studentInfo " class = "showItem">
+            <td>{{index + 1}}</td>
             <td>{{item.studentId}}</td>
             <td>{{item.name}}</td>
             <td>{{item.grade}}</td>
@@ -49,6 +49,7 @@
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: 'Statistics',
   data(){
@@ -61,9 +62,12 @@ export default {
     }
   },
   computed:{
+    ...mapGetters(['getStudentInfo']),
     total(){
       return Number(this.attended) + Number(this.usualGrade) + Number(this.documents) + Number(this.inGroup) + Number(this.betweenGroup)
-
+    },
+    studentInfo () {
+      return this.getStudentInfo
     }
   },
   methods:{
@@ -72,46 +76,52 @@ export default {
         alert("总分必须为100")
         return
       }
-      else{
-
-        return
-      }
     }
   }
 }
 </script>
 <style scoped>
+.Statistics {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
 .setStandards{
   position: relative;
   width: 100%;
-  height: 60px;
-  border:1px solid blue;
+  height: 8%;
   line-height: 60px;
+  border-bottom: 1px solid gray;
 }
 .showScore{
   position: relative;
   width: 90%;
-  height: 80%;
-  border:1px solid red;
+  height: 90%;
   top:30px;
   overflow: hidden;
   overflow-y: scroll;
+  margin: 0 auto;
 }
-.showScore table{
+table {
   position: absolute;
   width: 100%;
-  height: 40px;
+  height: 100%;
+  margin-bottom: 20px;
 }
-.tableHeader{
-  width: 100%;
+.tableHeader th{
+  position: relative;
+  /* width: 100%; */
   height: 40px;
   background-color: darkgray;
+  border-right: 1px solid white;
+}
+
+th, td {
+  text-align: center;
 }
 
 .showItem td{
-  border-bottom: 1px solid slategrey;
-  border-right: 1px solid slategrey;
-
+  border: 1px solid rgb(61, 74, 87);
 }
 
 </style>

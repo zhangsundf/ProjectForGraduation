@@ -12,6 +12,11 @@ const state = {
     currentPanel:'首页'
 }
 
+const getters = {
+    getStudentInfo: (state) => state.studentinfo
+
+}
+
 const mutations = {
   //登陆
     SETUSERNAME(state,param){
@@ -52,5 +57,6 @@ const mutations = {
 
 export default new Vuex.Store({
   state,
+  getters,
   mutations,
 })

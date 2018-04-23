@@ -1,6 +1,5 @@
 <template>
-  <div class = "StudentInfo">
-      <div class = "showinfo">
+  <div class = "studentinfo">
       <table>
         <tr class = "tableHeader">
             <th>序号</th>
@@ -22,8 +21,6 @@
         </tbody>
       </table>
       <h3>没有更多数据了</h3>
-      </div>
-
     </div>
 </template>
 
@@ -36,48 +33,44 @@ export default {
       studentList :[]
     }
   },
-  // mounted(){
-  //   axios.get('http://127.0.0.1:1230/all').then((val)=>{
-  //          this.$store.commit('SETSTUDENTINFO',val.data)
-  //          this.studentList = val.data;
-  //    })
-  //   },
+  mounted(){
+    axios.get('http://127.0.0.1:1230/all').then((val)=>{
+           this.$store.commit('SETSTUDENTINFO',val.data)
+           this.studentList = val.data;
+     })
+    },
 
 }
 </script>
-<style>
-.showinfo{
-  width: 90%;
-  height: 90%;
-  border: 2px solid black;
-  overflow: hidden;
-  display:flex;
-  overflow-y:scroll;
-  flex-direction: column;
-}
-table{
-  width: 100%;
-  overflow: hidden;
+<style scoped>
+  .studentinfo{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    overflow-y: scroll;
+  }
+  .tableHeader{
+    width: 100%;
+    height: 40px;
+    background-color: darkgray;
+    padding-left: 3%;
+  }
 
-}
-.tableHeader{
-  width: 100%;
-  height: 40px;
-  background-color: darkgray;
-}
+ td, th{
+    text-align: center;
+    border: 1px solid gray;
+  }
 
-.tbody{
-  width: 100%;
-  overflow: hidden;
-  overflow-y: scroll;
-}
- .bodyitem td{
+   table{
+    position: relative;
+    margin-top: 2%;
+    width: 90%;
+    /* height: 80%; */
+    margin: 0 auto;
 
-   height:30px;
-   border-bottom: 2px solid darkgray;
-   border-right: 2px solid darkgray;
-
-}
+  }
 
 </style>
 

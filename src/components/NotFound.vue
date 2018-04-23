@@ -1,8 +1,9 @@
 <template>
 <div class = "notfound">
-   <img src = '../assets/notfound.png'
+   <!-- <img src = '../assets/notfound.png'
         title = "图片没找到"
-        alt = "这是一个图片" @click="reload">
+        alt = "这是一个图片" @click="reload"> -->
+  <p class = "aaa">aaaa</p>
 </div>
 </template>
 <script>
@@ -18,11 +19,14 @@ export default {
         path: '/Home'
       })
   }
+ },
+ created(){
+   this.$emit("checkshow","asdf")
  }
 }
 </script>
 <style>
-  img{
+  /* img{
     max-width:100%;
             max-height:100%;
             position:absolute;
@@ -32,7 +36,7 @@ export default {
             -webkit-transform:translate3d(-50%,-50%,0);
             display: block;
 
-  }
+  } */
 
 </style>
 

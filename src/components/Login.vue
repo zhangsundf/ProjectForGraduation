@@ -1,5 +1,7 @@
 <template>
   <div class = "container is-centered">
+    <not-found v-if = "show" @checkshow = "checkshow "></not-found>
+      <not-found v-show = "show" @checkshow = "checkshow"></not-found>
     <div class = "media">
       <div class = "media-left">
         <p class = "img is-64x64">
@@ -7,14 +9,19 @@
         </p>
       </div>
       <div class = "media-content">
-        <div class = "notification container">"工程项目训练"教师端系统</div>
+        <div class = "notification container">
+          <!-- <p class = "img is-32x32 left">
+            <img src = '../assets/logo.png'>
+          </p> -->
+          <h4 class = "right">"工程项目训练"教师端系统</h4>
+          </div>
         <br/>
         <p v-show = "error">用户名或者密码不正确</p>
         <label for = "username">用户名</label>
         <input type = "text" id = "username" class = "inputText" v-model = "username"/>
         <br/>
         <br/>
-        <label for = "password">密码&nbsp;</label>
+        <label for = "password">密&nbsp;&nbsp;码&nbsp;</label>
         <input type = "password" id = "password" class = "inputText" v-model = "password"/><br/>
         <br/>
         <button class = "submit" value = "登录" @click = "login(username,password)">登录</button>
@@ -33,6 +40,7 @@
 
 <script>
 import axios from 'axios'
+import notFound from './NotFound'
 export default {
   name: 'Login',
   data () {
@@ -40,8 +48,13 @@ export default {
       username:'',
       password:'',
       error: false,
-      musics:''
+      musics:'',
+      title: false,
+      flag:false
     }
+  },
+  components:{
+    notFound
   },
   methods:{
 
@@ -54,10 +67,19 @@ export default {
             })
 
           this.$router.push('/Home')
+          this.flag = true
       }
       else{
         this.error = true
       }
+    },
+    checkshow(val){
+      return this.title = val ? true: false
+    }
+  },
+  computed:{
+    show(){
+      return this.title && this.flag
     }
   }
 }
@@ -74,6 +96,11 @@ export default {
    margin-top: -200px;
    margin-left: -200px;
 } */
+
+.right{
+  position: absolute;
+  float: right;
+}
 p{
   width:400px;
   height:50px;
@@ -91,6 +118,10 @@ label{
   border:2px solid gray;
 }
 button{
+  position: absolute;
+  display: block;
+  left: 40%;
+  top:100%;
   width: 50px;
   height: 30px;
    background-color: green;

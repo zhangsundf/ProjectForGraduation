@@ -13,7 +13,6 @@
                     <button class = "button" aria-haspopup="true" aria-controls="dropdown-menu">
                       <span>关于我们</span>
                       <span class = "icon is-small">
-                        <!-- <i class = "fas fas-angle-down" aria-hidden="true"></i> -->
                         <font-awesome-icon :icon = "['fas','angle-down']"/>
                       </span>
                     </button>
@@ -35,11 +34,11 @@
           </div>
       </header>
       <div class = "card-content">
-           <show-news id = "0"  v-if = "showPanel === 'link0' || show === 'link0'" class = "panel"></show-news>
-          <student-info id = "1"  v-if = "showPanel === 'link1' || show === 'link1'"  class = "panel"></student-info>
-          <attended-info id = "2"  v-if = "showPanel === 'link2'|| show === 'link2'"  class = "panel" ></attended-info>
-          <statistics id = "3" v-if = "showPanel === 'link3' || show === 'link3'" class = "panel" ></statistics>
-          <personal-info id = "4"  v-if = "showPanel === 'link4' ||show === 'link4'"  class = "panel"></personal-info>
+        <keep-alive>
+          <component :is = "curlink">
+
+          </component>
+        </keep-alive>
       </div>
       <footer class = "card-footer">
           <div class = "notification">
@@ -59,46 +58,19 @@ export default {
   name: "Main",
   data(){
     return {
-      panelState:{
-        link0 : true,
-        link1 : false,
-        link2 : false,
-        link3 : false,
-        link4 : false
-      },
-      currentTab:'',
-      tabsList:[],
-      defaultTabList:[
-         {
-            name:"link0",
-            tip:"首页",
-            show:true
-         },
-         {
-            name: "link1",
-            tip:"学生信息",
-            show:false
-         },
-         {
-            name:"link2",
-            tip:"考勤信息",
-            show:false
-         },
-         {
-            name:"link3",
-            tip:"成绩统计",
-            show:false
-         },
-         {
-            name:"link4",
-            tip:"个人中心",
-            show:false
-         }
-
-      ],
-
+     tabsList:{
+       "showNews": '首页'
+     }
     }
   },
+
+  props:{
+    curlink:{
+      type: String,
+      default: "showNews"
+    }
+  },
+
   components:{
     studentInfo,
     personalInfo,
@@ -107,64 +79,48 @@ export default {
     showNews
   },
   methods:{
-    TabshowPanel(){
-     //   this.toggleClass("headerTabs",index,"is-active")
-        var tabs = document.getElementsByClassName("headerTabs")
-        var panels = document.getElementsByClassName("panel")
-        for(var i = 0; i < tabs.length; i++){
-          tabs[i].index = i
-          tabs[i].onclick = function(){
-            for(var j = 0; j < tabs.length; j++){
-              tabs[j].classList.remove("is-active")
-              this.currentTab = ''
-            }
-            this.classList.add("is-active")
-            this.currentTab = 'link'+this.index
-         //   alert(this.currentTab +","+this.show)
-          }
-        }
-    },
-    checkTabsinHeader(item){
-      if(this.tabsList.indexOf(item) == -1){
-        this.tabsList.push(item)
-      }
-      return true
-    },
     handleClose(tag){
       this.tabsList.splice(this.tabsList.indexOf(tag),1)
     },
-    tabActive(){
-        var elTag = document.getElementsByClassName("el-tag")
-        alert(elTag.length)
-        for(var i = 0; i < elTag.length; i++){
-            elTag[i].index = i
-            elTag[i].onclick = function(){
-            elTag[i].classList.add("is-active")
+    tabInHeader(val){
+
+      let obj = Object.keys(this.tabsList)
+      console.log(",,,,"+obj)
+    //  obj.forEach( item =>{
+        //if(val !== item && !this.tabsList[val]){
+          switch (val){
+            case  'studentInfo':
+                  this.tabsList[val] = "学生信息"
+              break;
+            case  'personalInfo':
+                  this.tabsList[val] = "个人信息"
+              break;
+            case  'statistics':
+                  this.tabsList[val] = "成绩统计"
+              break;
+            case  'attendedInfo':
+                  this.tabsList[val] = "考勤信息"
+              break;
           }
-        }
+          // if(val === 'studentInfo')
+          //     this.tabsList[val] = "学生信息"
+        //}
+     //  })
+        console.log(Object.keys(this.tabsList).length)
+        console.log(Object.keys(this.tabsList))
+      return this.tabsList
       }
   },
   computed:{
-    currentLink(){
-       return this.$store.state.currentPanel
-    },
-    showPanel(){
-          this.checkTabsinHeader(this.currentLink)
-          return this.currentLink
-    },
-    show:{
-      get(){
-        return this.currentTab
-      },
-      set(v){
-        this.currentTab = v
-      //  alert("set show"+ this.currentTab)
-        return this.currentTab
-      }
-    }
+
   },
   mounted(){
-    this.tabActive()
+    //this.tabsList['showNews'] = "首页"
+     // "showNews": '首页'
+   //  this.tabInHeader(this.curlink)
+  },
+  beforeUpdate(){
+    this.tabInHeader(this.curlink)
   }
 
 }
@@ -182,11 +138,11 @@ export default {
   border-bottom: 6px solid rgb(22, 168, 132,0.6);
   height: 8%;
 }
-.tabs a{
-  display: inline-block;
-}
+
 .card-content{
+  position: relative;
   height: 88%;
+  overflow: hidden;
 }
 .card-footer{
   height: 4%;
@@ -196,16 +152,19 @@ export default {
   line-height: 4%;
 }
 .left{
-  position: absolute;
+  position: relative;
   float: left;
+  /* display: inline-block; */
   padding-left: 20%;
+  height: 100%;
+  overflow: hidden;
 }
 .el-tag{
   position: relative;
   width: 120px;
-  height: 50px;
+  height: 90%;
   line-height: 50px;
-  top:24px;
+  top:10px;
   background-color:white;
   font-weight: bold;
   font-style: italic;
@@ -220,22 +179,10 @@ export default {
   cursor: pointer;
   background-color: rgb(22, 168, 132,0.4);
 }
-.left ul li{
-  position: relative;
-  width: 110px;
-}
-.left ul li a{
-  width: 100%;
-}
-.left .tabs{
-  position: absolute;
-  display: inline-block;
-  bottom: 0px;
-  left: 100px;
-}
+
 .right{
   position: relative;
-  left:90%;
+  left:20%;
   top:30%;
 }
 .button.delete{
