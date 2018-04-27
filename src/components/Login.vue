@@ -1,7 +1,5 @@
 <template>
   <div class = "container is-centered">
-    <not-found v-if = "show" @checkshow = "checkshow "></not-found>
-      <not-found v-show = "show" @checkshow = "checkshow"></not-found>
     <div class = "media">
       <div class = "media-left">
         <p class = "img is-64x64">
@@ -26,14 +24,6 @@
         <br/>
         <button class = "submit" value = "登录" @click = "login(username,password)">登录</button>
      </div>
-     <ul v-for="music in musics">
-      <li>
-        {{ music.name }}
-      </li><br>
-      <li>
-        <img :src="music.album.picUrl" style="width:200px;">
-      </li>
-    </ul>
   </div>
   </div>
 </template>
@@ -45,57 +35,38 @@ export default {
   name: 'Login',
   data () {
     return {
-      username:'',
-      password:'',
-      error: false,
-      musics:'',
-      title: false,
-      flag:false
+      username: '',
+      password: '',
+      error: false
     }
   },
   components:{
     notFound
   },
   methods:{
-
     login(name,pass){
       sessionStorage.clear()
       if(name === "admin" && pass === "admin123"){
-          this.$store.commit('SETUSERNAME',{
-                'name':name,
-                'pass':pass
-            })
-
+          this.$store.dispatch('setLoginInfo', {
+            name: this.username,
+            pass: this.password,
+            login: true
+          })
           this.$router.push('/Home')
-          this.flag = true
       }
       else{
         this.error = true
       }
-    },
-    checkshow(val){
-      return this.title = val ? true: false
     }
   },
   computed:{
-    show(){
-      return this.title && this.flag
-    }
+
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* .media{
-   position: absolute;
-   width:400px;
-   height:400px;
-   left:50%;
-   top:50%;
-   margin-top: -200px;
-   margin-left: -200px;
-} */
 
 .right{
   position: absolute;

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import * as types from './mutation_types'
 
 Vue.use(Vuex)
 const state = {
@@ -8,55 +8,76 @@ const state = {
     pass: '',
     isLogin: false,
     studentinfo: [],
+    ManageClass: [],
     continueDate: [],
     currentPanel:'首页'
 }
 
 const getters = {
-    getStudentInfo: (state) => state.studentinfo
-
+    getUsername: (state) => state.user,
+    getStudentInfo: (state) => state.studentinfo,
+    getIsLogin: (state) => state.isLogin,
+    getManageClass: (state) => state.ManageClass,
+    getContainueDate: (state) => state.continueDate,
+    getIsLogin: (state) => state.isLogin
 }
 
 const mutations = {
   //登陆
-    SETUSERNAME(state,param){
+  [types.SET_USERNAME](state,param){
       sessionStorage.setItem('username',param.name)
       sessionStorage.setItem('username',param.pass)
       sessionStorage.setItem('isLogin', true)
       state.user = param.name
       state.pass = param.pass
-      state.isLogin = true
+      state.isLogin = param.login
    },
    //退出
-    QUITLOGIN(state){
+  [types.QUIT_LOGIN](state){
       sessionStorage.clear()
   },
   //存储学生的信息
-    SETSTUDENTINFO(state,param){
+   [types.SET_STUDENT_INFO](state,param){
      state.studentinfo = param
      sessionStorage.setItem('studentinfo',state.studentinfo)
    },
    //存储实习的天数
-    SETCONTINUEDATE(state,param){
+    [types.SET_CONTINUE_DATE](state,param){
      state.continueDate = param
      sessionStorage.setItem('continunedate',param)
    },
-
-   SETCURRENTPANEL(state,param){
+   [types.SET_MANGECLASS] (state,param ){
+      state.ManageClass = param
+   },
+   [types.SET_CURRENT_PANEL](state,param){
      state.currentPanel = param
      sessionStorage.setItem("currentPanel",param)
-   },
-   //一个存储左侧点击了什么的数组，在右侧card头部显示
-  //  SETTABLIST(state, param){
-  //    if (state.tabList.indexOf(param) == -1){
-  //         state.tabList.push(param)
-  //         sessionStorage.setItem("tabList",state.tabList)
-  //    }
-  //  }
+   }
+}
+
+const actions = {
+    setLoginInfo ({commit},param) {
+      return commit (types.SET_USERNAME,param)
+    },
+    haveComplateInfo ({getters}) {
+      let isLogin = this.getters.getIsLogin
+      let containeDate = this.getters.getContainueDate.length
+      let ManageClass = this.getters.getManageClass.length
+      console.log(isLogin + ',' + !!containeDate +','+ !!ManageClass)
+      if  (isLogin && !!containeDate && !!ManageClass) {
+         return true
+      }
+      return false
+    },
+    complateInfo ({commit},{arg1,arg2}){
+        commit (types.SET_CONTINUE_DATE, arg1)
+        commit (type.s)
+    }
 }
 
 export default new Vuex.Store({
   state,
   getters,
   mutations,
+  actions
 })
