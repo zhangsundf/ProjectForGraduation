@@ -1,7 +1,7 @@
 <template>
   <div class = "studentinfo">
-    <virtual-list :itemHeight = "itemHeight" ref = "list">
-      <table>
+    <!-- <virtual-list :itemHeight = "itemHeight" ref = "list"> -->
+      <!-- <table>
         <tr class = "tableHeader">
             <th>序号</th>
             <th>学号</th>
@@ -20,24 +20,40 @@
           <td>{{item.tel}}</td>
         </tr>
         </tbody>
-      </table>
-    </virtual-list>
+      </table> -->
+      {{studentListLength}}
+      <div class = "content" :style= "testObj">
+        <div v-for = "(item,index) in studentList">
+          <p class = "item" >{{index+1}}</p>
+          <p class = "item" >{{item.studentId}}</p>
+          <p class = "item" >{{item.name}}</p>
+          <p class = "item" >{{item.sex}}</p>
+          <p class = "item" >{{item.grade}}</p>
+          <p class = "item" >{{item.tel}}</p>
+        </div>
+      </div>
+    <!-- </virtual-list> -->
       <h3>没有更多数据了</h3>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
-import VirtualList from '../../common/VirtualList'
+// import VirtualList from '../../common/VirtualList'
 export default {
   name:'StudentInfo',
   data(){
     return {
-      studentList :[],
       itemHeight: 44,
-      scheduledAnimationFrame: false
+      scheduledAnimationFrame: false,
+      testObj : {
+          gridTemplateRows:repeat(this.studentList,1+'fr')
+      }
     }
   },
+  // components : {
+  //   VirtualList
+  // },
   mounted(){
     let tbody = document.getElementById("tbody")
     if (tbody && tbody.children[0]) {
@@ -51,12 +67,13 @@ export default {
         this.handleScroll,
         false)
     }
+    this.getInfo()
 
-
-    axios.get('http://127.0.0.1:1230/all').then((val)=>{
-           this.$store.commit('SETSTUDENTINFO',val.data)
-           this.studentList = val.data;
-     })
+    },
+    computed : {
+      studentList () {
+        return this.getInfo().length
+      }
     },
 
     methods :{
@@ -70,6 +87,12 @@ export default {
            //接下来可以写一些滚动时要做或者不做的事情逻辑
          })
        }
+    },
+    getInfo () {
+      axios.get('http://127.0.0.1:1230/all').then((val)=>{
+           this.$store.commit('SETSTUDENTINFO',val.data)
+          return val.data
+     })
     },
     beforeDestroy () {
       const list = this.$refs.list
@@ -89,6 +112,22 @@ export default {
     margin: 0 auto;
     overflow: hidden;
     overflow-y: scroll;
+  }
+  .content {
+    display:grid;
+    grid-template-columns: repeat(6,1fr)
+  }
+  .item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #fff;
+    border-radius: .2rem;
+    font-size: .8em;
+    min-height: 3rem;
+    padding: .75rem;
+    color: #f0f0f3;
+    background-color: #e91e63;
   }
   .tableHeader{
     width: 100%;

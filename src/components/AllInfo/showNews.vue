@@ -2,7 +2,7 @@
 <template>
   <div>
     <p>this is shownews page</p>
-     <cover-layout v-if = "!hasAllInfo" :message = "!hasAllInfo"></cover-layout>
+     <!-- <cover-layout v-if = "hasAllInfo" ></cover-layout> -->
   </div>
 
 </template>
@@ -18,8 +18,7 @@ export default {
   },
   computed: {
     hasAllInfo () {
-      console.log(this.$store.dispatch('haveComplateInfo'))
-       this.$store.dispatch('haveComplateInfo')
+      return this.$store.dispatch('haveComplateInfo')
     }
   },
   created () {

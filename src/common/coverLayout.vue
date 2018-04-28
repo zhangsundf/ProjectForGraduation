@@ -2,34 +2,31 @@
 
   <div class = "coverLayout">
     <div class = "content">
-        <el-contanier>
+        <el-container>
           <el-header>
-            <span> 请设置基本信息</span>
+            <p> 设置信息</p>
           </el-header>
           <el-main>
             <div class = "block">
-              <p>选择班级</p>
-                <ul class = "parent">
-                  <li v-for="(grade,index) in grade" @click = "toggleClasses(index)">
-                      <p>{{grade.grades}}<i class = "el-icon-arrow-down el-icon-right arrow"></i></p>
-                      <div class = "children">
-                      <el-checkbox-group v-model = "checkList"  v-for="classes in grade.classes" style="dispaly:none">
+              <p class = "notification">选择班级</p>
+              <el-collapse>
+                <el-collapse-item v-for = "(grade,index) in grade" :title=grade.grades>
+                    <el-checkbox-group v-model = "checkList"  v-for="classes in grade.classes">
                         <el-checkbox :label = classes>{{classes}}</el-checkbox>
-                      </el-checkbox-group>
-                      </div>
-                    </li>
-                </ul>
+                    </el-checkbox-group>
+                </el-collapse-item>
+              </el-collapse>
             </div>
             <div class = "block">
-              <p>选择实习天数</p>
+              <p class = "notification">选择实习天数</p>
                   <label for = "startDate">起始日期:</label>
                   <input type = "date" id = "startDate" v-model = "start" :min="mindate" >
                   <label for = "endDate">结束日期:</label>
                   <input type = "date" id = "endDate" v-model = "end" :min = "start">
             </div>
-            <el-button type = "primary" plain @click.once = "create(start,end)">确认创建</el-button>
+            <el-button type = "primary" plain @click = "create(start,end)">确认创建</el-button>
           </el-main>
-        </el-contanier>
+        </el-container>
 
     </div>
 
@@ -69,10 +66,6 @@ export default {
     }
   },
   props: {
-    message: {
-      default: false,
-      required: true
-    }
   },
   methods: {
     initDate () {
@@ -85,26 +78,6 @@ export default {
       this.mindate = year+'-'+month+'-'+day
       this.start = this.mindate
     },
-    toggleClasses (index) {
-      let children = document.getElementsByClassName('children')
-      let arrow = document.getElementsByClassName('arrow')
-      console.log(children.length)
-      for (let i = 0; i <children.length; i ++){
-        if(index === i){
-          if(children[i].style.display === "none")  {
-            children[i].style.display = "block"
-            arrow[i].classList.remove("el-icon-arrow-down")
-            arrow[i].classList.add("el-icon-arrow-up")
-          }
-          else{
-            arrow[i].classList.remove("el-icon-arrow-up")
-            arrow[i].classList.add("el-icon-arrow-down")
-            children[i].style.display = "none"
-          }
-        }
-      }
-
-    },
     create(start,end) {
       var startdate = new Date(start),
           enddate = new Date(end),
@@ -115,13 +88,13 @@ export default {
             alert("结束日期不能等于开始日期")
             return
           }
-
           else{
             for(var i = 0; i < timeDiff; i += 86400000){
               var ds = new Date(start_time + i)
               this.diff_arr.push((ds.getMonth() + 1)+'-'+ ds.getDate())
+              console.log(this.diff_arr)
             }
-             console.log(this.$store.state.ManageClass +":"+ this.$store.state.continueDate)
+          //  console1.log(this.diff_arr + ",/:"+this.checkList)
             this.$store.dispatch('complateInfo',this.diff_arr,this.checkList)
           }
        return
@@ -151,24 +124,39 @@ export default {
 
   .content {
     position: relative;
-    width:50%;
-    height: 70%;
+    width:36%;
+    height: 55%;
     margin: auto;
-    border:1px solid red;
+  }
+  .el-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .el-collapse {
+    position: relative;
+    width: 70%;
+    margin: 0 auto;
   }
 
+  .is-active {
+    background-color: rgb(245, 245, 245);
+  }
   .el-header {
     position: relative;
     width: 100%;
     height: 8%;
-    background-color: cadetblue;
+    background-color: rgba(17, 20, 20, 0.6);
+    color: white;
+    font-size: 1.5rem;
+    padding-top:0.5rem;
   }
 
   .el-main {
     position: relative;
     width: 100%;
     height: 92%;
-    background-color:honeydew;
+    background-color: white
   }
 
   ul,li {

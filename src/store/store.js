@@ -63,7 +63,6 @@ const actions = {
       let isLogin = this.getters.getIsLogin
       let containeDate = this.getters.getContainueDate.length
       let ManageClass = this.getters.getManageClass.length
-      console.log(isLogin + ',' + !!containeDate +','+ !!ManageClass)
       if  (isLogin && !!containeDate && !!ManageClass) {
          return true
       }
@@ -71,7 +70,7 @@ const actions = {
     },
     complateInfo ({commit},{arg1,arg2}){
         commit (types.SET_CONTINUE_DATE, arg1)
-        commit (type.s)
+        commit (type.SET_MANGECLASS,arg2)
     }
 }
 
