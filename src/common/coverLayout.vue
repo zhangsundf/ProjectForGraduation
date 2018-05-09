@@ -10,21 +10,23 @@
             <div class = "block">
               <p class = "notification">选择班级</p>
               <el-collapse>
-                <el-collapse-item v-for = "(grade,index) in grade" :title=grade.grades>
-                    <el-checkbox-group v-model = "checkList"  v-for="classes in grade.classes">
+                <el-collapse-item v-for = "(grade,index) in grade" :title=grade.grades :key = "index">
+                    <el-checkbox-group v-model = "checkList"  v-for="(classes,index) in grade.classes" :key = "index">
                         <el-checkbox :label = classes>{{classes}}</el-checkbox>
                     </el-checkbox-group>
                 </el-collapse-item>
               </el-collapse>
             </div>
             <div class = "block">
-              <p class = "notification">选择实习天数</p>
+              <p class = "notification">选择课设天数</p>
                   <label for = "startDate">起始日期:</label>
                   <input type = "date" id = "startDate" v-model = "start" :min="mindate" >
+                  <br/>
+                  <br/>
                   <label for = "endDate">结束日期:</label>
                   <input type = "date" id = "endDate" v-model = "end" :min = "start">
             </div>
-            <el-button type = "primary" plain @click = "create(start,end)">确认创建</el-button>
+            <button @click = "create(start,end)">确认创建</button>
           </el-main>
         </el-container>
 
@@ -34,6 +36,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: 'coverLayout',
   data () {
@@ -89,16 +92,26 @@ export default {
             return
           }
           else{
+            let obj = {}
+            if (this.checkList.length === 0) {
+              alert("还未选择班级")
+              return
+            }
             for(var i = 0; i < timeDiff; i += 86400000){
               var ds = new Date(start_time + i)
               this.diff_arr.push((ds.getMonth() + 1)+'-'+ ds.getDate())
-              console.log(this.diff_arr)
             }
-          //  console1.log(this.diff_arr + ",/:"+this.checkList)
-            this.$store.dispatch('complateInfo',this.diff_arr,this.checkList)
+            obj.containueDate = this.diff_arr
+            obj.checkList = this.checkList
+            this.$store.dispatch('complateInfo',obj)
+            this.$emit ("finish",true)
+            return 
           }
-       return
+        this.$emit ("finish",false)
     }
+  },
+  computed: {
+    ...mapGetters(["getManageClass","getContainueDate"])
   },
   mounted () {
     this.initDate()
@@ -125,7 +138,7 @@ export default {
   .content {
     position: relative;
     width:36%;
-    height: 55%;
+    height: 70%;
     margin: auto;
   }
   .el-container {
@@ -146,7 +159,7 @@ export default {
     position: relative;
     width: 100%;
     height: 8%;
-    background-color: rgba(17, 20, 20, 0.6);
+    background-color: rgba(17, 20, 20, 0.8);
     color: white;
     font-size: 1.5rem;
     padding-top:0.5rem;

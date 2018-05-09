@@ -7,6 +7,9 @@ import StudentInfo from '@/components/AllInfo/StudentInfo'
 import AttendedInfo from '@/components/AllInfo/AttendedInfo'
 import Statistics from '@/components/AllInfo/Statistics'
 import PersonalInfo from '@/components/AllInfo/PersonalInfo'
+import createGrade from '@/components/AllInfo/createGrade'
+import myCreateGrade from '@/components/AllInfo/myCreateGrade'
+import changePass from '@/components/AllInfo/changePass'
 
 Vue.use(Router)
 
@@ -24,27 +27,21 @@ export default new Router({
       component: Home,
       children:[
         {
-          path:'StudentInfo',
-          name:'StudentInfo',
-          component : StudentInfo
-
-         },
-        {
-          path: 'AttendedInfo',
-          name: 'AttendedInfo',
-          component: AttendedInfo
-
+          path: 'createGrade',
+          name: "CreateGrade",
+          component: createGrade
         },
         {
-          path: 'Statistics',
-          name: 'Statistics',
-          component: Statistics
+          path: 'myCreateGrade',
+          name: "myCreateGrade",
+          component: myCreateGrade
         },
         {
-          path: 'PersonalInfo',
-          name: 'PersonalInfo',
-          component: PersonalInfo
+          path: 'changePass',
+          name: "changePass",
+          component: changePass
         },
+        
         {
           path: '*',
           name: 'NotFound',

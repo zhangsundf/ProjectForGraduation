@@ -12,7 +12,7 @@ export default {
   name:'Home',
   data(){
     return {
-      cur: 'showNews'
+      cur: 'studentInfo'
     }
   },
   components:{
@@ -23,6 +23,10 @@ export default {
     getCurrentLink (arg){
       this.cur = arg
       return this.cur
+    },
+    changeCurlink (val) {
+       this.link = val
+       return this.link
     }
   },
   computed:{
@@ -38,12 +42,12 @@ export default {
   }
 }
 </script>
-<style >
+<style scoped>
 .home{
  position: relative;
  height: 100%;
  width: 100%;
- flex-direction: column;
+ flex-direction: row;
  overflow: hidden;
  display: flex;
 }

@@ -1,37 +1,84 @@
 <template>
+
   <div class = "studentinfo">
-    <!-- <virtual-list :itemHeight = "itemHeight" ref = "list"> -->
-      <!-- <table>
-        <tr class = "tableHeader">
-            <th>序号</th>
-            <th>学号</th>
-            <th>姓名</th>
-            <th>性别</th>
-            <th>班级</th>
-            <th>联系电话</th>
-        </tr>
-        <tbody id = "tbody">
-        <tr v-for = "(item,index) in studentList" class = "bodyitem">
-          <td>{{index+1}}</td>
-          <td>{{item.studentId}}</td>
-          <td>{{item.name}}</td>
-          <td>{{item.sex}}</td>
-          <td>{{item.grade}}</td>
-          <td>{{item.tel}}</td>
-        </tr>
-        </tbody>
-      </table> -->
-      {{studentListLength}}
-      <div class = "content" :style= "testObj">
-        <div v-for = "(item,index) in studentList">
-          <p class = "item" >{{index+1}}</p>
-          <p class = "item" >{{item.studentId}}</p>
-          <p class = "item" >{{item.name}}</p>
-          <p class = "item" >{{item.sex}}</p>
-          <p class = "item" >{{item.grade}}</p>
-          <p class = "item" >{{item.tel}}</p>
-        </div>
-      </div>
+    <el-table
+    :data="result"
+    style="width: 100%"
+    border
+    stripe
+    height="100%">
+    <el-table-column
+      label="学号"
+      width="100">
+      <template slot-scope="scope">
+        <span v-if = "!scope.row.editFlag" style="margin-left: 10px">{{scope.row.StudentId}}</span>
+        <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.StudentId" placeholder="请输入内容"></el-input></span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="姓名"
+      width="100">
+      <template slot-scope="scope">
+          <span v-if = "!scope.row.editFlag">{{ scope.row.username }}</span>
+          <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.username" placeholder="请输入内容"></el-input></span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="性别"
+      width="50">
+      <template slot-scope="scope">
+            <span  v-if = "!scope.row.editFlag">{{ scope.row.sex }}</span>
+            <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.sex" placeholder="请输入内容"></el-input></span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="班级"
+      width="100">
+      <template slot-scope="scope">
+            <span v-if = "!scope.row.editFlag">{{ scope.row.grade }}</span>
+            <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.grade" placeholder="请输入内容"></el-input></span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="小组"
+      width="80">
+      <template slot-scope="scope">
+            <span v-if = "!scope.row.editFlag">{{ scope.row.group }}</span>
+            <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.group" placeholder="请输入内容"></el-input></span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="电话"
+      width="180">
+      <template slot-scope="scope">
+            <span  v-if = "!scope.row.editFlag">{{ scope.row.mobilePhoneNumber }}</span>
+            <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.mobilePhoneNumber" placeholder="请输入内容"></el-input></span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="邮箱"
+      width="180">
+      <template slot-scope="scope">
+            <span  v-if = "!scope.row.editFlag">{{ scope.row.email }}</span>
+             <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.email" placeholder="请输入内容"></el-input></span>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作" width="260">
+      <template slot-scope="scope">
+        <el-button
+          size="mini"
+          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+        <el-button
+          size="mini"
+          type="danger"
+         @click.native.prevent="deleteRow(scope.$index, result)">删除</el-button>
+        <el-button
+          size="mini"
+          type="success"
+          @click="complete(scope.$index, scope.row)">完成</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
     <!-- </virtual-list> -->
       <h3>没有更多数据了</h3>
     </div>
@@ -39,69 +86,62 @@
 
 <script>
 import axios from 'axios'
-// import VirtualList from '../../common/VirtualList'
+import { mapGetters,mapActions } from 'vuex'
+
 export default {
   name:'StudentInfo',
   data(){
     return {
-      itemHeight: 44,
-      scheduledAnimationFrame: false,
-      testObj : {
-          gridTemplateRows:repeat(this.studentList,1+'fr')
-      }
-    }
-  },
-  // components : {
-  //   VirtualList
-  // },
-  mounted(){
-    let tbody = document.getElementById("tbody")
-    if (tbody && tbody.children[0]) {
-        return this.itemHeight = tbody.children[0].clientHeight || 44
-    }
 
-    const list = this.$refs.list
-    if (list && list.$el) {
-      list.$el.addEventListener (
-        'scroll',
-        this.handleScroll,
-        false)
-    }
-    this.getInfo()
-
-    },
-    computed : {
-      studentList () {
-        return this.getInfo().length
       }
     },
-
-    methods :{
-       handleScroll () {
-         if (this.scheduledAnimationFrame) return
-
-         this.scheduledAnimationFrame = true
-         //requestAnimationFrame
-         window.requestAnimationFrame (timeStamp => {
-           this.scheduledAnimationFrame = false
-           //接下来可以写一些滚动时要做或者不做的事情逻辑
-         })
-       }
+    methods: {
+      handleEdit(index, row) {
+        row.editFlag = true
+      },
+      handleDelete(index, row) {
+        alert(index, row);
+      },
+      deleteRow(index, rows) {
+        rows.splice(index, 1);
+      },
+      complete (index,row) {
+        let StudentId = row.StudentId
+        let username = row.username
+        let sex = row.sex
+        let grade = row.grade
+        let group = row.group
+        let email = row.email
+        let tel = row.mobilePhoneNumber
+        // alert(StudentId)
+        // this.$store.dispatch ("changeInfo",{
+        //   id: StudentId,
+        //   username: username,
+        //   sex: sex,
+        //   grade: grade,
+        //   group: group,
+        //   email: email,
+        //   tel:tel,
+        //   row:row
+        // })
+        row.editFlag = false
+      }
     },
-    getInfo () {
-      axios.get('http://127.0.0.1:1230/all').then((val)=>{
-           this.$store.commit('SETSTUDENTINFO',val.data)
-          return val.data
-     })
+
+  computed: {
+    ...mapGetters(['getStudentInfo']),
+    studentList () {
+      return this.getStudentInfo
     },
-    beforeDestroy () {
-      const list = this.$refs.list
-      list.$el.removeEventListener (
-        'scroll',
-        this.handleScroll
-      )
+    result () {
+       let result = []
+        for (let i = 0; i < this.studentList.length; i++){
+          result[i] = this.studentList[i].attributes
+          this.$set(result[i],'editFlag',false)
+        }
+        return result
     }
-
+  }
 }
 </script>
 <style scoped>
@@ -111,44 +151,8 @@ export default {
     height: 100%;
     margin: 0 auto;
     overflow: hidden;
-    overflow-y: scroll;
-  }
-  .content {
-    display:grid;
-    grid-template-columns: repeat(6,1fr)
-  }
-  .item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #fff;
-    border-radius: .2rem;
-    font-size: .8em;
-    min-height: 3rem;
-    padding: .75rem;
-    color: #f0f0f3;
-    background-color: #e91e63;
-  }
-  .tableHeader{
-    width: 100%;
-    height: 40px;
-    background-color: darkgray;
-    padding-left: 3%;
-  }
-
- td, th{
-    text-align: center;
-    border: 1px solid gray;
-  }
-
-   table{
-    position: relative;
-    margin-top: 2%;
-    width: 90%;
-    /* height: 80%; */
-    margin: 0 auto;
-
-  }
+    /* overflow-y: scroll; */
+  } 
 
 </style>
 

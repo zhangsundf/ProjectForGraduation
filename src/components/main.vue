@@ -1,13 +1,8 @@
 <template>
   <div class = "card">
       <header class = "card-header">
-        <div class = "left">
-          <el-tag :key = "tag" v-for = "tag in tabsList" closable
-                  :disable-tansition = "false" @close = "handleClose(tag)">
-                  {{tag}}
-          </el-tag>
-        </div>
-        <div class = "right">
+        
+        <!-- <div class = "right">
               <div class = "dropdown is-hoverable">
                   <div class = "dropdown-trigger">
                     <button class = "button" aria-haspopup="true" aria-controls="dropdown-menu">
@@ -31,7 +26,7 @@
                     </div>
                   </div>
               </div>
-          </div>
+          </div> -->
       </header>
       <div class = "card-content">
         <keep-alive>
@@ -40,11 +35,6 @@
           </component>
         </keep-alive>
       </div>
-      <footer class = "card-footer">
-          <div class = "notification">
-            <p>©copyright &nbsp;&nbsp;2018; 西安邮电大学</p>
-          </div>
-      </footer>
 
   </div>
 </template>
@@ -53,13 +43,12 @@ import studentInfo from './AllInfo/StudentInfo'
 import personalInfo from './AllInfo/PersonalInfo'
 import statistics from './AllInfo/Statistics'
 import attendedInfo from './AllInfo/AttendedInfo'
-import showNews from './AllInfo/showNews'
 export default {
   name: "Main",
   data(){
     return {
      tabsList:{
-       "showNews": '首页'
+       "studentInfo": '学生信息'
      }
     }
   },
@@ -67,7 +56,7 @@ export default {
   props:{
     curlink:{
       type: String,
-      default: "showNews"
+      default: "studentInfo"
     }
   },
 
@@ -76,40 +65,31 @@ export default {
     personalInfo,
     statistics,
     attendedInfo,
-    showNews
+   // showNews
   },
   methods:{
     handleClose(tag){
       this.tabsList.splice(this.tabsList.indexOf(tag),1)
     },
-    tabInHeader(val){
-
-      let obj = Object.keys(this.tabsList)
-      console.log(",,,,"+obj)
-    //  obj.forEach( item =>{
-        //if(val !== item && !this.tabsList[val]){
-          switch (val){
-            case  'studentInfo':
-                  this.tabsList[val] = "学生信息"
+    togglePanel(val) {
+      let clickTab = ''
+        switch (val){
+            case  '学生信息':
+                clickTab = "studentInfo"
               break;
-            case  'personalInfo':
-                  this.tabsList[val] = "个人信息"
+            case  '个人信息':
+                 clickTab = "personalInfo"
               break;
-            case  'statistics':
-                  this.tabsList[val] = "成绩统计"
+            case  '成绩统计':
+                 clickTab = "statistics"
               break;
-            case  'attendedInfo':
-                  this.tabsList[val] = "考勤信息"
+            case  '考勤信息':
+                  clickTab = "attendedInfo"
               break;
           }
-          // if(val === 'studentInfo')
-          //     this.tabsList[val] = "学生信息"
-        //}
-     //  })
-        console.log(Object.keys(this.tabsList).length)
-        console.log(Object.keys(this.tabsList))
-      return this.tabsList
-      }
+          this.$emit("changeCurlink",clickTab)
+       this.curlink = clickTab 
+    }
   },
   computed:{
 
@@ -119,75 +99,40 @@ export default {
      // "showNews": '首页'
    //  this.tabInHeader(this.curlink)
   },
-  beforeUpdate(){
-    this.tabInHeader(this.curlink)
-  }
+  
 
 }
 </script>
 
-<style>
+<style scoped>
 .card{
-    position: absolute;
-    left: 12%;
-    top:0px;
-    width: 88%;
+    position: relative;
+    width: 80%;
     height: 100%;
+    flex:1;
+ 
 }
 .card-header{
-  border-bottom: 6px solid rgb(22, 168, 132,0.6);
-  height: 8%;
-}
-
-.card-content{
   position: relative;
-  height: 88%;
-  overflow: hidden;
-}
-.card-footer{
-  height: 4%;
-}
-.notification{
   width: 100%;
-  line-height: 4%;
-}
-.left{
-  position: relative;
-  float: left;
-  /* display: inline-block; */
-  padding-left: 20%;
-  height: 100%;
-  overflow: hidden;
-}
-.el-tag{
-  position: relative;
-  width: 120px;
-  height: 90%;
-  line-height: 50px;
-  top:10px;
-  background-color:white;
-  font-weight: bold;
-  font-style: italic;
-  font-size: 2vh;
-  color:black;
-}
-.is-active{
-  background-color:rgb(22, 168, 132,0.6);
-  color: white;
-}
-.el-tag:hover{
-  cursor: pointer;
-  background-color: rgb(22, 168, 132,0.4);
+  border-bottom: 6px solid rgb(22, 168, 132,0.6);
+  height: 10%;
 }
 
 .right{
   position: relative;
-  left:20%;
-  top:30%;
+  width:20%;
+  top:20px;
+  left:80%;
 }
-.button.delete{
-  width: 5px;
+
+.card-content{
+  position: relative;
+  height: 90%;
+  overflow: hidden;
+  background-color: rgb(243, 243, 243)
 }
+
 </style>
 
 

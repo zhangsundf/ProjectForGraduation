@@ -11,42 +11,22 @@
         <input type = "text" v-model = "inGroup" id = "inGroup" placeholder="例：20"><span>%</span>
         <label for = "betweenGroup">组间互评</label>
         <input type = "text" v-model = "betweenGroup" id = "betweenGroup" placeholder="例：20"><span>%</span>
-        <button @click = "checkTotal">设置比重</button>
+        <button @click = "checkTotal">设置</button>
     </div>
-
-    <div class = "showScore">
-      <table>
-        <tr class = "tableHeader">
-          <th>序号</th>
-          <th>学号</th>
-          <th>姓名</th>
-          <th>班级</th>
-          <th>考勤</th>
-          <th>平时成绩</th>
-          <th>文档</th>
-          <th>组内互评</th>
-          <th>组间互评</th>
-          <th>总分</th>
-        </tr>
-        <tbody>
-          <tr v-for = "(item,index) in studentInfo " class = "showItem">
-            <td>{{index + 1}}</td>
-            <td>{{item.studentId}}</td>
-            <td>{{item.name}}</td>
-            <td>{{item.grade}}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-          </tr>
-        </tbody>
-      </table>
+     <div class = "showScore" style="width:100%;">
+            <v-table
+                    is-horizontal-resize
+                    style="width:100%;"
+                    :columns="columns"
+                    :table-data="result"
+                    row-hover-color="#eee"
+                    row-click-color="#edf7ff"
+            ></v-table>
+        </div>
+        <div style="clear:both;"></div>
+        
+        <h3>没有更多数据了</h3>
     </div>
-
-  </div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
@@ -58,7 +38,17 @@ export default {
       usualGrade: 0,
       documents: 0,
       inGroup:0,
-      betweenGroup: 0
+      betweenGroup: 0,
+      columns:[
+        {field: 'StudentId', title: '学号', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
+        {field: 'username', title: '姓名', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
+        {field: 'group', title: '小组', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
+        {field: 'attend', title: '考勤', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
+        {field: 'usualGrade', title: '平时成绩', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
+        {field: 'ingroup', title: '组内互评', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
+        {field: 'betweenGroup', title: '组间互评', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
+        {field: 'sum', title: '合计', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true}
+      ]
     }
   },
   computed:{
@@ -68,6 +58,13 @@ export default {
     },
     studentInfo () {
       return this.getStudentInfo
+    },
+    result () {
+       let result = []
+        for (let i = 0; i < this.studentInfo.length; i++){
+          result[i] = this.studentInfo[i].attributes
+        }
+        return result
     }
   },
   methods:{
@@ -89,40 +86,32 @@ export default {
 .setStandards{
   position: relative;
   width: 100%;
-  height: 8%;
-  line-height: 60px;
-  border-bottom: 1px solid gray;
+  height: 6%; 
+  bottom:-10px;
+  display: flex;
 }
+input {
+  position: relative;
+  width: 10%;
+  height: 80%;
+  margin-left: 1%;
+}
+.setStandards span {
+  position: relative;
+  margin-right: 2%;
+}
+
 .showScore{
   position: relative;
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 88%;
   top:30px;
   overflow: hidden;
   overflow-y: scroll;
   margin: 0 auto;
 }
-table {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  margin-bottom: 20px;
-}
-.tableHeader th{
-  position: relative;
-  /* width: 100%; */
-  height: 40px;
-  background-color: darkgray;
-  border-right: 1px solid white;
-}
 
-th, td {
-  text-align: center;
-}
 
-.showItem td{
-  border: 1px solid rgb(61, 74, 87);
-}
 
 </style>
 
