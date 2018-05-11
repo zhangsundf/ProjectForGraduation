@@ -1,18 +1,54 @@
 <template>
   <div class = "AttendedInfo">
-        <div style="width:100%;">
-            <v-table
-                    is-horizontal-resize
-                    style="width:100%;"
-                    :columns="columns"
-                    :table-data="result"
-                    row-hover-color="#eee"
-                    row-click-color="#edf7ff"
-            ></v-table>
-        </div>
-        <div style="clear:both;"></div>
-        <h3>没有更多数据了</h3>
+    <div class = "header">
+      <span class= "showdate" v-for = "(item,index) in dateList" :key = "index"  @click = "changeDate(item,index)">{{item | fommat}}</span>
+      <br>
+      <div class = "showCurDate"><span class = "setcurDate"></span></div>
     </div>
+    
+    <el-table
+    :data="result"
+    style="width: 100%"
+    border
+    stripe
+     height="86%">
+    <el-table-column
+      label="学号"
+      min-width="200">
+      <template slot-scope="scope">
+        <span style="margin-left: 10px">{{scope.row.StudentId}}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="姓名"
+      min-width="200">
+      <template slot-scope="scope">
+          <span>{{ scope.row.username }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="班级"
+      min-width="100">
+      <template slot-scope="scope">
+            <span>{{ scope.row.grade }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="小组"
+      min-width="100">
+      <template slot-scope="scope">
+            <span>{{ scope.row.temname }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="是否签到"
+      min-width="200">
+      <template slot-scope="scope">
+            <span>{{ scope.row.isSignin }}</span>
+      </template>
+    </el-table-column>
+  </el-table>
+  </div>
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex'
@@ -20,41 +56,96 @@ export default {
   name: 'AttendedInfo',
   data(){
     return {
-      columns:[
-        {field: 'StudentId', title: '学号', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true},
-        {field: 'username', title: '姓名', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true},
-        {field: 'group', title: '小组', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true},
-        {field: 'grade', title: '班级', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true},
-        {field: 'attend', title: '考勤', width: 400, titleAlign: 'center', columnAlign: 'center',isResize:true},
-        {field: 'sum', title: '合计', width: 50, titleAlign: 'center', columnAlign: 'center',isResize:false}
-      ]
+      dateList:[],
     }
   },
   computed: {
-    ...mapGetters(['getStudentInfo']),
+    ...mapGetters(['getStudentInfo','getSigninList','getDate']),
     tableData () {
       return this.getStudentInfo
     },
     result () {
        let result = []
         for (let i = 0; i < this.tableData.length; i++){
-          result[i] = this.tableData[i].attributes
+          for (let j = 0; j < this.getSigninList.length; j++){
+            if(this.tableData[i].id === this.getSigninList[j].userID){
+                result.push(Object.assign({},this.getSigninList[j],this.tableData[i].attributes))
+                break
+            }
+          }
         }
         return result
     }
   },
+ beforeCreate() {
+    var now=new Date();
+    let getMonth = now.getMonth() + 1 < 10 ? '0'+(now.getMonth() + 1):now.getMonth() + 1
+    let getDate = now.getDate() < 10 ? '0' + now.getDate() : now.getDate() 
+    var curDate = now.getFullYear()+"-"+getMonth +"-"+getDate
 
+    this.$store.dispatch ("getIsSign",curDate)
+    this.$store.dispatch ("getDateArray")
+  },
+  methods: {
+    changeDate (item,index) {
+      let setcurDate = document.getElementsByClassName('setcurDate')[0]
+        this.$store.dispatch ("getIsSign",item)
+        setcurDate.innerHTML = item
+        this.toggleClass("showdate",index+1,"active")
+    }
+  },
+  mounted () {
+    // let lastIndex = document.getElementsByClassName('showdate')
+    // alert(lastIndex.length)
+    // lastIndex[lastIndex.length-1].style.cssText = 'color:red'
+    this.dateList = this.getDate
+    var now=new Date();
+    let getMonth = now.getMonth() + 1 < 10 ? '0'+(now.getMonth() + 1):now.getMonth() + 1
+    let getDate = now.getDate() < 10 ? '0' + now.getDate() : now.getDate() 
+    var curDate = now.getFullYear()+"-"+getMonth +"-"+getDate
+
+    let setcurDate = document.getElementsByClassName('setcurDate')[0]
+    setcurDate.innerHTML = curDate
+    
+  },
+  filters:{
+    fommat (val) {
+      return val.substring(5)
+    }
+  }
 }
 </script>
 <style scoped>
-  .AttendedInfo{
+  .header {
     position: relative;
     width: 100%;
-    height: 100%;
+    height: 12%;
+    font-size:12px;
+    color: grey;
+    font-weight: bold;
     margin: 0 auto;
-    overflow: hidden;
-    overflow-y: scroll;
+    text-align: center;
   }
+  .showdate {
+    position: relative;
+    margin: 10px;
+    font-size: 16px;
+  }
+  .showdate:hover{
+    cursor: pointer;
+    color:blue;
+  }
+  header .showdate:first-child{
+    color: red;
+  }
+  .previous, .next{
+    display: inline-block;
+    
+  }
+  .active {
+    color: red;
+  }
+
 </style>
 
 

@@ -17,15 +17,9 @@ import regular from '@fortawesome/fontawesome-free-regular'
 import brands from '@fortawesome/fontawesome-free-brands'
 import VueResource from 'vue-resource'
 import qs from 'qs'
-import {post,get,crossOrigin} from './util/http'
 import toggleClass from './util/getSibling'
-import 'vue-easytable/libs/themes-base/index.css'
-// 导入 table 和 分页组件
-import {VTable,VPagination} from 'vue-easytable'
+import echarts from 'echarts'
 
-// 注册到全局
-Vue.component(VTable.name, VTable)
-Vue.component(VPagination.name, VPagination)
 
 fontawesome.library.add(solid)
 fontawesome.library.add(regular)
@@ -41,20 +35,26 @@ Vue.use(bulma)
 Vue.use(VueResource)
 Vue.use(qs)
 Vue.use(toggleClass)
-//Vue.use(axios)
 Vue.config.productionTip = false
+Vue.prototype.$echarts = echarts 
 
-Vue.prototype.$post = post
-Vue.prototype.$get = get
-Vue.prototype.$crossOrigin = crossOrigin
-var bus = new Vue()
-/* eslint-disable no-new */
+router.beforeEach((to,from,next) => {   
+    if(to.matched.some( m => m.meta.auth)){     
+    
+        if(store.state.isLogin===true) {        
+          next()     
+        }else{       
+        　 next({path:'/',query:{ Rurl: to.fullPath} })
+        } 
+    }else{ 
+    　　next() 
+    } 
+    })
 new Vue({
   el: '#app',
   router,
    store,
    plugin,
-   bus,
   components: { App },
   template: '<App/>'
 })

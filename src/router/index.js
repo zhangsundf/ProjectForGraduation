@@ -10,7 +10,7 @@ import PersonalInfo from '@/components/AllInfo/PersonalInfo'
 import createGrade from '@/components/AllInfo/createGrade'
 import myCreateGrade from '@/components/AllInfo/myCreateGrade'
 import changePass from '@/components/AllInfo/changePass'
-
+import StudentActivities from '@/components/AllInfo/StudentActivities'
 Vue.use(Router)
 
 export default new Router({
@@ -19,29 +19,56 @@ export default new Router({
       path: '/',
       name: 'Login',
       component: Login
-
     },
     {
       path: '/Home',
       name: 'Home',
       component: Home,
+      meta:{auth:true},
       children:[
         {
-          path: 'createGrade',
-          name: "CreateGrade",
-          component: createGrade
+          path: 'StudentInfo',
+          name: "StudentInfo",
+          component: StudentInfo
         },
         {
-          path: 'myCreateGrade',
-          name: "myCreateGrade",
-          component: myCreateGrade
+          path: 'PersonalInfo',
+          name: "PersonalInfo",
+          component: PersonalInfo,
+          children: [
+            {
+              path: 'createGrade',
+              name: "CreateGrade",
+              component: createGrade
+            },
+            {
+              path: 'myCreateGrade',
+              name: "myCreateGrade",
+              component: myCreateGrade
+            },
+            {
+              path: 'changePass',
+              name: "changePass",
+              component: changePass
+            },
+            
+          ]
         },
         {
-          path: 'changePass',
-          name: "changePass",
-          component: changePass
+          path: 'AttendedInfo',
+          name: "AttendedInfo",
+          component: AttendedInfo
         },
-        
+        {
+          path: 'StudentActivities',
+          name: "StudentActivities",
+          component: StudentActivities
+        },
+        {
+          path: 'Statistics',
+          name: "Statistics",
+          component: Statistics
+        },
         {
           path: '*',
           name: 'NotFound',

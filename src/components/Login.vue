@@ -1,20 +1,56 @@
 <template>
   <div class = "container is-centered">
-   
       <div class = "loginPanel">
         <div class = "notification header">
           <h4 class = "headerText">"工程项目训练"教师端系统</h4>
+          <!-- <img src = "../assets/logo-text.png"> -->
         </div>
         <br/>
-        <p class = "error" v-show = "error">用户名或者密码不正确</p>
-        <label for = "username">用户名</label>
-        <input type = "text" id = "username" class = "inputText" v-model = "username"/>
-        <br/>
-        <br/>
-        <label for = "password">密&nbsp;&nbsp;码&nbsp;</label>
-        <input type = "password" id = "password" class = "inputText" v-model = "password"/><br/>
-        <br/>
-        <button class = "submit" value = "登录" @click = "login(username,password)">登录</button>
+            <a class = "is-centered button is-danger is-outlined error" v-show = "error" disabled>用户名或者密码不正确</a>
+      
+        <div class = "panel">
+          <div class = "loginMethods">
+            <ul>
+              <li :class = "{active: tab === 1}"  @click = "changeLoginMethods(1)">账户密码登录</li>
+              <li :class = "{active: tab === 2}"  @click = "changeLoginMethods(2)">手机号登录</li>
+            </ul>
+         </div>
+          <div class = "login login1" v-if = "tab === 1">
+            <div class="field">
+              <div class="control has-icons-left">
+                <input class="input is-primary" type="text" placeholder="Primary input" v-model = "username">
+               <span class=" icon is-left">
+                 <span style = "font-size:14px;">账号</span>
+               </span>
+              </div>
+            </div>
+            <div class="field">
+              <div class="control has-icons-left">
+                <input class="input is-info" type="password" placeholder="Info input" v-model = "password">
+                <span class=" icon is-left">
+                  <span style = "font-size:14px;">密码</span>
+                </span>
+              </div>
+            </div>
+            <div class="field">
+              <div class="control">
+                <a class="button is-primary loginBtn" @click="login(username,password)">登录</a>
+              </div>
+            </div>
+          </div>
+         <div class = "login login2" v-if = "tab === 2">
+            <div class="field">
+              <div class="control">
+                <input class="input is-primary" type="text" placeholder="请输入手机号" v-model = "username">
+              </div>
+            </div>
+            <div class="field getMessage">
+              <div class="control">
+                <a class="button is-primary loginBtn" @click="login(username,password)">获取验证码</a>
+              </div>
+            </div>
+          </div>
+        </div>
      </div>
      <div class = "signup">
         <el-button type="text" @click="dialogVisible = true">忘记密码?</el-button>
@@ -61,7 +97,8 @@ export default {
       username: '',
       password: '',
       error: false,
-      dialogVisible: false
+      dialogVisible: false,
+      tab:1
     }
   },
   computed: {
@@ -76,17 +113,14 @@ export default {
             name: this.username,
             pass: this.password,
             login: true
-        })
-          if(this.getIsLogin) {
+        }).then (() => {
+            alert("this.getLogin is true")
             this.$store.dispatch("getUser")
-            this.$router.push('/Home')
-          }
-          else {
-          // alert("用户名或者密码错误")
-            this.error = true
-            return
-          }
-       
+            this.$router.push({path:'/Home/StudentInfo'})
+
+        }).catch(() => {
+          this.error = true
+        })   
     },
     handleClose(done) {
         this.$confirm('确认关闭？')
@@ -104,9 +138,12 @@ export default {
           name:name,
           tel:tel,
           email:email,
-          pass:pass
+          pass:pass,
+          isteacher:true
       })
-
+    },
+    changeLoginMethods(index) {
+      this.tab = index
     }
   }
 }
@@ -116,24 +153,33 @@ export default {
 <style scoped>
   .container {
     position: relative;
-    width: 40%;
-    height:60%;
-    box-shadow: 5px 5px 5px 5px  gray;
-    overflow: hidden;
+    width: 30%;
+    height:50%;
     top:20%;
+  }
+  .notification {
+    background-color: white;
+    margin: 0px;
   }
   .error {
     position: relative;
-    width: 100%;
-    height: 40px;
-    color: red;
-    font-size: 16px;
-    font-family:fantasy;
-    font-weight: bold;
+    width: 84%;
+    height: 30px;
+    margin-top: -20px;
+    font-size:14px;
+    margin: 0 auto;
+  }
+  .error:hover {
+    cursor: pointer;
   }
   .headerText {
     color: gray;
     font-weight: bold;
+    font-size: 26px;
+    font-family:cursive;
+  }
+  .field{
+    width: 90%;
   }
    .content {
     position: relative;
@@ -156,5 +202,27 @@ export default {
     border-radius: 5px ;
     border: 1px solid #DBDBDB;
   }
-
+  ul li {
+    position: relative;
+    display: inline-block;
+    margin: 10px;
+  }
+  .active {
+    color: rgb(33, 202, 194);
+    border-bottom: 3px solid rgb(33, 202, 194)
+      }
+.login {
+  margin: 20px;
+}
+.loginBtn {
+  position: relative;
+  width: 100%;
+  margin-top: 20px;
+}
+.el-button {
+  margin-right:30px;
+}
+.getMessage {
+  margin-top:50px;
+}
 </style>

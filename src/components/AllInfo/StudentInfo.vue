@@ -6,34 +6,31 @@
     style="width: 100%"
     border
     stripe
-    height="100%">
+     height="100%">
     <el-table-column
       label="学号"
-      width="100">
+      min-width="100">
       <template slot-scope="scope">
-        <span v-if = "!scope.row.editFlag" style="margin-left: 10px">{{scope.row.StudentId}}</span>
-        <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.StudentId" placeholder="请输入内容"></el-input></span>
+        <span style="margin-left: 10px">{{scope.row.StudentId}}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="姓名"
-      width="100">
+      min-width="100">
       <template slot-scope="scope">
-          <span v-if = "!scope.row.editFlag">{{ scope.row.username }}</span>
-          <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.username" placeholder="请输入内容"></el-input></span>
+          <span>{{ scope.row.username }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="性别"
-      width="50">
+      min-width="50">
       <template slot-scope="scope">
-            <span  v-if = "!scope.row.editFlag">{{ scope.row.sex }}</span>
-            <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.sex" placeholder="请输入内容"></el-input></span>
+            <span>{{ scope.row.sex }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="班级"
-      width="100">
+      min-width="100">
       <template slot-scope="scope">
             <span v-if = "!scope.row.editFlag">{{ scope.row.grade }}</span>
             <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.grade" placeholder="请输入内容"></el-input></span>
@@ -41,29 +38,27 @@
     </el-table-column>
     <el-table-column
       label="小组"
-      width="80">
+      min-width="80">
       <template slot-scope="scope">
-            <span v-if = "!scope.row.editFlag">{{ scope.row.group }}</span>
+            <span v-if = "!scope.row.editFlag">{{ scope.row.teamname }}</span>
             <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.group" placeholder="请输入内容"></el-input></span>
       </template>
     </el-table-column>
     <el-table-column
       label="电话"
-      width="180">
+      min-width="180">
       <template slot-scope="scope">
-            <span  v-if = "!scope.row.editFlag">{{ scope.row.mobilePhoneNumber }}</span>
-            <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.mobilePhoneNumber" placeholder="请输入内容"></el-input></span>
+            <span>{{ scope.row.mobilePhoneNumber }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="邮箱"
-      width="180">
+      min-width="180">
       <template slot-scope="scope">
-            <span  v-if = "!scope.row.editFlag">{{ scope.row.email }}</span>
-             <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.email" placeholder="请输入内容"></el-input></span>
+            <span>{{ scope.row.email }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="操作" width="260">
+    <el-table-column label="操作" min-width="250">
       <template slot-scope="scope">
         <el-button
           size="mini"
@@ -80,7 +75,6 @@
     </el-table-column>
   </el-table>
     <!-- </virtual-list> -->
-      <h3>没有更多数据了</h3>
     </div>
 </template>
 
@@ -122,7 +116,7 @@ export default {
         //   group: group,
         //   email: email,
         //   tel:tel,
-        //   row:row
+        //  
         // })
         row.editFlag = false
       }
@@ -145,14 +139,7 @@ export default {
 }
 </script>
 <style scoped>
-  .studentinfo{
-    position: relative;
-    width: 100%;
-    height: 100%;
-    margin: 0 auto;
-    overflow: hidden;
-    /* overflow-y: scroll; */
-  } 
+
 
 </style>
 

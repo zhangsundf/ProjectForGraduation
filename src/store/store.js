@@ -5,7 +5,8 @@ import AV from 'leancloud-storage'
 
 AV.init ({
   appId: 'MepAGl7Wai0XwJAu4Kk8aYo1-gzGzoHsz',
-  appKey: 'U3dJSqfmKuDjnl67TkLQOhpN'
+  appKey: 'U3dJSqfmKuDjnl67TkLQOhpN',
+  masterKey:'wJ8tjBXyxxyAWBFf8y0V4Fxn'
 })
 
 Vue.use(Vuex)
@@ -15,17 +16,30 @@ const state = {
     isLogin: false,
     studentinfo: [],
     myCreateGrade: '',
-    userInfo: {}
+    userInfo: {},
+    studentComment: [],
+    signinList: [],
+    dateArray: [],
+    attendScoreList:[],
+    inGroupScoreList:[],
+    gradeListinfo:[],
+    AllGradNameList: []
 }
 
 const getters = {
     getUsername: (state) => state.user,
     getStudentInfo: (state) => state.studentinfo,
     getIsLogin: (state) => state.isLogin,
-    getMyCreateGrade: (state) => {
-      return state.userInfo.attributes.createGrade
+    getCurUserInfo: (state) => state.userInfo,
+    getstudentComment (state){
+      return state.studentComment
     },
-    getCurUserInfo: (state) => state.userInfo
+    getSigninList: (state) => state.signinList,
+    getDate: (state) => state.dateArray,
+    getAttendScoreList: (state) => state.attendScoreList,
+    getinGroupScoreList: (state) => state.inGroupScoreList,
+    getGradeListinfo: (state) => state.gradeListinfo,
+    getAllGradNameList: (state) => state.AllGradNameList
 }
 
 const mutations = {
@@ -45,58 +59,203 @@ const mutations = {
         return
       })
    },
-   //退出
   [types.QUIT_LOGIN](state){
       AV.User.logOut();
   },
-  //存储学生的信息
    [types.SET_STUDENT_LIST](state){
-     let userObj = AV.Object.extend('_User')
-     let query = new AV.Query(userObj)
-    query.equalTo("isTeacher",false).equalTo('grade',state.userInfo.attributes.createGrade).find().then(function (userList){
-      let result = []
-      for (let i = 0; i < userList.length; i++) {
-        result[i] = userList[i]
-      }
-       state.studentinfo = result
-    },function(err){
-      alert(err)
-    })
-    // AV.User.current().set("sex",'女')
-    // AV.User.current().save()
+      let gradeArray = []
+      let findAllGradeName = new AV.Query("GradeTable")
+      findAllGradeName.find().then(function(item){
+        for(let p = 0; p < item.length; p ++) {
+          state.AllGradNameList.push(item[p].attributes.createGrade)
+        }
+      })
+     let queryTeacherId = new AV.Query("GradeTable")
+     queryTeacherId.equalTo('TeacherId',state.userInfo.id).find().then (function (item) {
+       for (let i = 0; i < item.length; i++) {
+         let gradeItem = item[i].attributes.createGrade
+         gradeArray.push(gradeItem)
+         let queryStudent1 = new AV.Query('_User')
+         queryStudent1.equalTo('grade',gradeItem)
+         let queryStudent2 = new AV.Query('_User')
+         queryStudent2.equalTo('isTeacher',false)
 
-    // var User = new AV.Object.extend('_User');
-    // var query2 = new AV.Query(User);
-    // // query2.equalTo('isTeacher', false);
-    // query2.find().then(function(userList) {
-    //    AV._.each(userList, function(v) {
-           
-    //        // 对每个符合条件的 user 进行设置
-    //        v.set('StudentId', '04143080');
-    
-    //        // 存储设置
-    //        v.save();
-    //    });
-    // });
-  
-   },
-
-   [types.SET_CURRENT_PANEL](state,param){
-     state.currentPanel = param
-     sessionStorage.setItem("currentPanel",param)
-   },
+         let query = AV.Query.and(queryStudent1,queryStudent2)
+         query.ascending('StudentId');
+         query.find().then(function(userList) {
+           for (let j = 0; j < userList.length; j++){
+            state.studentinfo.push(userList[j])
+           }
+         })
+       }
+       state.userInfo.attributes = Object.assign({'createGrade':gradeArray},state.userInfo.attributes)
+      })
+    },
    [types.CHANGR_STUDENT_INFO] (state, param) {
-     console.log(param.row)
+
       param.row.set("username",param.username)
       param.row.set('StudentId',param.id)
       param.row.save()
       alert("save studentinfo")
+   },
+   [types.GET_STUDENT_ACTIVITIES] (state, param) {
+
+      for (let i = 0; i < state.studentinfo.length; i++){
+        let comment = new AV.Query('Comment')
+        comment.equalTo('userID',state.studentinfo[i].id)
+
+        comment.find().then(function(commentItem) {
+          for(let k = 0; k < commentItem.length; k++){
+            state.studentComment.push(commentItem[k])
+          }
+      })
+    }
+  },
+   
+   [types.GET_SIGN_LIST] (state,param) {
+     state.signinList = []
+     let result = []
+     for (let i = 0; i < state.studentinfo.length; i++) {
+       let userId = state.studentinfo[i].id
+       let queryUser = new AV.Query('SigninList')
+       queryUser.equalTo("userID",userId)
+       let querySign = new AV.Query('SigninList')
+       querySign.equalTo("date",param)
+       
+       var query = AV.Query.and (queryUser,querySign)
+       query.find().then(function (signin) {
+        if(signin.length !== 0) {
+          state.signinList.push ({'userID':userId,'isSignin':signin[0].attributes.isSignin,'date':param})
+        }
+         if(signin.length === 0) {
+           let query = new AV.Object('SigninList')
+           query.set('userID',userId)
+           query.set ('date',param)
+           query.set ('isSignin',false)
+           query.save()
+           state.signinList.push({'userID':userId,'isSignin':false,'date':param}) 
+         }
+      })
+     }
+     return result
+   },
+   [types.GET_DATE_LIST] (state) {
+     let set = []
+     let query = new AV.Query("SigninList")
+     query.ascending('date')
+     query.find().then (function (item) {
+       for(let i = 0; i < item.length; i ++){
+         if(set.indexOf(item[i].attributes.date) === -1)
+          set.push(item[i].attributes.date)
+       }
+     })
+     state.dateArray = set.sort()
+   },
+   [types.GET_ATTEND_SCORE] (state) {
+     let studentinfo = state.studentinfo
+     for (let i = 0; i < studentinfo.length; i++) {
+       let score = 0
+      let userId = state.studentinfo[i].id
+      let queryUser = new AV.Query('SigninList')
+
+      queryUser.equalTo('userID',userId).find().then(function(item) {
+        for (let j = 0; j <item.length; j ++ ) {
+          if(item[j].attributes.isSignin === true) {
+            score+=10
+          }
+        }
+        state.studentinfo[i].attributes = Object.assign({},{'attendScore':score},state.studentinfo[i].attributes)
+        state.attendScoreList.push ({'userID':userId,'attendScore':score})
+      })
+     }
+   },
+   [types.GET_SCORE_INGROUP] (state) {
+     let studentinfo = state.studentinfo
+     for (let i = 0; i < state.studentinfo.length; i++){
+       let score = 0
+       let result = 0
+       let userId = state.studentinfo[i].id
+       let query = new AV.Query('InTeamComment')
+       query.equalTo('targetUserID',userId).find().then(function(item){
+         let itemLength = item.length
+         if (!itemLength) result = 0
+         else{
+          for (let j = 0; j < itemLength; j ++) {
+            score += item[j].attributes.score
+          }
+          result = Math.ceil(score/itemLength)
+        }
+        state.studentinfo[i].attributes = Object.assign({},{'inGrouScore':result},state.studentinfo[i].attributes)
+        state.inGroupScoreList.push({'UserID':userId,'inGrouScore':result})
+       })
+     }
+   },
+   [types.GET_GRADE_LIST] (state){
+    let gradeList = state.userInfo.attributes.createGrade
+    let result = []
+    for (let i = 0; i < gradeList.length; i++) {
+      let info = {}
+      let groupList = []
+      let queryGrade = new AV.Query('_User')
+      queryGrade.equalTo('grade',gradeList[i]).equalTo('isTeacher',false)
+      queryGrade.count().then(function (count){
+        info.GradeName = gradeList[i]
+        info.studentCount = count
+      },function(err){
+        console(err)
+      })
+      let queryGroup = new AV.Query('_User')
+      queryGroup.equalTo('grade',gradeList[i]).equalTo('isTeacher',false)
+      queryGroup.find().then (function(groupItem){
+        for (let j = 0; j < groupItem.length; j++) {
+          let teamname = groupItem[j].attributes.teamname
+          if(teamname && groupList.indexOf(teamname) === -1){
+            groupList.push(groupItem[j].attributes.teamname)
+          }
+        }
+        info.GroupList = groupList
+        info.GroupCount = groupList.length
+      })
+      result.push(info)
+    }
+    state.gradeListinfo = result
+   },
+   [types.CHANGR_PASS] (state,param) {
+    console.log(state.userInfo)
+     let userId = state.userInfo.attributes.password
+      alert(userId)
+   },
+   [types.CREATE_MY_GRADE] (state,param) {
+      let myGradeArray = state.userInfo.attributes.createGrade
+      let TeacherId = state.userInfo.id
+        let CreateItem = AV.Object.extend('GradeTable')
+        let instance = new CreateItem()
+        instance.set('TeacherId',TeacherId)
+        instance.set('createGrade',param)
+        instance.save()
+        myGradeArray.push(param)
    }
 }
 
 const actions = {
   checkLogin ({state,commit},param) {
-    commit (types.SET_CURUSER_INFO,param)
+    return new Promise((resolve, reject) => {
+
+      AV.User.logIn(param.name,param.pass).then(function(loginedUser) {
+           if(loginedUser.attributes.isTeacher){
+              state.user = param.name
+              state.pass = param.pass
+              state.isLogin = param.login
+              state.userInfo = AV.User.current()
+              resolve()
+          }
+          if (!loginedUser.attributes.isTeacher) {
+              reject()
+           }
+      }).catch(error => {
+        reject(error)
+      })
+    })
         
     },
     getUser ({commit}) {
@@ -117,6 +276,30 @@ const actions = {
     },
     changeInfo ({commit}, param) {
       commit (types.CHANGR_STUDENT_INFO,param)
+    },
+    getStudentActivities ({commit}) {
+      commit (types.GET_STUDENT_ACTIVITIES)
+    },
+    getIsSign ({commit},param) {
+      commit (types.GET_SIGN_LIST,param)
+    },
+    getDateArray ({commit}) {
+      commit (types.GET_DATE_LIST)
+    },
+    getAttendScore ({commit}) {
+      commit (types.GET_ATTEND_SCORE)
+    },
+    getInGroupScore ({commit}) {
+      commit(types.GET_SCORE_INGROUP)
+    },
+    createGradeListInfo ({commit}) {
+      commit (types.GET_GRADE_LIST)
+    },
+    changePassWord ({commit}, param) {
+      commit (types.CHANGR_PASS,param)
+    },
+    createMyGrade ({commit}, param) {
+      commit (types.CREATE_MY_GRADE,param)
     }
 }
 

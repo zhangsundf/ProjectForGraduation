@@ -1,32 +1,128 @@
 <template>
   <div class = "Statistics">
-    <div class = "setStandards">
-        <label for = "attended">考勤</label>
-        <input type = "text" v-model = "attended" id = "attended" placeholder="例：20"><span>%</span>
-        <label for = "usualGrade">平时成绩</label>
-        <input type = "text" v-model = "usualGrade" id = "usualGrade" placeholder="例：20"><span>%</span>
-        <label for = "documents">文档</label>
-        <input type = "text" v-model = "documents" id = "documents" placeholder="例：20"><span>%</span>
-        <label for = "inGroup">组内互评</label>
-        <input type = "text" v-model = "inGroup" id = "inGroup" placeholder="例：20"><span>%</span>
-        <label for = "betweenGroup">组间互评</label>
-        <input type = "text" v-model = "betweenGroup" id = "betweenGroup" placeholder="例：20"><span>%</span>
-        <button @click = "checkTotal">设置</button>
-    </div>
-     <div class = "showScore" style="width:100%;">
-            <v-table
-                    is-horizontal-resize
-                    style="width:100%;"
-                    :columns="columns"
-                    :table-data="result"
-                    row-hover-color="#eee"
-                    row-click-color="#edf7ff"
-            ></v-table>
+    <nav class="level">
+      <div class="level-item has-text-centered">
+        <div class="control  has-icons-left">
+          <input class="input is-primary" type="text" placeholder="Primary input" v-model="attended">
+          <span class=" icon is-left">
+            <span style = "font-size:14px;">考勤</span>
+          </span>
         </div>
-        <div style="clear:both;"></div>
-        
-        <h3>没有更多数据了</h3>
-    </div>
+      </div>
+
+        <div class="level-item has-text-centered">
+        <div class="control has-icons-left">
+          <input class="input is-primary" type="text" placeholder="Primary input" v-model = "usualGrade">
+          <span class=" icon is-left">
+            <span style = "font-size:14px;">平时</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="level-item has-text-centered">
+        <div class="control  has-icons-left">
+          <input class="input is-primary" type="text" placeholder="Primary input" v-model="documents">
+          <span class=" icon is-left">
+            <span style = "font-size:14px;">文档</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="level-item has-text-centered">
+        <div class="control has-icons-left">
+          <input class="input is-primary" type="text" placeholder="Primary input" v-model="inGroup">
+          <span class=" icon is-left">
+            <span style = "font-size:14px;">组内</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="level-item has-text-centered">
+        <div class="control has-icons-left">
+          <input class="input is-primary" type="text" placeholder="Primary input" v-model = "betweenGroup">
+          <span class=" icon is-left">
+            <span style = "font-size:14px;">组间</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="level-item has-text-centered">
+        <a class="button is-primary">设置比重</a>
+      </div>
+
+    </nav>
+    <el-table
+    :data="result"
+    style="width: 100%"
+    border
+    stripe
+     height="80%">
+    <el-table-column
+      label="学号"
+      min-width="160">
+      <template slot-scope="scope">
+        <span style="margin-left: 10px">{{scope.row.StudentId}}</span>
+
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="姓名"
+      min-width="150">
+      <template slot-scope="scope">
+          <span>{{ scope.row.username }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="小组"
+      min-width="120">
+      <template slot-scope="scope">
+            <span >{{ scope.row.teamname }}</span>
+           </template>
+    </el-table-column>
+    <el-table-column
+      label="考勤"
+      min-width="100">
+      <template slot-scope="scope">
+            <span>{{ scope.row.attendScore }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="平时成绩"
+      min-width="80">
+      <template slot-scope="scope">
+            <span >{{ scope.row.unsualScore }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="组内互评"
+      min-width="80">
+      <template slot-scope="scope">
+            <span>{{ scope.row.inGrouScore }}</span>    
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="组间互评"
+      min-width="180">
+      <template slot-scope="scope">
+            <span >{{ scope.row.betweenGroupScore }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="文档"
+      min-width="80">
+      <template slot-scope="scope">
+            <span >{{ scope.row.documentScore }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="总分"
+      min-width="80">
+      <template slot-scope="scope">
+            <span >{{ scope.row.sumScore }}</span>
+      </template>
+    </el-table-column>
+  </el-table>
+</div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
@@ -38,21 +134,11 @@ export default {
       usualGrade: 0,
       documents: 0,
       inGroup:0,
-      betweenGroup: 0,
-      columns:[
-        {field: 'StudentId', title: '学号', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
-        {field: 'username', title: '姓名', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
-        {field: 'group', title: '小组', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
-        {field: 'attend', title: '考勤', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
-        {field: 'usualGrade', title: '平时成绩', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
-        {field: 'ingroup', title: '组内互评', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
-        {field: 'betweenGroup', title: '组间互评', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true},
-        {field: 'sum', title: '合计', width: 40, titleAlign: 'center', columnAlign: 'center',isResize:true,isFrozen: true}
-      ]
+      betweenGroup: 0
     }
   },
   computed:{
-    ...mapGetters(['getStudentInfo']),
+    ...mapGetters(['getStudentInfo','getAttendScoreList']),
     total(){
       return Number(this.attended) + Number(this.usualGrade) + Number(this.documents) + Number(this.inGroup) + Number(this.betweenGroup)
     },
@@ -62,10 +148,16 @@ export default {
     result () {
        let result = []
         for (let i = 0; i < this.studentInfo.length; i++){
-          result[i] = this.studentInfo[i].attributes
+          for (let j = 0; j < this.getAttendScoreList.length; j++){
+            if (this.studentInfo[i].id === this.getAttendScoreList[j].userID){
+                result.push(Object.assign({},this.getAttendScoreList[j],this.studentInfo[i].attributes))
+                break
+            }
+          }
+      }
+        
+     return result
         }
-        return result
-    }
   },
   methods:{
     checkTotal(){
@@ -74,15 +166,18 @@ export default {
         return
       }
     }
+  },
+  beforeCreate () {
+    this.$store.dispatch("getAttendScore")
+    this.$store.dispatch("getInGroupScore")
+  },
+  mounted () {
+
   }
 }
 </script>
 <style scoped>
-.Statistics {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-}
+
 .setStandards{
   position: relative;
   width: 100%;
@@ -90,28 +185,31 @@ export default {
   bottom:-10px;
   display: flex;
 }
-input {
-  position: relative;
-  width: 10%;
-  height: 80%;
-  margin-left: 1%;
-}
-.setStandards span {
-  position: relative;
-  margin-right: 2%;
-}
 
-.showScore{
+.el-table{
   position: relative;
   width: 100%;
-  height: 88%;
+  height: 85%;
   top:30px;
   overflow: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin: 0 auto;
+  top:3%;
 }
+.level {
+  position: relative;
+  width: 100%;
+  height: 10%;
+}
+.level-item {
+  position: relative;
+  width:10%; 
+}
+.control input {
+  position: relative;
+  width: 80%;
 
-
+}
 
 </style>
 
