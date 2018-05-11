@@ -33,27 +33,45 @@
       min-width="100">
       <template slot-scope="scope">
             <span v-if = "!scope.row.editFlag">{{ scope.row.grade }}</span>
-            <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.grade" placeholder="请输入内容"></el-input></span>
+            <div v-if = "scope.row.editFlag" class="field">
+                <el-dropdown @command="handleCommand" >
+                  <span class="el-dropdown-link">
+                    <span  id = "grade">{{scope.row.grade}}</span><i class="el-icon-arrow-down el-icon--right"></i>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item v-for = "(item,index) in teachersGrade" :key = "index" v-text="item" :command = "item">{{item}}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown> 
+          </div>
       </template>
     </el-table-column>
     <el-table-column
       label="小组"
-      min-width="80">
+      min-width="100">
       <template slot-scope="scope">
             <span v-if = "!scope.row.editFlag">{{ scope.row.teamname }}</span>
-            <span v-if = "scope.row.editFlag" class="cell-edit-input"><el-input v-model = "scope.row.group" placeholder="请输入内容"></el-input></span>
+            <div v-if = "scope.row.editFlag" class="field">
+                <el-dropdown @command="handleCommandGroup">
+                  <span class="el-dropdown-link">
+                    {{scope.row.teamname}}<i class="el-icon-arrow-down el-icon--right"></i>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item :command="a">黄金糕</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+          </div>
       </template>
     </el-table-column>
     <el-table-column
       label="电话"
-      min-width="180">
+      min-width="150">
       <template slot-scope="scope">
             <span>{{ scope.row.mobilePhoneNumber }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="邮箱"
-      min-width="180">
+      min-width="150">
       <template slot-scope="scope">
             <span>{{ scope.row.email }}</span>
       </template>
@@ -80,13 +98,13 @@
 
 <script>
 import axios from 'axios'
-import { mapGetters,mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   name:'StudentInfo',
   data(){
     return {
-
+      chooseGrade:''
       }
     },
     methods: {
@@ -99,31 +117,19 @@ export default {
       deleteRow(index, rows) {
         rows.splice(index, 1);
       },
+      handleCommandGrade(command) {
+        let parent = document.getElementById("grade")
+        parent.innerText = command
+        this.chooseGrade = command
+      },
       complete (index,row) {
-        let StudentId = row.StudentId
-        let username = row.username
-        let sex = row.sex
-        let grade = row.grade
-        let group = row.group
-        let email = row.email
-        let tel = row.mobilePhoneNumber
-        // alert(StudentId)
-        // this.$store.dispatch ("changeInfo",{
-        //   id: StudentId,
-        //   username: username,
-        //   sex: sex,
-        //   grade: grade,
-        //   group: group,
-        //   email: email,
-        //   tel:tel,
-        //  
-        // })
+        
         row.editFlag = false
       }
     },
 
   computed: {
-    ...mapGetters(['getStudentInfo']),
+    ...mapGetters(['getStudentInfo','getCurUserInfo']),
     studentList () {
       return this.getStudentInfo
     },
@@ -134,12 +140,24 @@ export default {
           this.$set(result[i],'editFlag',false)
         }
         return result
+    },
+    teachersGrade () {
+      return this.getCurUserInfo.attributes.createGrade
     }
+  },
+  created() {
+      this.$store.dispatch('getGradeAndGroup')
   }
 }
 </script>
 <style scoped>
-
+  .el-dropdown-link {
+    cursor: pointer;
+    color: #409EFF;
+  }
+  .el-icon-arrow-down {
+    font-size: 12px;
+  }
 
 </style>
 
