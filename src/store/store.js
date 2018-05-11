@@ -43,33 +43,11 @@ const getters = {
 }
 
 const mutations = {
-  //登陆
-  [types.SET_CURUSER_INFO](state,param){
-      AV.User.logIn(param.name,param.pass).then(function(loginedUser) {
-        if(loginedUser.attributes.isTeacher){
-            state.user = param.name
-            state.pass = param.pass
-            state.isLogin = param.login
-            state.userInfo = AV.User.current()
-        }
-        else {
-          alert("您没有登录权限")
-        }
-      }, function (err) {
-        return
-      })
-   },
   [types.QUIT_LOGIN](state){
       AV.User.logOut();
   },
    [types.SET_STUDENT_LIST](state){
       let gradeArray = []
-      let findAllGradeName = new AV.Query("GradeTable")
-      findAllGradeName.find().then(function(item){
-        for(let p = 0; p < item.length; p ++) {
-          state.AllGradNameList.push(item[p].attributes.createGrade)
-        }
-      })
      let queryTeacherId = new AV.Query("GradeTable")
      queryTeacherId.equalTo('TeacherId',state.userInfo.id).find().then (function (item) {
        for (let i = 0; i < item.length; i++) {
@@ -90,6 +68,7 @@ const mutations = {
        }
        state.userInfo.attributes = Object.assign({'createGrade':gradeArray},state.userInfo.attributes)
       })
+
     },
    [types.CHANGR_STUDENT_INFO] (state, param) {
 
@@ -234,6 +213,38 @@ const mutations = {
         instance.set('createGrade',param)
         instance.save()
         myGradeArray.push(param)
+   },
+   [types.GRADE_AND_GROUP] (state) {
+     let TeacherId = state.userInfo.id
+     
+    let findAllGradeName = new AV.Query("GradeTable")
+    findAllGradeName.equalTo("TeacherId",TeacherId)
+    findAllGradeName.find().then(function(item){
+      for(let p = 0; p < item.length; p ++) {
+
+        let gradeName = item[p].attributes.createGrade
+        let Group = []
+        let obj = {}
+        let objGrade = {}
+        let gradeStuNumber = 0
+        let queryGroup = new AV.Query('_User')
+        queryGroup.equalTo('grade',gradeName)
+        queryGroup.find().then(function(item) {
+          for(let i = 0; i < item.length; i++){
+            let groupitem = item[i].attributes.teamname
+            obj[groupitem] = obj[groupitem] ? obj[groupitem]+1 : 1
+            
+          }
+          for(let key in obj){
+            gradeStuNumber += obj[key]
+            Group.push({'groupName':key,'groupStuNumber':obj[key]})
+          }
+          Group.push({'gradeStuNumber':gradeStuNumber})
+        })
+        state.AllGradNameList.push({'grades':gradeName,'groups':Group})
+        console.log(state.AllGradNameList)
+        }
+      })
    }
 }
 
@@ -300,6 +311,9 @@ const actions = {
     },
     createMyGrade ({commit}, param) {
       commit (types.CREATE_MY_GRADE,param)
+    },
+    getGradeAndGroup ({commit}) {
+      commit (types.GRADE_AND_GROUP)
     }
 }
 

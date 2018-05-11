@@ -22,7 +22,7 @@
     </div>
   </nav>
   <el-table
-    :data="gradeInfo"
+    :data="getAllGradNameList"
     style="width: 100%"
     border
     stripe
@@ -31,21 +31,21 @@
       label="班级"
       min-width="100">
       <template slot-scope="scope">
-        <span style="margin-left: 10px">{{scope.row.GradeName}}</span>
+        <span style="margin-left: 10px">{{scope.row.grades}}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="小组个数"
       min-width="100">
       <template slot-scope="scope">
-          <span>{{ scope.row.GroupCount }}</span>
+          <span>{{ scope.row.groups.length-1}}</span>
       </template>
     </el-table-column>
     <el-table-column
-      label="加入人数"
+      label="班级人数"
       min-width="50">
       <template slot-scope="scope">
-            <span>{{ scope.row.studentCount }}</span>
+            <span>{{ scope.row.groups[scope.row.groups.length-1].gradeStuNumber }}</span>
       </template>
     </el-table-column>
     <el-table-column
@@ -65,15 +65,11 @@ export default {
     name: 'myCreateGrade',
     data () {
         return {
-          gradeName: '',
-          gradeInfo:[]
+          gradeName: ''
         }
     },
     computed: {
-        ...mapGetters (['getGradeListinfo','getAllGradNameList']),
-        // gradeInfo () {     
-        //   return this.getGradeListinfo
-        // }
+        ...mapGetters (['getAllGradNameList']),
     },
     methods: {
       createGrade (name) {
@@ -83,17 +79,18 @@ export default {
           this.gradeName = ''
           return
         }
-        if (this.getAllGradNameList.indexOf(gradeName) !== -1) {
-          alert("班级已经存在，不能重复创建")
-          return 
-        }
+        for(let i = 0; i < this.getAllGradNameList.length; i++){
+          if (this.getAllGradNameList[i].grades.indexOf(gradeName) !== -1) {
+            alert("班级已经存在，不能重复创建")
+            return 
+          }
         else {
           this.$store.dispatch ("createMyGrade",gradeName)
           this.gradeInfo.push({'GradeName':this.gradeName,'GroupCount':0,'studentCount':0,'createdAt':this.GetDate()})
           this.gradeName = ''
           alert("创建成功！快去小组管理创建班级小组吧")
         }
-
+        }
       },
       GetDate(){
         let date = new Date()

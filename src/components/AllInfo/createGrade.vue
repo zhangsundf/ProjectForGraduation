@@ -22,30 +22,30 @@
         </div>
     </nav>
   <el-table
-    :data="gradeInfo"
+    :data="results"
     style="width: 100%"
     border
     stripe
-    height="100%">
+    height="500px;">
     <el-table-column
       label="班级"
       min-width="100">
       <template slot-scope="scope">
-        <span style="margin-left: 10px">{{scope.row.GradeName}}</span>
+        <span style="margin-left: 10px">{{scope.row.gradeName}}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="小组名"
       min-width="100">
       <template slot-scope="scope">
-          <span>{{ scope.row.GroupCount }}</span>
+          <span>{{ scope.row.groupName.groupName }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="小组人数"
       min-width="50">
       <template slot-scope="scope">
-            <span>{{ scope.row.studentCount }}</span>
+            <span>{{ scope.row.groupName.groupStuNumber }}</span>
       </template>
     </el-table-column>
     <el-table-column
@@ -60,7 +60,27 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
+  name : 'CreateGroup',
+  data () {
+    return {
+
+    }
+  },
+  computed:{
+      ...mapGetters (['getAllGradNameList']),
+      results() {
+        let result = []
+        let grade = this.getAllGradNameList
+         for (let i = 0; i < grade.length; i++) {
+          for(let j = 0; j < grade[i].groups.length-1; j++){
+            result.push ({'groupName':grade[i].groups[j],'gradeName':grade[i].grades})
+          }
+         }
+         return result
+       }
+  }
 
 }
 </script>
