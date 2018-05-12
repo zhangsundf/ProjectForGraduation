@@ -8,7 +8,7 @@ AV.init ({
   appKey: 'U3dJSqfmKuDjnl67TkLQOhpN',
   masterKey:'wJ8tjBXyxxyAWBFf8y0V4Fxn'
 })
-
+AV._config.useMasterKey =true
 Vue.use(Vuex)
 const state = {
     user:'',
@@ -71,11 +71,7 @@ const mutations = {
 
     },
    [types.CHANGR_STUDENT_INFO] (state, param) {
-
-      param.row.set("username",param.username)
-      param.row.set('StudentId',param.id)
-      param.row.save()
-      alert("save studentinfo")
+    
    },
    [types.GET_STUDENT_ACTIVITIES] (state, param) {
 
@@ -286,7 +282,24 @@ const actions = {
       }));
     },
     changeInfo ({commit}, param) {
-      commit (types.CHANGR_STUDENT_INFO,param)
+      alert(param.grade+','+param.group)
+      return new Promise((resolve,reject) => {
+        let student = {}
+        let studentId = state.studentinfo[param.index].id
+        console.log(studentId)
+        var todo = AV.Object.createWithoutData('_User', studentId);
+        todo.set('grade', param.grade);
+        todo.set('teamname',param.group)
+        // 保存到云端
+        console.log(todo)
+        todo.save().then(function(){
+            resolve()
+        },function(err){
+          console.log(err)
+           reject()
+        })
+      })
+     
     },
     getStudentActivities ({commit}) {
       commit (types.GET_STUDENT_ACTIVITIES)

@@ -1,7 +1,7 @@
 <template>
   <div class = "AttendedInfo">
     <div class = "header">
-      <span class= "showdate" v-for = "(item,index) in dateList" :key = "index"  @click = "changeDate(item,index)">{{item | fommat}}</span>
+      <span class= "showdate" v-for = "(item,index) in dateList" :key = "index"  @click = "changeDate(item,index)">{{item | fommatDate}}</span>
       <br>
       <div class = "showCurDate"><span class = "setcurDate"></span></div>
     </div>
@@ -16,35 +16,35 @@
       label="学号"
       min-width="200">
       <template slot-scope="scope">
-        <span style="margin-left: 10px">{{scope.row.StudentId}}</span>
+        <span style="margin-left: 10px" class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{scope.row.StudentId}}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="姓名"
       min-width="200">
       <template slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
+          <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.username }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="班级"
       min-width="100">
       <template slot-scope="scope">
-            <span>{{ scope.row.grade }}</span>
+            <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.grade }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="小组"
       min-width="100">
       <template slot-scope="scope">
-            <span>{{ scope.row.temname }}</span>
+            <span class = "span">{{ scope.row.temname }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="是否签到"
       min-width="200">
       <template slot-scope="scope">
-            <span>{{ scope.row.isSignin }}</span>
+            <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.isSignin}}</span>
       </template>
     </el-table-column>
   </el-table>
@@ -95,9 +95,6 @@ export default {
     }
   },
   mounted () {
-    // let lastIndex = document.getElementsByClassName('showdate')
-    // alert(lastIndex.length)
-    // lastIndex[lastIndex.length-1].style.cssText = 'color:red'
     this.dateList = this.getDate
     var now=new Date();
     let getMonth = now.getMonth() + 1 < 10 ? '0'+(now.getMonth() + 1):now.getMonth() + 1
@@ -109,8 +106,14 @@ export default {
     
   },
   filters:{
-    fommat (val) {
+    fommatDate (val) {
       return val.substring(5)
+    },
+    fommatSign(val){
+      if(val === true) {
+        return 10
+      }
+      return 0
     }
   }
 }
@@ -145,7 +148,16 @@ export default {
   .active {
     color: red;
   }
-
+  .signin {
+    position: relative;
+    line-height: 100%;
+    background-color: green;
+  }
+  .nosignin {
+    position: relative;
+    line-height: 100%;
+    background-color: red;
+  }
 </style>
 
 

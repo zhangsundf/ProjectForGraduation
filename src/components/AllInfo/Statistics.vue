@@ -81,6 +81,7 @@
     </el-table-column>
     <el-table-column
       label="考勤"
+      sortable
       min-width="100">
       <template slot-scope="scope">
             <span>{{ scope.row.attendScore }}</span>

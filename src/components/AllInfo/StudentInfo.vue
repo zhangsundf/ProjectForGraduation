@@ -30,41 +30,41 @@
     </el-table-column>
     <el-table-column
       label="班级"
-      min-width="100">
+      min-width="140">
       <template slot-scope="scope">
             <span v-if = "!scope.row.editFlag">{{ scope.row.grade }}</span>
             <div v-if = "scope.row.editFlag" class="field">
-                <el-dropdown @command="handleCommand" >
-                  <span class="el-dropdown-link">
-                    <span  id = "grade">{{scope.row.grade}}</span><i class="el-icon-arrow-down el-icon--right"></i>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item v-for = "(item,index) in teachersGrade" :key = "index" v-text="item" :command = "item">{{item}}</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown> 
+               <el-select v-model="chooseGrade" :placeholder="scope.row.grade">
+                  <el-option
+                    v-for="(item,index) in teachersGrade"
+                    :key="index"
+                    :label="item"
+                    :value="item">
+                  </el-option>
+                </el-select>
           </div>
       </template>
     </el-table-column>
     <el-table-column
       label="小组"
-      min-width="100">
+      min-width="120">
       <template slot-scope="scope">
             <span v-if = "!scope.row.editFlag">{{ scope.row.teamname }}</span>
             <div v-if = "scope.row.editFlag" class="field">
-                <el-dropdown @command="handleCommandGroup">
-                  <span class="el-dropdown-link">
-                    {{scope.row.teamname}}<i class="el-icon-arrow-down el-icon--right"></i>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item :command="a">黄金糕</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
+               <el-select v-model="chooseGroup" :placeholder="scope.row.teamname">
+                  <el-option
+                    v-for="(item,index) in groupList"
+                    :key="index"
+                    :label="item"
+                    :value="item">
+                  </el-option>
+                </el-select>
           </div>
       </template>
     </el-table-column>
     <el-table-column
       label="电话"
-      min-width="150">
+      min-width="140">
       <template slot-scope="scope">
             <span>{{ scope.row.mobilePhoneNumber }}</span>
       </template>
@@ -76,7 +76,7 @@
             <span>{{ scope.row.email }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="操作" min-width="250">
+    <el-table-column label="操作" min-width="230">
       <template slot-scope="scope">
         <el-button
           size="mini"
@@ -88,7 +88,7 @@
         <el-button
           size="mini"
           type="success"
-          @click="complete(scope.$index, scope.row)">完成</el-button>
+          @click="complete(scope.$index,scope.row)">完成</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -104,32 +104,58 @@ export default {
   name:'StudentInfo',
   data(){
     return {
-      chooseGrade:''
+      chooseGrade:'',
+      chooseGroup:'',
+      groupList:[],
+      isOneEdit:false,
+      index:-1
       }
     },
     methods: {
       handleEdit(index, row) {
-        row.editFlag = true
+        if(this.isOneEdit === false){
+            this.isOneEdit = true
+            this.chooseGrade = row.grade
+            row.editFlag = true
+            this.index = index
+        }else{
+          alert("已有一个学生信息处于编辑编辑状态，请点击完成后在执行该操作！")
+          return
+        }
+      
       },
       handleDelete(index, row) {
+
         alert(index, row);
       },
       deleteRow(index, rows) {
         rows.splice(index, 1);
-      },
-      handleCommandGrade(command) {
-        let parent = document.getElementById("grade")
-        parent.innerText = command
-        this.chooseGrade = command
-      },
+        },
       complete (index,row) {
-        
-        row.editFlag = false
+        if(this.isOneEdit === true && this.index === index) {
+              this.$store.dispatch('changeInfo',{
+                                    grade:this.chooseGrade,
+                                    group:this.chooseGroup,
+                                    index:index
+                                    }).then(()=>{
+                                      console.log(this.getStudentInfo)
+                                      row.grade = this.chooseGrade
+                                      row.teamname = this.chooseGroup
+                                      this.isOneEdit = false
+                                      alert("success")
+                                    }).catch(()=>{
+                                      alert("failed")
+                                    })
+              row.editFlag = false
+        return
+        }else{
+          return 
+        }
       }
-    },
+},
 
   computed: {
-    ...mapGetters(['getStudentInfo','getCurUserInfo']),
+    ...mapGetters(['getStudentInfo','getCurUserInfo','getAllGradNameList']),
     studentList () {
       return this.getStudentInfo
     },
@@ -143,6 +169,24 @@ export default {
     },
     teachersGrade () {
       return this.getCurUserInfo.attributes.createGrade
+    }
+    
+  },
+  watch: {
+    chooseGrade (){
+        this.groupList = []
+           for(let i = 0; i < this.getAllGradNameList.length; i++) {
+            if (this.getAllGradNameList[i].grades === this.chooseGrade) {
+            for(let j = 0; j < this.getAllGradNameList[i].groups.length-1; j++) {
+              this.groupList.push(this.getAllGradNameList[i].groups[j].groupName)
+              }
+            }
+            this.chooseGroup = this.groupList[0]
+            // alert(this.chooseGroup)
+         }
+    },
+    chooseGroup() {
+      alert(this.chooseGroup)
     }
   },
   created() {
