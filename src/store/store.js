@@ -190,7 +190,9 @@ const mutations = {
         instance.set('TeacherId',TeacherId)
         instance.set('createGrade',param)
         instance.save().then(function(){
-           state.AllGradNameList.push({'grades':param,'groups':[{'groupName':'','groupStuNumber':0,'gradeStuNumber':0}]})
+           state.AllGradNameList.push({'grades':param,
+                        'groups':[{'groupName':'','groupStuNumber':0,'gradeStuNumber':0}],
+                        'updatedAt':new Date(),'createdAt':new Date()})
           alert("创建成功")
         },function(){
           alert("创建失败")
@@ -225,11 +227,14 @@ const mutations = {
           }
           Group.push({'gradeStuNumber':gradeStuNumber})
         })
-        state.AllGradNameList.push({'grades':gradeName,'groups':Group})
+        state.AllGradNameList.push(Object.assign({'createdAt':item[p].createdAt,'updatedAt':item[p].updatedAt},{'grades':gradeName,'groups':Group}))
         console.log(state.AllGradNameList)
         }
       })
-   }
+   },
+  //  [types.CHANGE_GRADE_NAME] (state, param) {
+
+  //  } 
 }
 
 const actions = {
@@ -299,8 +304,6 @@ const actions = {
             // alert("删除失败")
             reject()
           })
-        // state.studentinfo.splice(param,1)
-        // console.log(state.studentinfo)
       })
     },
     getStudentActivities ({commit}) {
@@ -329,7 +332,42 @@ const actions = {
     },
     getGradeAndGroup ({commit}) {
       commit (types.GRADE_AND_GROUP)
-    }
+    },
+    changeGradeName ({commit},param){
+      let UserId = state.userInfo.id
+      let queryMyGrade = new AV.Query("GradeTable")
+      queryMyGrade.equalTo('TeacherId',UserId)
+
+      let oneGrade = new AV.Query("GradeTable")
+      oneGrade.equalTo ('createGrade',param.originalName) 
+
+       return new Promise((resolve,reject) => {
+ 
+        let query = AV.Query.and(queryMyGrade,oneGrade)
+        quey.find().then(function(item){
+         console.log(item)
+          item.set('createGrade', param.newGradeName);
+          item.save().then(function(){
+            resolve()
+          },function(){
+            reject()
+          })
+        },function(){
+          reject()
+        })
+      //   let gradeName = state.AllGradNameList[param.index].grades
+      //   var todo = AV.Object.createWithoutData('GradeTable', gradeName);
+      //   todo.set('createGrade', param.grade);
+      //   // 保存到云端
+      //   todo.save().then(function(){
+      //       resolve()
+      //   },function(err){
+      //     console.log(err)
+      //      reject()
+      //   })
+      // })
+       })
+      }
 }
 
 export default new Vuex.Store({

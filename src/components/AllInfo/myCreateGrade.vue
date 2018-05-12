@@ -31,12 +31,13 @@
       label="班级"
       min-width="100">
       <template slot-scope="scope">
-        <span style="margin-left: 10px">{{scope.row.grades}}</span>
+        <span style="margin-left: 10px" v-if = "!scope.row.editFlag">{{scope.row.grades}}</span>
+        <span v-if = "scope.row.editFlag"><input type = "text" class = "input is-primary" v-model = "newGradeName"></span>
       </template>
     </el-table-column>
     <el-table-column
       label="小组个数"
-      min-width="100">
+      min-width="40">
       <template slot-scope="scope">
           <span>{{ scope.row.groups.length-1}}</span>
       </template>
@@ -49,10 +50,32 @@
       </template>
     </el-table-column>
     <el-table-column
+      label="最近修改时间"
+      min-width="100">
+      <template slot-scope="scope">
+            <span>{{scope.row.updatedAt | fommatDate}}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
       label="创建时间"
       min-width="100">
       <template slot-scope="scope">
-            <span>{{scope.row.createdAt}}</span>
+            <span>{{scope.row.createdAt | fommatDate}}</span>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作" min-width="120">
+      <template slot-scope="scope">
+        <el-button
+          size="mini"
+          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+        <el-button
+          size="mini"
+          type="danger"
+         @click.native.prevent="deleteRow(scope.$index,result)">删除</el-button>
+        <el-button
+          size="mini"
+          type="success"
+          @click="complete(scope.$index,scope.row)">完成</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -66,13 +89,21 @@ export default {
     data () {
         return {
           gradeName: '',
-        // gradeAndGroup:[]
+          isOneEdit: false,
+          idex:-1,
+          newGradeName:'',
+          originalName:''
         }
     },
     computed: {
         ...mapGetters (['getAllGradNameList','getGradeList']),
         gradeAndGroup() {
-          return this.getAllGradNameList
+          let result = []
+          for (let i = 0; i < this.getAllGradNameList.length; i++){
+            result[i] = this.getAllGradNameList[i]
+            this.$set(result[i],'editFlag',false)
+          }
+          return result
         }
     },
     methods: {
@@ -89,21 +120,76 @@ export default {
         }
         this.$store.dispatch ("createMyGrade",gradeName)
         this.gradeName = ''
-         this.$store.dispatch('getUser')
+        this.$store.dispatch('getUser')
         alert("创建成功！快去小组管理创建班级小组吧")
       },
-      GetDate(){
-        let date = new Date()
-        let Str=date.getFullYear() + '-' +
-        (date.getMonth() + 1) + '-' + 
-        date.getDate()
+       handleEdit(index, row) {
+        if(this.isOneEdit === false){
+            this.isOneEdit = true
+            row.editFlag = true
+            this.originalName = row.grades
+            this.index = index
+            this.newGradeName = row.grades
+        }else{
+          alert("已有一个学生信息处于编辑编辑状态，请点击完成后在执行该操作！")
+          return
+        }
+      
+      },
+      deleteRow(index,rows) {
+        var r = confirm("确认将此学生从你管理的班级移除？")
+        if (r) {
+          this.$store.dispatch("deleteStudent",index).then(function(){
+              alert("删除成功")
+              rows.splice(index, 1);
+          }).catch(()=>{
+              alert("删除失败")
+          })
+        }
+        else {
+          return
+        }
+
+      },
+      complete (index,row) {
+        if(this.isOneEdit === true && this.index === index) {
+              this.$store.dispatch('changeGradeName',{
+                                    newGradeName:this.newGradeName,
+                                    original:this.originalName,
+                                    index:index
+                                    }).then(()=>{
+                                      this.isOneEdit = false
+                                      alert("success")
+                                    }).catch(()=>{
+                                      alert("failed")
+                                    })
+              row.editFlag = false
+        return
+        }else{
+          return 
+        }
+      }
+    },
+    filters: {
+      fommatDate (val) {
+        let date = new Date(val)
+        let getFullYear =  date.getFullYear() < 10 ? '0'+ date.getFullYear() :  date.getFullYear()
+        let getMonth =  date.getMonth() +1 < 10 ? '0'+ (date.getMonth()+1) :  date.getMonth()
+        let getDate =  date.getDate() < 10 ? '0'+ date.getDate() :  date.getDate()
+        let getHours =  date.getHours() < 10 ? '0'+ date.getHours() :  date.getHours()       
+        let getMinutes =  date.getMinutes() < 10 ? '0'+ date.getMinutes() :  date.getMinutes()
+        let getSeconds =  date.getSeconds() < 10 ? '0'+ date.getSeconds() :  date.getSeconds()
+        let Str= getFullYear + '-' +
+        getMonth+ '-' + 
+        getDate+' '+
+        getHours+':'+
+        getMinutes +':'+
+        getSeconds
         return Str
       }
     },
     beforeCreate() {
          this.$store.dispatch("getAllInfoList")
-        //  this.$store.dispatch('getGradeAndGroup')
- 
     },
     mounted () {
       console.log(this.getGradeList) 
