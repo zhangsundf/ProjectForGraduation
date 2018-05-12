@@ -74,11 +74,10 @@ const mutations = {
     
    },
    [types.GET_STUDENT_ACTIVITIES] (state, param) {
-
+      state.studentComment = []
       for (let i = 0; i < state.studentinfo.length; i++){
         let comment = new AV.Query('Comment')
         comment.equalTo('userID',state.studentinfo[i].id)
-
         comment.find().then(function(commentItem) {
           for(let k = 0; k < commentItem.length; k++){
             state.studentComment.push(commentItem[k])
@@ -282,7 +281,6 @@ const actions = {
       }));
     },
     changeInfo ({commit}, param) {
-      alert(param.grade+','+param.group)
       return new Promise((resolve,reject) => {
         let student = {}
         let studentId = state.studentinfo[param.index].id
@@ -291,7 +289,6 @@ const actions = {
         todo.set('grade', param.grade);
         todo.set('teamname',param.group)
         // 保存到云端
-        console.log(todo)
         todo.save().then(function(){
             resolve()
         },function(err){

@@ -5,16 +5,18 @@
         <article class="media">
         <figure class="media-left">
             <p class="image is-64x64">
-                {{item.attributes.userID}}
+                {{item.username}}
             </p>
         </figure>
         <div class="media-content">
             <div class="content">
                 <div>
-                    <strong>{{item.attributes.userID}}</strong> 
+                    <strong>{{item.username}}</strong>        
+                    <span class = "info"> {{item.grade}}</span>
+                    <span class = "info group">{{item.teamname}}</span>
                     <br>
                     <div class = "commentArea">
-                        {{item.attributes.comment}}
+                        {{item.comment}}
                     </div>
                 </div>
             </div>
@@ -29,13 +31,14 @@
             </div>
             <div class = "level-right">
                  <span class="level-item">
-                <span>对自己评价：<span class="icon is-small rating"> <font-awesome-icon :icon = "['fas','heart']"/></span>{{item.attributes.rating}}</span>
+                <span>对自己评价：<span class="icon is-small rating"> <font-awesome-icon :icon = "['fas','heart']"/></span>{{item.rating}}</span>
                 </span>
             </div>
             </nav>
         </div>
          <div class="media-right">
-             <span>{{item.attributes.date}}</span>
+
+             <span>{{item.date}}</span>
          </div>
         </article>
         <!-- </a> -->
@@ -55,19 +58,24 @@ export default {
      }
  },
  computed: {
-     ...mapGetters (['getstudentComment']),
-     result : {
-         get() {
-        return this.getstudentComment
-         },
-         set (val) {
-             return val
-         }
+     ...mapGetters (['getstudentComment','getStudentInfo']),
+     result () {
+        let result = []
+        for(let i = 0; i < this.getStudentInfo.length; i++){
+            let student = this.getStudentInfo[i]
+            for(let j = 0; j < this.getstudentComment.length; j++){
+                let commentItem = this.getstudentComment[j]
+                if (student.id === commentItem.attributes.userID){
+
+                    result.push(Object.assign({},commentItem.attributes,student.attributes))
+                }
+            }
+        }
+        return result
      }
  },
  beforeCreate () {
      this.$store.dispatch ("getStudentActivities")
-     this.result = []
  },
  methods: {
      support () {
@@ -98,6 +106,9 @@ export default {
       border-radius: 20px;
       padding: 10px;
       margin: 10px;
+      font-size: 16px;
+      font-family: cursive;
+      color: rgb(112, 109, 109);
   }
   .level-right {
     font-size: 10px;
@@ -109,7 +120,7 @@ export default {
   .media-right {
     font-size: 14px;
     font-weight:bold;
-    color:grey;
+    color: rgb(52, 168, 139);
   }
   .image {
       color: #fff;
@@ -117,9 +128,19 @@ export default {
       font-weight:bold;
       border-radius:32px;
       background-color: rgb(122, 233, 164);
+      line-height: 64px;
+      text-align: center;
   }
   .content {
-      border-bottom: 2px solid #e9e6e6;
-
+      border-bottom: 2px solid #f5f4f4;
+  }
+  .info {
+      color:rgb(112, 115, 116);
+      font-size: 14px;
+      margin-left:15%;
+  }
+  .group {
+      margin:2%;
+      color:rgb(150, 155, 156);
   }
 </style>
