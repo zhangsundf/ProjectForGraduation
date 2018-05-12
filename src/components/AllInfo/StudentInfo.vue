@@ -84,7 +84,7 @@
         <el-button
           size="mini"
           type="danger"
-         @click.native.prevent="deleteRow(scope.$index, result)">删除</el-button>
+         @click.native.prevent="deleteRow(scope.$index,result)">删除</el-button>
         <el-button
           size="mini"
           type="success"
@@ -124,13 +124,21 @@ export default {
         }
       
       },
-      handleDelete(index, row) {
+      deleteRow(index,rows) {
+        var r = confirm("确认将此学生从你管理的班级移除？")
+        if (r) {
+          this.$store.dispatch("deleteStudent",index).then(function(){
+              alert("删除成功")
+              rows.splice(index, 1);
+          }).catch(()=>{
+              alert("删除失败")
+          })
+        }
+        else {
+          return
+        }
 
-        alert(index, row);
       },
-      deleteRow(index, rows) {
-        rows.splice(index, 1);
-        },
       complete (index,row) {
         if(this.isOneEdit === true && this.index === index) {
               this.$store.dispatch('changeInfo',{
@@ -138,9 +146,9 @@ export default {
                                     group:this.chooseGroup,
                                     index:index
                                     }).then(()=>{
-                                      console.log(this.getStudentInfo)
                                       row.grade = this.chooseGrade
                                       row.teamname = this.chooseGroup
+                                      this.groupList = []
                                       this.isOneEdit = false
                                       alert("success")
                                     }).catch(()=>{
@@ -184,9 +192,6 @@ export default {
             this.chooseGroup = this.groupList[0]
             // alert(this.chooseGroup)
          }
-    },
-    chooseGroup() {
-      alert(this.chooseGroup)
     }
   },
   created() {

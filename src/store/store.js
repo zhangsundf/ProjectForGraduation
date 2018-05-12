@@ -70,8 +70,8 @@ const mutations = {
       })
 
     },
-   [types.CHANGR_STUDENT_INFO] (state, param) {
-    
+   [types.DELETE_STUDENT] (state, param) {
+  
    },
    [types.GET_STUDENT_ACTIVITIES] (state, param) {
       state.studentComment = []
@@ -284,7 +284,6 @@ const actions = {
       return new Promise((resolve,reject) => {
         let student = {}
         let studentId = state.studentinfo[param.index].id
-        console.log(studentId)
         var todo = AV.Object.createWithoutData('_User', studentId);
         todo.set('grade', param.grade);
         todo.set('teamname',param.group)
@@ -296,7 +295,24 @@ const actions = {
            reject()
         })
       })
-     
+    },
+    deleteStudent ({commit},param) {
+      return new Promise ((resolve,reject) => {
+        let studentId = state.studentinfo[param].id
+        let item = AV.Object.createWithoutData('_User', studentId);
+          item.set('grade','')
+          item.set('teamname','')
+          item.save().then(function(){
+            // alert("删除成功")
+            state.studentinfo.splice(param,1)
+            resolve()
+          },function(){
+            // alert("删除失败")
+            reject()
+          })
+        // state.studentinfo.splice(param,1)
+        // console.log(state.studentinfo)
+      })
     },
     getStudentActivities ({commit}) {
       commit (types.GET_STUDENT_ACTIVITIES)
