@@ -22,7 +22,7 @@
     </div>
   </nav>
   <el-table
-    :data="getAllGradNameList"
+    :data="gradeAndGroup"
     style="width: 100%"
     border
     stripe
@@ -65,32 +65,32 @@ export default {
     name: 'myCreateGrade',
     data () {
         return {
-          gradeName: ''
+          gradeName: '',
+        // gradeAndGroup:[]
         }
     },
     computed: {
-        ...mapGetters (['getAllGradNameList']),
+        ...mapGetters (['getAllGradNameList','getGradeList']),
+        gradeAndGroup() {
+          return this.getAllGradNameList
+        }
     },
     methods: {
       createGrade (name) {
-        let gradeName =  name.replace(/(^\s*)|(\s*$)/g, ""); 
+        let gradeName =  name.trim()
         if (!gradeName) {
           alert("班级名不能为空")
           this.gradeName = ''
           return
         }
-        for(let i = 0; i < this.getAllGradNameList.length; i++){
-          if (this.getAllGradNameList[i].grades.indexOf(gradeName) !== -1) {
+        if (this.getGradeList.indexOf(gradeName) !== -1) {
             alert("班级已经存在，不能重复创建")
             return 
-          }
-        else {
-          this.$store.dispatch ("createMyGrade",gradeName)
-          this.gradeInfo.push({'GradeName':this.gradeName,'GroupCount':0,'studentCount':0,'createdAt':this.GetDate()})
-          this.gradeName = ''
-          alert("创建成功！快去小组管理创建班级小组吧")
         }
-        }
+        this.$store.dispatch ("createMyGrade",gradeName)
+        this.gradeName = ''
+         this.$store.dispatch('getUser')
+        alert("创建成功！快去小组管理创建班级小组吧")
       },
       GetDate(){
         let date = new Date()
@@ -101,10 +101,12 @@ export default {
       }
     },
     beforeCreate() {
-      this.$store.dispatch("createGradeListInfo")
+         this.$store.dispatch("getAllInfoList")
+        //  this.$store.dispatch('getGradeAndGroup')
+ 
     },
     mounted () {
-      this.gradeInfo = this.getGradeListinfo
+      console.log(this.getGradeList) 
     }
 
 }

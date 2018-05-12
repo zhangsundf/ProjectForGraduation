@@ -22,7 +22,7 @@ const state = {
     dateArray: [],
     attendScoreList:[],
     inGroupScoreList:[],
-    gradeListinfo:[],
+    gradeList:[],
     AllGradNameList: []
 }
 
@@ -38,7 +38,7 @@ const getters = {
     getDate: (state) => state.dateArray,
     getAttendScoreList: (state) => state.attendScoreList,
     getinGroupScoreList: (state) => state.inGroupScoreList,
-    getGradeListinfo: (state) => state.gradeListinfo,
+    getGradeList: (state) => state.gradeList,
     getAllGradNameList: (state) => state.AllGradNameList
 }
 
@@ -50,6 +50,7 @@ const mutations = {
       let gradeArray = []
      let queryTeacherId = new AV.Query("GradeTable")
      queryTeacherId.equalTo('TeacherId',state.userInfo.id).find().then (function (item) {
+      state.studentinfo = []
        for (let i = 0; i < item.length; i++) {
          let gradeItem = item[i].attributes.createGrade
          gradeArray.push(gradeItem)
@@ -68,7 +69,7 @@ const mutations = {
        }
        state.userInfo.attributes = Object.assign({'createGrade':gradeArray},state.userInfo.attributes)
       })
-
+      console.log(state.studentinfo)
     },
    [types.DELETE_STUDENT] (state, param) {
   
@@ -165,34 +166,16 @@ const mutations = {
      }
    },
    [types.GET_GRADE_LIST] (state){
-    let gradeList = state.userInfo.attributes.createGrade
-    let result = []
-    for (let i = 0; i < gradeList.length; i++) {
-      let info = {}
-      let groupList = []
-      let queryGrade = new AV.Query('_User')
-      queryGrade.equalTo('grade',gradeList[i]).equalTo('isTeacher',false)
-      queryGrade.count().then(function (count){
-        info.GradeName = gradeList[i]
-        info.studentCount = count
-      },function(err){
-        console(err)
-      })
-      let queryGroup = new AV.Query('_User')
-      queryGroup.equalTo('grade',gradeList[i]).equalTo('isTeacher',false)
+      state.gradeList  = []
+      let queryGroup = new AV.Query('GradeTable')
       queryGroup.find().then (function(groupItem){
-        for (let j = 0; j < groupItem.length; j++) {
-          let teamname = groupItem[j].attributes.teamname
-          if(teamname && groupList.indexOf(teamname) === -1){
-            groupList.push(groupItem[j].attributes.teamname)
-          }
+        for(let i = 0; i < groupItem.length; i++){
+          state.gradeList.push(groupItem[i].attributes.createGrade)
         }
-        info.GroupList = groupList
-        info.GroupCount = groupList.length
-      })
-      result.push(info)
-    }
-    state.gradeListinfo = result
+        console.log(state.gradeList)
+    },function(err){
+      console.log("无权访问班级表")
+    })
    },
    [types.CHANGR_PASS] (state,param) {
     console.log(state.userInfo)
@@ -206,10 +189,16 @@ const mutations = {
         let instance = new CreateItem()
         instance.set('TeacherId',TeacherId)
         instance.set('createGrade',param)
-        instance.save()
-        myGradeArray.push(param)
+        instance.save().then(function(){
+           state.AllGradNameList.push({'grades':param,'groups':[{'groupName':'','groupStuNumber':0,'gradeStuNumber':0}]})
+          alert("创建成功")
+        },function(){
+          alert("创建失败")
+        })
+        
    },
    [types.GRADE_AND_GROUP] (state) {
+     state.AllGradNameList = []
      let TeacherId = state.userInfo.id
      
     let findAllGradeName = new AV.Query("GradeTable")
@@ -329,7 +318,7 @@ const actions = {
     getInGroupScore ({commit}) {
       commit(types.GET_SCORE_INGROUP)
     },
-    createGradeListInfo ({commit}) {
+    getAllInfoList ({commit}) {
       commit (types.GET_GRADE_LIST)
     },
     changePassWord ({commit}, param) {

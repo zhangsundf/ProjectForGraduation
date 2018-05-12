@@ -115,7 +115,7 @@ export default {
             login: true
         }).then (() => {
             alert("this.getLogin is true")
-            this.$store.dispatch("getUser")
+             this.$store.dispatch("getUser")
             this.$router.push({path:'/Home/StudentInfo'})
 
         }).catch(() => {

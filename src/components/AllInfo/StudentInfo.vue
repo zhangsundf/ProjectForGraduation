@@ -196,6 +196,7 @@ export default {
   },
   created() {
       this.$store.dispatch('getGradeAndGroup')
+      // this.$store.dispatch('getUser')
   }
 }
 </script>
