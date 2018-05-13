@@ -29,7 +29,7 @@
     height="100%">
     <el-table-column
       label="班级"
-      min-width="100">
+      min-width="60">
       <template slot-scope="scope">
         <span style="margin-left: 10px" v-if = "!scope.row.editFlag">{{scope.row.grades}}</span>
         <span v-if = "scope.row.editFlag"><input type = "text" class = "input is-primary" v-model = "newGradeName"></span>
@@ -46,7 +46,7 @@
       label="班级人数"
       min-width="50">
       <template slot-scope="scope">
-            <span>{{ scope.row.groups[scope.row.groups.length-1].gradeStuNumber }}</span>
+            <span>{{ scope.row.groups[0].gradeStuNumber }}</span>
       </template>
     </el-table-column>
     <el-table-column
@@ -71,7 +71,7 @@
         <el-button
           size="mini"
           type="danger"
-         @click.native.prevent="deleteRow(scope.$index,result)">删除</el-button>
+         @click.native.prevent="deleteRow(scope.$index,gradeAndGroup,scope.row)">删除</el-button>
         <el-button
           size="mini"
           type="success"
@@ -120,7 +120,7 @@ export default {
         }
         this.$store.dispatch ("createMyGrade",gradeName)
         this.gradeName = ''
-        this.$store.dispatch('getUser')
+        // this.$store.dispatch('getUser')
         alert("创建成功！快去小组管理创建班级小组吧")
       },
        handleEdit(index, row) {
@@ -136,15 +136,25 @@ export default {
         }
       
       },
-      deleteRow(index,rows) {
-        var r = confirm("确认将此学生从你管理的班级移除？")
+      deleteRow(index,rows,row) {
+        var r = confirm("确认将此班级从你管理的班级移除？此操作会删除该班级下所以有的小组以及成员")
         if (r) {
-          this.$store.dispatch("deleteStudent",index).then(function(){
+          this.$store.dispatch("deleteGrade",{
+                                              id:index,
+                                              gradeName:row.grades
+          }).then(function(){
               alert("删除成功")
               rows.splice(index, 1);
           }).catch(()=>{
               alert("删除失败")
           })
+          this.$store.dispatch('deleteGroupsByGrade',row).then(function(){
+                  alert("更新远端的小组表成功")
+                }).catch(function(){
+                  alert("更新远端的小组表失败")
+                })
+
+
         }
         else {
           return
@@ -158,11 +168,12 @@ export default {
                                     original:this.originalName,
                                     index:index
                                     }).then(()=>{
-                                      this.isOneEdit = false
+                                     
                                       alert("success")
                                     }).catch(()=>{
                                       alert("failed")
                                     })
+               this.isOneEdit = false
               row.editFlag = false
         return
         }else{
