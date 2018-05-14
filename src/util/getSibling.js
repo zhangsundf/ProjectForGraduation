@@ -1,6 +1,5 @@
 export default{
   install(Vue){
-    Vue.prototype.$bus = new Vue()
     Vue.prototype.toggleClass = (tagclass,curindex, style) => {
    //   console.log("this is getSibling")
         var li_list = document.getElementsByClassName(tagclass)

@@ -47,7 +47,7 @@ export default {
   name:'Home',
   data(){
     return {
-      cur: 'studentInfo'
+      
     }
   },
   methods:{
@@ -56,16 +56,11 @@ export default {
         this.toggleClass("link",index,"is-active")
     }
   },
-  computed:{
-    link:{
-      get (){
-       return this.cur
-      },
-      set (val){
-        this.cur = val
-        return this.cur
-      }
-    }
+  beforeCreate () {
+     this.$store.dispatch ("getDateArray")
+  },
+  mounted() {
+    console.log(this.$store.state.getDate)
   }
 }
 </script>

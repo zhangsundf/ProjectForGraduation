@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import * as types from './mutation_types'
 import AV from 'leancloud-storage'
 
+
 AV.init ({
   appId: 'MepAGl7Wai0XwJAu4Kk8aYo1-gzGzoHsz',
   appKey: 'U3dJSqfmKuDjnl67TkLQOhpN',
@@ -112,16 +113,23 @@ const mutations = {
      return result
    },
    [types.GET_DATE_LIST] (state) {
-     let set = []
-     let query = new AV.Query("SigninList")
-     query.ascending('date')
-     query.find().then (function (item) {
-       for(let i = 0; i < item.length; i ++){
-         if(set.indexOf(item[i].attributes.date) === -1)
-          set.push(item[i].attributes.date)
-       }
-     })
-     state.dateArray = set.sort()
+    let beginDate = state.userInfo.attributes.startDate
+    let today = new Date().format() 
+      let dateList = []
+      var ab = beginDate.split("-");  
+      var ae = today.split("-");  
+      var db = new Date();  
+      db.setUTCFullYear(ab[0], ab[1] - 1, ab[2]);  
+      var de = new Date();  
+      de.setUTCFullYear(ae[0], ae[1] - 1, ae[2]);  
+      var unixDb = db.getTime();  
+      var unixDe = de.getTime();  
+      for (var k = unixDb; k <= unixDe;) {  
+         dateList.push((new Date(parseInt(k))).format());  
+          k = k + 24 * 60 * 60 * 1000;  
+      }
+      
+     state.dateArray =  dateList
    },
    [types.GET_ATTEND_SCORE] (state) {
      let studentinfo = state.studentinfo

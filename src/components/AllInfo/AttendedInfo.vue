@@ -1,9 +1,29 @@
 <template>
   <div class = "AttendedInfo">
     <div class = "header">
-      <span class= "showdate" v-for = "(item,index) in dateList" :key = "index"  @click = "changeDate(item,index)">{{item | fommatDate}}</span>
-      <br>
-      <div class = "showCurDate"><span class = "setcurDate"></span></div>
+       <nav class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <p class="subtitle is-5">
+            <strong>选择日期</strong> 
+          </p>
+        </div>
+        <div class="level-item">
+
+          <div class="field has-addons">
+              <el-select  v-model="chooseDate" :placeholder= "dateList[dateList.length-1]">
+                  <el-option
+                    v-for="(item,index) in dateList"
+                    :key="index"
+                    :label="item"
+                    :value="item">
+                  </el-option>
+              </el-select>
+            
+          </div>
+          </div>
+        </div>
+    </nav>
     </div>
     
     <el-table
@@ -37,14 +57,25 @@
       label="小组"
       min-width="100">
       <template slot-scope="scope">
-            <span class = "span">{{ scope.row.teamname }}</span>
+            <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.teamname }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="是否签到"
       min-width="200">
       <template slot-scope="scope">
-            <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.isSignin}}</span>
+            <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.isSignin | fommatSign}}</span>
+      </template>
+    </el-table-column>
+     <el-table-column label="操作" min-width="230">
+      <template slot-scope="scope">
+        <el-button
+          size="mini"
+         >编辑</el-button>
+        <el-button
+          size="mini"
+          type="success"
+          >完成</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -57,6 +88,8 @@ export default {
   data(){
     return {
       dateList:[],
+      chooseDate:'',
+      today: new Date().format()
     }
   },
   computed: {
@@ -84,36 +117,22 @@ export default {
     var curDate = now.getFullYear()+"-"+getMonth +"-"+getDate
 
     this.$store.dispatch ("getIsSign",curDate)
-    this.$store.dispatch ("getDateArray")
   },
-  methods: {
-    changeDate (item,index) {
-      let setcurDate = document.getElementsByClassName('setcurDate')[0]
-        this.$store.dispatch ("getIsSign",item)
-        setcurDate.innerHTML = item
-        this.toggleClass("showdate",index+1,"active")
+  watch: {
+    chooseDate() {
+       this.$store.dispatch ("getIsSign",this.chooseDate)
     }
   },
   mounted () {
     this.dateList = this.getDate
-    var now=new Date();
-    let getMonth = now.getMonth() + 1 < 10 ? '0'+(now.getMonth() + 1):now.getMonth() + 1
-    let getDate = now.getDate() < 10 ? '0' + now.getDate() : now.getDate() 
-    var curDate = now.getFullYear()+"-"+getMonth +"-"+getDate
-
-    let setcurDate = document.getElementsByClassName('setcurDate')[0]
-    setcurDate.innerHTML = curDate
-    
+    console.log(this.getDate)
   },
   filters:{
-    fommatDate (val) {
-      return val.substring(5)
-    },
     fommatSign(val){
       if(val === true) {
-        return 10
+        return '成功签到'
       }
-      return 0
+      return '未签到'
     }
   }
 }
@@ -123,40 +142,20 @@ export default {
     position: relative;
     width: 100%;
     height: 12%;
-    font-size:12px;
-    color: grey;
-    font-weight: bold;
-    margin: 0 auto;
-    text-align: center;
-  }
-  .showdate {
-    position: relative;
-    margin: 10px;
-    font-size: 16px;
-  }
-  .showdate:hover{
-    cursor: pointer;
-    color:blue;
-  }
-  header .showdate:first-child{
-    color: red;
-  }
-  .previous, .next{
-    display: inline-block;
-    
-  }
-  .active {
-    color: red;
+
   }
   .signin {
     position: relative;
     line-height: 100%;
-    background-color: green;
+    color: green;
+    font-weight: bold;
+    font-weight:normal;
   }
   .nosignin {
     position: relative;
     line-height: 100%;
-    background-color: red;
+    color:red;
+    font-weight:normal;
   }
 </style>
 

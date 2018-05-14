@@ -114,9 +114,9 @@ export default {
             pass: this.password,
             login: true
         }).then (() => {
-            alert("this.getLogin is true")
-             this.$store.dispatch("getUser")
-            this.$router.push({path:'/Home/StudentInfo'})
+             
+              this.$store.dispatch("getUser")
+              this.$router.push({path:'/Home/StudentInfo'})
 
         }).catch(() => {
           this.error = true
