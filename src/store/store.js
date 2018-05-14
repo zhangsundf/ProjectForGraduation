@@ -416,17 +416,22 @@ const actions = {
           queryGrade.find().then(function(item) {
             let queryGroupByGrade = new AV.Query('Team')
             queryGroupByGrade.equalTo("GradeID",item[0].id)
-            let objects = []
-            queryGroupByGrade.find().then(function(group) {
-              for(let i = 0; i < group.length; i++){
-               objects.push(group[i])
-            }
-         })
-         AV.Object.destroyAll(objects).then(function () {
-          resolve()
-        }, function (error) {
+            queryGroupByGrade.find().then(function(todos){
+              todos.forEach(function(todo) {
+                var todo = AV.Object.createWithoutData('Team', todo.id)
+                todo.destroy().then(function (success) {
+                 console.log("删除成功")
+                }, function (error) {
+                 reject()
+                });
+              });
+              return AV.Object.saveAll(todos)
+            })
+           
+        }).then(function(){
+          resoLlve()
+        },function(){
           reject()
-        });
         })
     })
 
