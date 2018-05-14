@@ -51,6 +51,7 @@
       </div>
 
     </nav>
+    
     <el-table
     :data="result"
     style="width: 100%"
@@ -91,7 +92,7 @@
       sortable
       min-width="100">
       <template slot-scope="scope">
-            <span>{{ scope.row.attendScore }}</span>
+            <span>{{scope.row.attendScore }}</span>
       </template>
     </el-table-column>
     <el-table-column
@@ -142,7 +143,8 @@ export default {
       usualGrade: 0,
       documents: 0,
       inGroup:0,
-      betweenGroup: 0
+      betweenGroup: 0,
+      // studentInfo: []
     }
   },
   computed:{
@@ -180,7 +182,7 @@ export default {
     this.$store.dispatch("getInGroupScore")
   },
   mounted () {
-
+  //  this.studentInfo = this.getStudentInfo
   }
 }
 </script>

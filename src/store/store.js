@@ -87,7 +87,7 @@ const mutations = {
    
    [types.GET_SIGN_LIST] (state,param) {
      state.signinList = []
-     let result = []
+    //  let result = []
      for (let i = 0; i < state.studentinfo.length; i++) {
        let userId = state.studentinfo[i].id
        let queryUser = new AV.Query('SigninList')
@@ -98,7 +98,7 @@ const mutations = {
        var query = AV.Query.and (queryUser,querySign)
        query.find().then(function (signin) {
         if(signin.length !== 0) {
-          state.signinList.push ({'userID':userId,'isSignin':signin[0].attributes.isSignin,'date':param})
+          state.signinList.push ({'userID':userId,'isSignin':signin[0].attributes.isSignin,'date':param,'signId':signin[0].id})
         }
          if(signin.length === 0) {
            let query = new AV.Object('SigninList')
@@ -110,7 +110,7 @@ const mutations = {
          }
       })
      }
-     return result
+    //  return result
    },
    [types.GET_DATE_LIST] (state) {
     let beginDate = state.userInfo.attributes.startDate
@@ -141,11 +141,11 @@ const mutations = {
       queryUser.equalTo('userID',userId).find().then(function(item) {
         for (let j = 0; j <item.length; j ++ ) {
           if(item[j].attributes.isSignin === true) {
-            score+=10
+            score+=100
           }
         }
         state.studentinfo[i].attributes = Object.assign({},{'attendScore':score},state.studentinfo[i].attributes)
-        state.attendScoreList.push ({'userID':userId,'attendScore':score})
+         state.attendScoreList.push ({'userID':userId,'attendScore':score})
       })
      }
    },
@@ -300,6 +300,20 @@ const actions = {
            reject()
         })
       })
+    },
+    changeAttendStatus ({commit}, param) {
+      console.log(param)
+      return new Promise ((resolve,reject) =>{
+                var todo = AV.Object.createWithoutData('SigninList', param.row.signId);
+                todo.set('isSignin', param.status);
+                // 保存到云端
+                todo.save().then(function(){
+                    resolve()
+                },function(err){
+                  console.log(err)
+                  reject()
+                })
+              })
     },
     deleteStudent ({commit},param) {
       return new Promise ((resolve,reject) => {

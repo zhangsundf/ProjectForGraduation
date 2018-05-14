@@ -25,7 +25,6 @@
         </div>
     </nav>
     </div>
-    
     <el-table
     :data="result"
     style="width: 100%"
@@ -64,18 +63,28 @@
       label="是否签到"
       min-width="200">
       <template slot-scope="scope">
-            <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.isSignin | fommatSign}}</span>
+            <span v-if = "!scope.row.editFlag" class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.isSignin | fommatSign}}</span>
+            <div v-if = "scope.row.editFlag" class = "field">
+                <el-select v-model="chooseStatus" :placeholder= "scope.row.isSignin | fommatSign" >
+                  <el-option
+                    v-for="(item,index) in siginState"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+            </div>
       </template>
     </el-table-column>
      <el-table-column label="操作" min-width="230">
       <template slot-scope="scope">
         <el-button
           size="mini"
-         >编辑</el-button>
+         @click = handleEdit(scope.$index,scope.row)>编辑</el-button>
         <el-button
           size="mini"
           type="success"
-          >完成</el-button>
+          @click = "complete(scope.$index,scope.row)">完成</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -89,7 +98,10 @@ export default {
     return {
       dateList:[],
       chooseDate:'',
-      today: new Date().format()
+      isOneEdit:false,
+      siginState: [{'label':"签到成功",value:true},{'label':"未签到",value:false}],
+      chooseStatus: '',
+      index:-1
     }
   },
   computed: {
@@ -102,13 +114,43 @@ export default {
         for (let i = 0; i < this.tableData.length; i++){
           for (let j = 0; j < this.getSigninList.length; j++){
             if(this.tableData[i].id === this.getSigninList[j].userID){
-                result.push(Object.assign({},this.getSigninList[j],this.tableData[i].attributes))
+                result.push(Object.assign({'editFlag':false},this.getSigninList[j],this.tableData[i].attributes))
                 break
             }
           }
-        }
+        }  
         return result
     }
+  },
+  methods: {
+    handleEdit(index, row) {
+        if(this.isOneEdit === false){
+            this.isOneEdit = true
+            row.editFlag = true
+            this.index = index
+        }else{
+          alert("已有一个学生签到处于编辑编辑状态，请点击完成后在执行该操作！")
+          return
+        }
+      },
+        complete (index,row) {
+        if(this.isOneEdit === true && this.index === index) {
+              this.$store.dispatch('changeAttendStatus',{
+                                    status:this.chooseStatus,
+                                    row:row
+                                    }).then(()=>{
+                                      row.isSignin = this.chooseStatus
+                                      this.isOneEdit = false
+                                      alert("success")
+                                    }).catch(()=>{
+                                      alert("failed")
+                                    })
+              row.editFlag = false
+        return
+        }else{
+          return 
+        }
+      }
   },
  beforeCreate() {
     var now=new Date();
@@ -125,12 +167,11 @@ export default {
   },
   mounted () {
     this.dateList = this.getDate
-    console.log(this.getDate)
   },
   filters:{
     fommatSign(val){
       if(val === true) {
-        return '成功签到'
+        return '签到成功'
       }
       return '未签到'
     }
