@@ -199,42 +199,37 @@ const mutations = {
    [types.GRADE_AND_GROUP] (state) {
     state.AllGradNameList = []
     let TeacherId = state.userInfo.id
-   let findAllGradeName = new AV.Query("GradeTable")
-   findAllGradeName.equalTo("TeacherId",TeacherId)
-   findAllGradeName.ascending('createGrade')
-   findAllGradeName.find().then(function(item){
+    let findAllGradeName = new AV.Query("GradeTable")
+    findAllGradeName.equalTo("TeacherId",TeacherId)
+    findAllGradeName.ascending('createGrade')
+    findAllGradeName.find().then(function(item){
      for(let p = 0; p < item.length; p ++) {
 
-       let gradeName = item[p].attributes.createGrade
-       let Group = []
-       let obj = {}
-       let objGrade = {}
-       let gradeStuNumber = 0
-       let queryGroup = new AV.Query('_User')
-       queryGroup.equalTo('grade',gradeName)
-       queryGroup.find().then(function(items) {
-         for(let i = 0; i < items.length; i++){
-           let groupitem = items[i].attributes.teamname
-           obj[groupitem] = obj[groupitem] ? obj[groupitem]+1 : 1
-         }
-         for(let key in obj){
-            gradeStuNumber += obj[key]
-            let query1 = new AV.Query('Team')
-            query1.equalTo('GradeID',item[p].id)
-
-            let query2 = new AV.Query('Team')
-            query2.equalTo('teamname',key)
-
-            let query = AV.Query.and(query1,query2)
-            query.find().then(function(item2){
-              Group.push({'groupName':key,'groupStuNumber':obj[key],'createdAt':item2[0].createdAt,'updatedAt':item2[0].updatedAt})
+        let gradeName = item[p].attributes.createGrade
+        let Group = []
+        let obj = {}
+        let objGrade = {}
+        let gradeStuNumber = 0
+        
+        let queryGroup = new AV.Query('Team')
+        queryGroup.equalTo('GradeID',item[p].id) 
+        queryGroup.find().then (function(groupitem) {
+          for(let i = 0; i < groupitem.length; i ++ ){
+            let key = groupitem[i]
+            let queryStudent = new AV.Query('_User')
+            queryStudent.equalTo('teamname',key.attributes.teamname) 
+            queryStudent.count().then (function(count) {
+              Group.push({'groupName':key.attributes.teamname,'groupStuNumber':count,'createdAt':key.createdAt,'updatedAt':key.updatedAt})
             })
-         }
-         Group.push({'gradeStuNumber':gradeStuNumber})
-       })
-       state.AllGradNameList.push(Object.assign({'createdAt':item[p].createdAt,'updatedAt':item[p].updatedAt},{'grades':gradeName,'groups':Group}))
-       }
-       console.log(state.AllGradNameList)
+          }
+        })
+        let countGradeStuNum = new AV.Query('_User')
+        countGradeStuNum.equalTo('grade',item[p].attributes.createGrade)
+
+        countGradeStuNum.count().then (function(count) {
+          state.AllGradNameList.push(Object.assign({'createdAt':item[p].createdAt,'updatedAt':item[p].updatedAt,'gradeStuNumber':count},{'grades':gradeName,'groups':Group}))
+        })
+      }
      })
 
   }
@@ -242,25 +237,25 @@ const mutations = {
 }
 
 const actions = {
-  checkLogin ({state,commit},param) {
-    return new Promise((resolve, reject) => {
+    checkLogin ({state,commit},param) {
+      return new Promise((resolve, reject) => {
 
-      AV.User.logIn(param.name,param.pass).then(function(loginedUser) {
-           if(loginedUser.attributes.isTeacher){
-              state.user = param.name
-              state.pass = param.pass
-              state.isLogin = param.login
-              state.userInfo = AV.User.current()
-              resolve()
-          }
-          if (!loginedUser.attributes.isTeacher) {
-              reject()
-           }
-      }).catch(error => {
-        reject(error)
+        AV.User.logIn(param.name,param.pass).then(function(loginedUser) {
+            if(loginedUser.attributes.isTeacher){
+                state.user = param.name
+                state.pass = param.pass
+                state.isLogin = param.login
+                state.userInfo = AV.User.current()
+                resolve()
+            }
+            if (!loginedUser.attributes.isTeacher) {
+                reject()
+            }
+        }).catch(error => {
+          reject(error)
+        })
       })
-    })
-        
+          
     },
     getUser ({commit}) {
       commit(types.SET_STUDENT_LIST)
@@ -372,7 +367,7 @@ const actions = {
                   break
             }
           }
-          commit(types.SET_STUDENT_LIST)
+          console.log(state.AllGradNameList)
           resolve()
           },function(){
             reject()
@@ -435,7 +430,7 @@ const actions = {
         })
     })
 
-}
+  }
 }
 
 export default new Vuex.Store({

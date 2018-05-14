@@ -185,18 +185,16 @@ export default {
         this.groupList = []
            for(let i = 0; i < this.getAllGradNameList.length; i++) {
             if (this.getAllGradNameList[i].grades === this.chooseGrade) {
-            for(let j = 1; j < this.getAllGradNameList[i].groups.length; j++) {
+            for(let j = 0; j < this.getAllGradNameList[i].groups.length; j++) {
               this.groupList.push(this.getAllGradNameList[i].groups[j].groupName)
               }
             }
             this.chooseGroup = this.groupList[0]
-            // alert(this.chooseGroup)
          }
     }
   },
   created() {
       this.$store.dispatch('getGradeAndGroup')
-      // this.$store.dispatch('getUser')
   }
 }
 </script>

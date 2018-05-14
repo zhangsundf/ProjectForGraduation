@@ -128,7 +128,7 @@ export default {
         let grade = this.getAllGradNameList
          for (let i = 0; i < grade.length; i++) {
            let groupList = []
-          for(let j = 1; j < grade[i].groups.length; j++){
+          for(let j = 0; j < grade[i].groups.length; j++){
             groupList.push(grade[i].groups[j])
           }
            result.push (Object.assign({'gradeName':grade[i].grades},{'groupList':groupList}))
@@ -138,7 +138,21 @@ export default {
   },
   methods: {
     addGroup (name) {
-      
+       let groupName =  name.trim()
+        if (!groupName) {
+          alert("小组名不能为空")
+          this.groupName = ''
+          return
+        }
+       for(let i = 0; i < this.getAllGradNameList.length; i++) {
+         let grade = this.getAllGradNameList[i]
+          for (let j = 1; j < grade.groups.length; j++) {
+            if (grade.groups[j].groupName === groupName) {
+              alert("小组名已经存在不能重复创建")
+              return 
+            }
+          }
+       }
       this.$store.dispatch('addGroup',{
                                       gradeName:this.chooseGrade,
                                       groupName:name

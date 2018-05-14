@@ -39,14 +39,14 @@
       label="小组个数"
       min-width="40">
       <template slot-scope="scope">
-          <span>{{ scope.row.groups.length-1}}</span>
+          <span>{{ scope.row.groups.length}}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="班级人数"
       min-width="50">
       <template slot-scope="scope">
-            <span>{{ scope.row.groups[0].gradeStuNumber }}</span>
+            <span>{{ scope.row.gradeStuNumber }}</span>
       </template>
     </el-table-column>
     <el-table-column
