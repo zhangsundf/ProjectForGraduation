@@ -88,21 +88,14 @@
           </div>
       </template>
     </el-table-column>
-     <el-table-column label="操作" min-width="120">
+     <el-table-column label="操作" min-width="80">
       <template slot-scope="scope">
         <div class="content-rowspan">
             <div v-for= "(value,index) in scope.row.groupList"  :key = "index">
               <el-button
-                size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-              <el-button
-                size="mini"
+                size="small"
                 type="danger"
-              @click.native.prevent="deleteRow(scope.$index,result)">删除</el-button>
-              <el-button
-                size="mini"
-                type="success"
-                @click="complete(scope.$index,scope.row)">完成</el-button>
+              @click.native.prevent="deleteRow(index,scope.row)">删除</el-button>
             </div>
         </div>
       </template>
@@ -164,6 +157,40 @@ export default {
                                       })
                                         this.groupName = ''
                                         this.chooseGrade = ''
+    },
+    deleteRow (index,row) {
+      console.log(row)
+
+        console.log(row.groupList[index].groupName)
+           this.$store.dispatch("deleteGroupByGroupName",{
+                                              gradeName:row.gradeName,
+                                              groupName:row.groupList[index].groupName,
+                                              index:index
+                                              }).then (function(){
+                                                
+                                                row.groupList.splice(index,1)
+                                                alert("删除小组成功")
+                                                  }).catch(function(){
+                                                    alert("删除小组失败")
+                                                  })
+       this.$store.dispatch('updategradeAndGroup',{
+                       gradeName:row.gradeName,
+                       groupName:row.groupList[index].groupName,
+                       index:index
+                     }).then (function(){
+                     
+                     }).catch(function(err){
+                       console.log("从本地更新state失败"+err)
+                     })
+      this.$store.dispatch('deleteStudentByGroup',{
+                                              gradeName:row.gradeName,
+                                              groupName:row.groupList[index].groupName,
+                                            }).then (function(){
+                                              console.log("删除远端学生成功")
+                                            }).catch(function(){
+                                              console.log("删除远端学生失败")
+                                            })
+
     }
                                     
   },

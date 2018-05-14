@@ -63,19 +63,15 @@
             <span>{{scope.row.createdAt | fommatDate}}</span>
       </template>
     </el-table-column>
-    <el-table-column label="操作" min-width="120">
+    <el-table-column label="操作" min-width="60" style = "text-align:center">
       <template slot-scope="scope">
+
         <el-button
-          size="mini"
-          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-        <el-button
-          size="mini"
+          size="small"
           type="danger"
+           
          @click.native.prevent="deleteRow(scope.$index,gradeAndGroup,scope.row)">删除</el-button>
-        <el-button
-          size="mini"
-          type="success"
-          @click="complete(scope.$index,scope.row)">完成</el-button>
+      
       </template>
     </el-table-column>
   </el-table>
@@ -123,19 +119,6 @@ export default {
         // this.$store.dispatch('getUser')
         alert("创建成功！快去小组管理创建班级小组吧")
       },
-       handleEdit(index, row) {
-        if(this.isOneEdit === false){
-            this.isOneEdit = true
-            row.editFlag = true
-            this.originalName = row.grades
-            this.index = index
-            this.newGradeName = row.grades
-        }else{
-          alert("已有一个学生信息处于编辑编辑状态，请点击完成后在执行该操作！")
-          return
-        }
-      
-      },
       deleteRow(index,rows,row) {
         var r = confirm("确认将此班级从你管理的班级移除？此操作会删除该班级下所以有的小组以及成员")
         if (r) {
@@ -149,36 +132,21 @@ export default {
               alert("删除失败")
           })
           this.$store.dispatch('deleteGroupsByGrade',row).then(function(){
-                  alert("更新远端的小组表成功")
-                }).catch(function(){
-                  alert("更新远端的小组表失败")
+                  // alert("更新远端的小组表成功")
+                }).catch(function(err){
+                  // alert("更新远端的小组表失败")
+                  console.log(err)
                 })
-
-
+          this.$store.dispatch('deleteStudentByGrade',row.grades).then(function(){
+              alert("通过班级批量删除学生成功")
+          }).catch(function(err){
+              console.log(err)
+          })
         }
         else {
           return
         }
 
-      },
-      complete (index,row) {
-        if(this.isOneEdit === true && this.index === index) {
-              this.$store.dispatch('changeGradeName',{
-                                    newGradeName:this.newGradeName,
-                                    original:this.originalName,
-                                    index:index
-                                    }).then(()=>{
-                                     
-                                      alert("success")
-                                    }).catch(()=>{
-                                      alert("failed")
-                                    })
-               this.isOneEdit = false
-              row.editFlag = false
-        return
-        }else{
-          return 
-        }
       }
     },
     filters: {

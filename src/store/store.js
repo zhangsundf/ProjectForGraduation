@@ -52,7 +52,6 @@ const mutations = {
      queryTeacherId.equalTo('TeacherId',state.userInfo.id)
      queryTeacherId.ascending('createGrade')
      queryTeacherId.find().then (function (item) {
-       console.log(item)
       state.studentinfo = []
        for (let i = 0; i < item.length; i++) {
          let gradeItem = item[i].attributes.createGrade
@@ -187,7 +186,7 @@ const mutations = {
         instance.set('createGrade',param)
         instance.save().then(function(){
            state.AllGradNameList.push({'grades':param,
-                         'groups':[{'gradeStuNumber':0}],
+                         'groups':[],'gradeStuNumber':0,
                         //  [{'groupName':'','groupStuNumber':0,'updatedAt':new Date(),'createdAt':new Date()}],
                         'updatedAt':new Date(),'createdAt':new Date()})
           alert("创建成功")
@@ -216,9 +215,15 @@ const mutations = {
         queryGroup.find().then (function(groupitem) {
           for(let i = 0; i < groupitem.length; i ++ ){
             let key = groupitem[i]
-            let queryStudent = new AV.Query('_User')
-            queryStudent.equalTo('teamname',key.attributes.teamname) 
-            queryStudent.count().then (function(count) {
+            let queryStudent1 = new AV.Query('_User')
+            queryStudent1.equalTo('teamname',key.attributes.teamname) 
+
+            let queryStudent2 = new AV.Query('_User')
+            queryStudent2.equalTo('grade',gradeName) 
+
+            let query = AV.Query.and(queryStudent1,queryStudent2)
+            query.count().then (function(count) {
+
               Group.push({'groupName':key.attributes.teamname,'groupStuNumber':count,'createdAt':key.createdAt,'updatedAt':key.updatedAt})
             })
           }
@@ -231,7 +236,6 @@ const mutations = {
         })
       }
      })
-
   }
   
 }
@@ -332,20 +336,6 @@ const actions = {
     getGradeAndGroup ({commit}) {
       commit (types.GRADE_AND_GROUP)
     },
-    changeGradeName ({commit},param){
-      return new Promise(function (resolve,reject) {
-        let UserId = state.userInfo.id
-        AV.Query.doCloudQuery('update GradeTable set createGrade= '+param.newGradeName+'where TeacherId = '+'UserId')
-        .then(function (data) {
-          // data 中的 results 是本次查询返回的结果，AV.Object 实例列表
-          // var results = data.results;
-          resolve()
-        }, function (error) {
-          // 异常处理
-          reject()
-        });
-      })
-    },
     addGroup ({commit},param) {
       return new Promise (function(resolve,reject) {
         let queryGrade = new AV.Query("GradeTable")
@@ -367,7 +357,6 @@ const actions = {
                   break
             }
           }
-          console.log(state.AllGradNameList)
           resolve()
           },function(){
             reject()
@@ -391,10 +380,9 @@ const actions = {
               let deleteGrade = state.AllGradNameList[k].grades
               if(deleteGrade === param.gradeName) {
                 state.AllGradNameList.splice(k,1)
-                break
               }
             }
-            resolve()
+             resolve()
           }, function (error) {
            reject()
           });
@@ -429,7 +417,94 @@ const actions = {
           reject()
         })
     })
+  },
+  deleteGroupByGroupName ({commit},param) {
+    return new Promise (function(resolve,reject) {
+      let queryGrade = new AV.Query('GradeTable')
+          queryGrade.equalTo('createGrade',param.gradeName)
+          queryGrade.find().then(function(gradeItem) {
+            let queryGroup1 = new AV.Query('Team')
+                queryGroup1.equalTo('GradeID',gradeItem[0].id)
 
+            let queryGroup2 = new AV.Query('Team')
+                queryGroup2.equalTo('teamname',param.groupName)
+
+            let query = AV.Query.and(queryGroup1,queryGroup2)
+                query.find().then(function(todo) {
+                  var todo = AV.Object.createWithoutData('Team', todo[0].id)
+                  todo.destroy().then(function (success) {
+                    
+                    resolve()
+                  }, function (error) {
+                   reject()
+                  });
+                })
+          })
+
+    })
+  },
+  updategradeAndGroup ({commit}, param) {
+    return new Promise(function(resolve,reject) {
+      for(let i = 0; i < state.AllGradNameList.length; i++) {
+        let grade = state.AllGradNameList[i]
+         
+            // for(let j = 0; j < grade.groups.length; j ++) {
+           
+              if(grade.grades === param.gradeName ){
+                for(let j = 0; j < grade.groups.length; j++) {
+                  if (grade.groups[j].groupName === param.groupName) {
+                     grade.groups.splice(j,1)
+                     resolve()
+                  }  
+              }
+          }
+        }
+      reject()
+    })
+  },
+  deleteStudentByGrade ({commit},param) {
+    return new Promise(function(resolve,reject){
+      let querystudent1 = new AV.Query('_User')
+      querystudent1.equalTo('grade',param)
+  
+      querystudent1.find().then(function(stuList){
+        stuList.forEach(function(todo) {
+          var todo = AV.Object.createWithoutData('_User', todo.id)
+          todo.destroy().then(function (success) {
+           console.log("删除成功")
+          }, function (error) {
+           reject()
+          })
+        })
+        commit(types.SET_STUDENT_LIST)
+        return AV.Object.saveAll(stuList)
+      })
+    })
+    
+  },
+  deleteStudentByGroup ({commit},param) {
+    return new Promise(function(resolve,reject){
+      let querystudent1 = new AV.Query('_User')
+      querystudent1.equalTo('grade',param.gradeName)
+  
+      let querystudent2 = new AV.Query('_User')
+      querystudent2.equalTo('teamname',param.groupName)
+  
+      let query = AV.Query.and(querystudent1,querystudent2)
+      query.find().then(function(stuList){
+        stuList.forEach(function(todo) {
+          var todo = AV.Object.createWithoutData('_User', todo.id)
+          todo.destroy().then(function (success) {
+           commit(types.GRADE_AND_GROUP)
+          }, function (error) {
+           reject()
+          })
+        })
+        commit(types.SET_STUDENT_LIST)
+        return AV.Object.saveAll(stuList)
+      })
+    })
+    
   }
 }
 
