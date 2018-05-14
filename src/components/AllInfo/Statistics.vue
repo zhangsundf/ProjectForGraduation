@@ -59,7 +59,7 @@
      height="80%">
     <el-table-column
       label="学号"
-      min-width="160">
+      min-width="120">
       <template slot-scope="scope">
         <span style="margin-left: 10px">{{scope.row.StudentId}}</span>
 
@@ -67,14 +67,21 @@
     </el-table-column>
     <el-table-column
       label="姓名"
-      min-width="150">
+      min-width="100">
       <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
       </template>
     </el-table-column>
     <el-table-column
+      label="班级"
+      min-width="100">
+      <template slot-scope="scope">
+            <span >{{ scope.row.grade }}</span>
+           </template>
+    </el-table-column>
+    <el-table-column
       label="小组"
-      min-width="120">
+      min-width="100">
       <template slot-scope="scope">
             <span >{{ scope.row.teamname }}</span>
            </template>

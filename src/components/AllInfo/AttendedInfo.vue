@@ -37,7 +37,7 @@
       label="小组"
       min-width="100">
       <template slot-scope="scope">
-            <span class = "span">{{ scope.row.temname }}</span>
+            <span class = "span">{{ scope.row.teamname }}</span>
       </template>
     </el-table-column>
     <el-table-column

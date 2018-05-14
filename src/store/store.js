@@ -49,19 +49,18 @@ const mutations = {
    [types.SET_STUDENT_LIST](state){
       let gradeArray = []
      let queryTeacherId = new AV.Query("GradeTable")
-     queryTeacherId.equalTo('TeacherId',state.userInfo.id).find().then (function (item) {
+     queryTeacherId.equalTo('TeacherId',state.userInfo.id)
+     queryTeacherId.ascending('createGrade')
+     queryTeacherId.find().then (function (item) {
+       console.log(item)
       state.studentinfo = []
        for (let i = 0; i < item.length; i++) {
          let gradeItem = item[i].attributes.createGrade
          gradeArray.push(gradeItem)
          let queryStudent1 = new AV.Query('_User')
          queryStudent1.equalTo('grade',gradeItem)
-         let queryStudent2 = new AV.Query('_User')
-         queryStudent2.equalTo('isTeacher',false)
-
-         let query = AV.Query.and(queryStudent1,queryStudent2)
-         query.ascending('StudentId');
-         query.find().then(function(userList) {
+         queryStudent1.ascending('grade')
+         queryStudent1.find().then(function(userList) {
            for (let j = 0; j < userList.length; j++){
             state.studentinfo.push(userList[j])
            }
@@ -200,9 +199,9 @@ const mutations = {
    [types.GRADE_AND_GROUP] (state) {
     state.AllGradNameList = []
     let TeacherId = state.userInfo.id
-    
    let findAllGradeName = new AV.Query("GradeTable")
    findAllGradeName.equalTo("TeacherId",TeacherId)
+   findAllGradeName.ascending('createGrade')
    findAllGradeName.find().then(function(item){
      for(let p = 0; p < item.length; p ++) {
 
@@ -230,14 +229,14 @@ const mutations = {
             query.find().then(function(item2){
               Group.push({'groupName':key,'groupStuNumber':obj[key],'createdAt':item2[0].createdAt,'updatedAt':item2[0].updatedAt})
             })
-
-            // Group.push({'groupName':key,'groupStuNumber':obj[key]})
          }
          Group.push({'gradeStuNumber':gradeStuNumber})
        })
        state.AllGradNameList.push(Object.assign({'createdAt':item[p].createdAt,'updatedAt':item[p].updatedAt},{'grades':gradeName,'groups':Group}))
        }
+       console.log(state.AllGradNameList)
      })
+
   }
   
 }
@@ -370,7 +369,6 @@ const actions = {
                  state.AllGradNameList[i].groups.push (Object.assign({
                    'groupName':param.groupName,'groupStuNumber':0,'updatedAt':new Date(),'createdAt':new Date()
                   }))
-                 
                   break
             }
           }
@@ -384,39 +382,29 @@ const actions = {
       })
     },
     deleteGrade ({commit},param) {
-      console.log("进入了state")
       return new Promise ((resolve,reject) => {
-
         let queryGrade = new AV.Query('GradeTable')
         queryGrade.equalTo('createGrade',param.gradeName)
 
         queryGrade.find().then(function(item){
           var todo = AV.Object.createWithoutData('GradeTable', item[0].id);
           todo.destroy().then(function (success) {
-            
-          
             if(state.gradeList.indexOf(param.gradeName) !== -1) {
               state.gradeList.splice(state.gradeList.indexOf(param.gradeName),1)
             }
-            console.log("删除班级后，在班级列表中删除:" + state.gradeList)
             for(let k = 0; k < state.AllGradNameList.length; k++) {
               let deleteGrade = state.AllGradNameList[k].grades
               if(deleteGrade === param.gradeName) {
                 state.AllGradNameList.splice(k,1)
-                console.log("删除班级小组表中的班级")
-                console.log(state.AllGradNameList)
                 break
               }
             }
-            
-            
             resolve()
           }, function (error) {
            reject()
           });
             resolve()
           },function(){
-            // alert("删除失败")
             reject()
           })
         })
@@ -425,7 +413,6 @@ const actions = {
       return new Promise(function(resolve,reject) {
           let queryGrade = new AV.Query('GradeTable')
           queryGrade.equalTo('createGrade',param.grades)
-
           queryGrade.find().then(function(item) {
             let queryGroupByGrade = new AV.Query('Team')
             queryGroupByGrade.equalTo("GradeID",item[0].id)
@@ -433,15 +420,6 @@ const actions = {
             queryGroupByGrade.find().then(function(group) {
               for(let i = 0; i < group.length; i++){
                objects.push(group[i])
-                // var todo2 = AV.Object.createWithoutData('Team',group[i].id);
-                // todo2.destroy().then(function (success) {
-                //   resolve()
-                //   console.log("从小组表中删除group成功")
-                // }, function (error) {
-                //   reject()
-                //   console.log("从小组表中删除group失败")
-                // })
-             
             }
          })
          AV.Object.destroyAll(objects).then(function () {
