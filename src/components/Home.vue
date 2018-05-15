@@ -112,6 +112,19 @@ export default {
     padding:2%;
     padding-top:5%;
   }
+.showView::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.showView::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+  border-radius: 10px;
+}
+.showView::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
 
 </style>
 

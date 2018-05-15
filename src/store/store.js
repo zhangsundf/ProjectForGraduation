@@ -584,7 +584,32 @@ const actions = {
         return AV.Object.saveAll(stuList)
       })
     })
-    
+  },
+  saveScore ({commit},param) {
+    return new Promise ((resolve,reject) => {
+      let studentId = state.studentinfo[param.index].id
+      console.log(param.index +','+ param.usually + ',' + param.document +','+studentId)
+      let query = new AV.Query('scoreList')
+      query.equalTo('userID',studentId)
+
+      query.find().then(function(scoreItem) {
+        console.log(scoreItem)
+        var todo = AV.Object.createWithoutData('scoreList',scoreItem[0].id)
+        // 修改属性
+        todo.set('documentScore',Number(param.document))
+        todo.set('usuallyScore',Number(param.usually))
+
+        todo.save().then (function(){
+          // state.scoreList.push({'userID':studentId,'attendScore':score})
+          console.log("保存到云端的考勤成绩更新成功")
+          resolve()
+        },function(){
+          console.log("保存到云端的考勤成绩更新失败")
+           reject()
+        })
+      
+      })
+    })
   }
 }
 
