@@ -21,8 +21,8 @@ const state = {
     studentComment: [],
     signinList: [],
     dateArray: [],
-    attendScoreList:[],
-    inGroupScoreList:[],
+    scoreList:[],
+    // inGroupScoreList:[],
     gradeList:[],
     AllGradNameList: []
 }
@@ -37,8 +37,8 @@ const getters = {
     },
     getSigninList: (state) => state.signinList,
     getDate: (state) => state.dateArray,
-    getAttendScoreList: (state) => state.attendScoreList,
-    getinGroupScoreList: (state) => state.inGroupScoreList,
+    getScoreList: (state) => state.scoreList,
+    // getinGroupScoreList: (state) => state.inGroupScoreList,
     getGradeList: (state) => state.gradeList,
     getAllGradNameList: (state) => state.AllGradNameList
 }
@@ -77,6 +77,7 @@ const mutations = {
       for (let i = 0; i < state.studentinfo.length; i++){
         let comment = new AV.Query('Comment')
         comment.equalTo('userID',state.studentinfo[i].id)
+        comment.ascending('date')
         comment.find().then(function(commentItem) {
           for(let k = 0; k < commentItem.length; k++){
             state.studentComment.push(commentItem[k])
@@ -131,45 +132,45 @@ const mutations = {
       
      state.dateArray =  dateList
    },
-   [types.GET_ATTEND_SCORE] (state) {
-     let studentinfo = state.studentinfo
-     for (let i = 0; i < studentinfo.length; i++) {
-       let score = 0
-      let userId = state.studentinfo[i].id
-      let queryUser = new AV.Query('SigninList')
+  //  [types.GET_ATTEND_SCORE] (state) {
+  //    let studentinfo = state.studentinfo
+  //    for (let i = 0; i < studentinfo.length; i++) {
+  //      let score = 0
+  //     let userId = state.studentinfo[i].id
+  //     let queryUser = new AV.Query('SigninList')
 
-      queryUser.equalTo('userID',userId).find().then(function(item) {
-        for (let j = 0; j <item.length; j ++ ) {
-          if(item[j].attributes.isSignin === true) {
-            score+=100
-          }
-        }
-        state.studentinfo[i].attributes = Object.assign({},{'attendScore':score},state.studentinfo[i].attributes)
-         state.attendScoreList.push ({'userID':userId,'attendScore':score})
-      })
-     }
-   },
-   [types.GET_SCORE_INGROUP] (state) {
-     let studentinfo = state.studentinfo
-     for (let i = 0; i < state.studentinfo.length; i++){
-       let score = 0
-       let result = 0
-       let userId = state.studentinfo[i].id
-       let query = new AV.Query('InTeamComment')
-       query.equalTo('targetUserID',userId).find().then(function(item){
-         let itemLength = item.length
-         if (!itemLength) result = 0
-         else{
-          for (let j = 0; j < itemLength; j ++) {
-            score += item[j].attributes.score
-          }
-          result = Math.ceil(score/itemLength)
-        }
-        state.studentinfo[i].attributes = Object.assign({},{'inGrouScore':result},state.studentinfo[i].attributes)
-        state.inGroupScoreList.push({'UserID':userId,'inGrouScore':result})
-       })
-     }
-   },
+  //     queryUser.equalTo('userID',userId).find().then(function(item) {
+  //       for (let j = 0; j <item.length; j ++ ) {
+  //         if(item[j].attributes.isSignin === true) {
+  //           score+=100
+  //         }
+  //       }
+  //       state.studentinfo[i].attributes = Object.assign({},{'attendScore':score},state.studentinfo[i].attributes)
+  //        state.attendScore.push ({'userID':userId,'attendScore':score})
+  //     })
+  //    }
+  //  },
+  //  [types.GET_SCORE_INGROUP] (state) {
+  //    let studentinfo = state.studentinfo
+  //    for (let i = 0; i < state.studentinfo.length; i++){
+  //      let score = 0
+  //      let result = 0
+  //      let userId = state.studentinfo[i].id
+  //      let query = new AV.Query('InTeamComment')
+  //      query.equalTo('targetUserID',userId).find().then(function(item){
+  //        let itemLength = item.length
+  //        if (!itemLength) result = 0
+  //        else{
+  //         for (let j = 0; j < itemLength; j ++) {
+  //           score += item[j].attributes.score
+  //         }
+  //         result = Math.ceil(score/itemLength)
+  //       }
+  //       state.studentinfo[i].attributes = Object.assign({},{'inGrouScore':result},state.studentinfo[i].attributes)
+  //       state.inGroupScoreList.push({'UserID':userId,'inGrouScore':result})
+  //      })
+  //    }
+  //  },
    [types.GET_GRADE_LIST] (state){
       state.gradeList  = []
       let queryGroup = new AV.Query('GradeTable')
@@ -330,6 +331,63 @@ const actions = {
             reject()
           })
       })
+    },
+    getStudentScoreList ({commit}) {
+
+      return new Promise((resolve,reject) => {
+        state.scoreList = []
+        for (let i = 0; i < state.studentinfo.length; i ++) {
+          let studentId = state.studentinfo[i].id
+          let score = 0 
+          let queryAttend = new AV.Query('SigninList')
+          queryAttend.equalTo('userID',studentId)
+  
+          queryAttend.find().then (function(signinList){
+            for (let k = 0; k < signinList.length; k ++) {
+                if(signinList[k].attributes.isSignin === true) {
+                  score += 100
+                }
+            }
+            let queryScore = new AV.Query('scoreList') 
+            queryScore.equalTo('userID',studentId)
+  
+            queryScore.find().then (function(scoreItem) {
+              if (scoreItem.length === 0) {
+                let CreateItem = AV.Object.extend('scoreList')
+                let instance = new CreateItem()
+                instance.set('userID',studentId)
+                instance.set('attendScore',score)
+                instance.save().then(function(){
+                  console.log("创建远端的学生考勤成绩成功")
+                  state.scoreList.push({'userID':studentId,'attendScore':score})
+                 resolve()
+                },function(){
+                  console.log("创建远端的学生考勤成绩失败")
+                  // reject()
+                })
+              }
+
+              if(scoreItem.length !== 0) {
+                var todo = AV.Object.createWithoutData('scoreList',scoreItem[0].id)
+                // 修改属性
+                todo.set('attendScore', score)
+                todo.save().then (function(){
+                  state.scoreList.push({'userID':studentId,'attendScore':score})
+                  console.log("保存到云端的考勤成绩更新成功")
+                  resolve()
+                },function(){
+                  console.log("保存到云端的考勤成绩更新失败")
+                  // reject()
+                })
+              }
+            })
+       
+             
+          })
+        }
+        // reject()
+      })
+  
     },
     getStudentActivities ({commit}) {
       commit (types.GET_STUDENT_ACTIVITIES)

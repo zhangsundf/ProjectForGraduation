@@ -105,7 +105,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getStudentInfo','getSigninList','getDate']),
+    ...mapGetters(['getStudentInfo','getSigninList','getDate','getScoreList']),
     tableData () {
       return this.getStudentInfo
     },
@@ -145,6 +145,12 @@ export default {
                                     }).catch(()=>{
                                       alert("failed")
                                     })
+              this.$store.dispatch('getStudentScoreList').then (function(){
+                console.log("修改签到信息，重新计算签到次数")
+               
+              }).catch(function(){
+                console.log("修改签到信息，重新计算签到次数失败啦！")
+              })
               row.editFlag = false
         return
         }else{

@@ -148,7 +148,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters(['getStudentInfo','getAttendScoreList']),
+    ...mapGetters(['getStudentInfo','getScoreList']),
     total(){
       return Number(this.attended) + Number(this.usualGrade) + Number(this.documents) + Number(this.inGroup) + Number(this.betweenGroup)
     },
@@ -158,16 +158,15 @@ export default {
     result () {
        let result = []
         for (let i = 0; i < this.studentInfo.length; i++){
-          for (let j = 0; j < this.getAttendScoreList.length; j++){
-            if (this.studentInfo[i].id === this.getAttendScoreList[j].userID){
-                result.push(Object.assign({},this.getAttendScoreList[j],this.studentInfo[i].attributes))
-                break
-            }
-          }
-      }
-        
-     return result
+              for (let j = 0; j < this.getScoreList.length; j++) {
+                if(this.studentInfo[i].id === this.getScoreList[j].userID){
+                  result.push(Object.assign({},this.getScoreList[j],this.studentInfo[i].attributes))
+                  break
+                }
+              }  
         }
+        return result
+    }
   },
   methods:{
     checkTotal(){
@@ -178,11 +177,16 @@ export default {
     }
   },
   beforeCreate () {
-    this.$store.dispatch("getAttendScore")
-    this.$store.dispatch("getInGroupScore")
+    this.$store.dispatch("getStudentScoreList").then(function(){
+      console.log("chengg ")
+    }).catch(function(err){
+      console.log(err)
+      console.log("出了严重的错误")
+    })
   },
   mounted () {
-  //  this.studentInfo = this.getStudentInfo
+  console.log('mounted')
+  console.log(this.getScoreList)
   }
 }
 </script>
