@@ -132,45 +132,6 @@ const mutations = {
       
      state.dateArray =  dateList
    },
-  //  [types.GET_ATTEND_SCORE] (state) {
-  //    let studentinfo = state.studentinfo
-  //    for (let i = 0; i < studentinfo.length; i++) {
-  //      let score = 0
-  //     let userId = state.studentinfo[i].id
-  //     let queryUser = new AV.Query('SigninList')
-
-  //     queryUser.equalTo('userID',userId).find().then(function(item) {
-  //       for (let j = 0; j <item.length; j ++ ) {
-  //         if(item[j].attributes.isSignin === true) {
-  //           score+=100
-  //         }
-  //       }
-  //       state.studentinfo[i].attributes = Object.assign({},{'attendScore':score},state.studentinfo[i].attributes)
-  //        state.attendScore.push ({'userID':userId,'attendScore':score})
-  //     })
-  //    }
-  //  },
-  //  [types.GET_SCORE_INGROUP] (state) {
-  //    let studentinfo = state.studentinfo
-  //    for (let i = 0; i < state.studentinfo.length; i++){
-  //      let score = 0
-  //      let result = 0
-  //      let userId = state.studentinfo[i].id
-  //      let query = new AV.Query('InTeamComment')
-  //      query.equalTo('targetUserID',userId).find().then(function(item){
-  //        let itemLength = item.length
-  //        if (!itemLength) result = 0
-  //        else{
-  //         for (let j = 0; j < itemLength; j ++) {
-  //           score += item[j].attributes.score
-  //         }
-  //         result = Math.ceil(score/itemLength)
-  //       }
-  //       state.studentinfo[i].attributes = Object.assign({},{'inGrouScore':result},state.studentinfo[i].attributes)
-  //       state.inGroupScoreList.push({'UserID':userId,'inGrouScore':result})
-  //      })
-  //    }
-  //  },
    [types.GET_GRADE_LIST] (state){
       state.gradeList  = []
       let queryGroup = new AV.Query('GradeTable')
@@ -392,13 +353,14 @@ const actions = {
       })
     },
     getStudentScoreList ({commit}) {
-
       return new Promise((resolve,reject) => {
         let sum = 0
         state.scoreList = []
         for (let i = 0; i < state.studentinfo.length; i ++) {
           let studentId = state.studentinfo[i].id
           let score = 0 
+          let score2 = 0
+          let result = 0
           let queryAttend = new AV.Query('SigninList')
           queryAttend.equalTo('userID',studentId)
   
@@ -408,6 +370,19 @@ const actions = {
                   score += 10
                 }
             }
+
+       let userId = state.studentinfo[i].id
+       let query = new AV.Query('InTeamComment')
+       query.equalTo('targetUserID',userId).find().then(function(item){
+         let itemLength = item.length
+         if (!itemLength) result = 0
+         else{
+          for (let j = 0; j < itemLength; j ++) {
+            score2 += item[j].attributes.score
+          }
+          result = Math.ceil(score2/itemLength)
+          }
+       })
             let queryScore = new AV.Query('scoreList') 
             queryScore.equalTo('userID',studentId)
   
@@ -417,11 +392,12 @@ const actions = {
                 let instance = new CreateItem()
                 instance.set('userID',studentId)
                 instance.set('attendScore',score)
+                instance.set('inGroupScore',result)
                 instance.save().then(function(){
                   state.scoreList.push({'userID':studentId,'attendScore':score,
                                         'documentScore':0,'usuallyScore':0,
                                         'betweenGroupSore':0,
-                                        'inGroupScore':0,'sum':score})
+                                        'inGroupScore':result,'sum':score})
                  
                 },function(){
                    reject()
@@ -432,6 +408,7 @@ const actions = {
                 var todo = AV.Object.createWithoutData('scoreList',scoreItem[0].id)
                 // 修改属性
                 todo.set('attendScore', score)
+                todo.set('inGroupScore',result)
                 todo.save().then (function(){
                   let documentScore = scoreItem[0].attributes.documentScore
                   let usuallyScore = scoreItem[0].attributes.usuallyScore
@@ -439,12 +416,12 @@ const actions = {
                   let inGroupScore = scoreItem[0].attributes.inGroupScore
                   let sum = score * (state.standard.attend)/100 + documentScore * state.standard.document/100
                           + usuallyScore * state.standard.usually/100 + betweenGroupScore * state.standard.betweenGroup/100
-                          + inGroupScore * state.standard.ingroup
+                          + inGroupScore * state.standard.ingroup/100
                   state.scoreList.push({'userID':studentId,'attendScore':score,
                                         'documentScore':documentScore,
                                         'usuallyScore':usuallyScore,
                                         'betweenGroupScore':betweenGroupScore,
-                                        'inGroupScore':inGroupScore,
+                                        'inGroupScore':result,
                                         'sum': sum
                                       })
                   
@@ -597,10 +574,7 @@ const actions = {
   updategradeAndGroup ({commit}, param) {
     return new Promise(function(resolve,reject) {
       for(let i = 0; i < state.AllGradNameList.length; i++) {
-        let grade = state.AllGradNameList[i]
-         
-            // for(let j = 0; j < grade.groups.length; j ++) {
-           
+        let grade = state.AllGradNameList[i] 
               if(grade.grades === param.gradeName ){
                 for(let j = 0; j < grade.groups.length; j++) {
                   if (grade.groups[j].groupName === param.groupName) {
@@ -671,7 +645,23 @@ const actions = {
         todo.set('usuallyScore',Number(param.usually))
 
         todo.save().then (function(){
-          // state.scoreList.push({'userID':studentId,'attendScore':score})
+          let attendscore = scoreItem[0].attributes.attendScore
+          let documentScore = Number(param.document)
+          let usuallyScore = Number(param.usually)
+          let betweenGroupScore = scoreItem[0].attributes.betweenGroupScore
+          let inGroupScore = scoreItem[0].attributes.inGroupScore
+          let sum = attendscore * (state.standard.attend)/100 + documentScore * state.standard.document/100
+                  + usuallyScore * state.standard.usually/100 + betweenGroupScore * state.standard.betweenGroup/100
+                  + inGroupScore * state.standard.ingroup/100
+          // console.log("meigaizhiqian :"+state.scoreList[i].sum )
+          for(let i = 0; i < state.scoreList.length; i++) {
+            if(state.scoreList[i].userID === studentId) {
+              state.scoreList[i].documentScore = Number(param.document)
+              state.scoreList[i].usuallyScore = Number(param.usually)
+              state.scoreList[i].sum = sum
+              // console.log("after :"+  state.scoreList[i].documentScore + ',' +  state.scoreList[i].usuallyScore +','+state.scoreList[i].sum )
+            }
+          }
           console.log("保存到云端的考勤成绩更新成功")
           resolve()
         },function(){

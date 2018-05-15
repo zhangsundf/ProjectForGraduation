@@ -129,6 +129,7 @@ export default {
         if (r) {
           this.$store.dispatch("deleteStudent",index).then(function(){
               alert("删除成功")
+              this.$store.dispatch('getGradeAndGroup')
               rows.splice(index, 1);
           }).catch(()=>{
               alert("删除失败")
@@ -150,10 +151,13 @@ export default {
                                       row.teamname = this.chooseGroup
                                       this.groupList = []
                                       this.isOneEdit = false
+                                      
                                       alert("success")
                                     }).catch(()=>{
                                       alert("failed")
                                     })
+                                     this.$store.dispatch('getGradeAndGroup')
+
               row.editFlag = false
         return
         }else{

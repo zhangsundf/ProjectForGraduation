@@ -38,7 +38,7 @@
         </li>
       </ul>
    </div>
-   <router-view class = "showView"></router-view>
+   <keep-alive><router-view class = "showView"></router-view></keep-alive>
 </div>
 </template>
  <script>

@@ -128,7 +128,7 @@
       label="总分"
       min-width="80">
       <template slot-scope="scope">
-            <span :class = "scope.row.sum <= 60 ? 'nopass' : 'pass' ">{{scope.row.sum}}</span>
+            <span :class = "scope.row.sum <= 60 ? 'nopass' :  'pass' ">{{scope.row.sum}}</span>
        </template>
     </el-table-column>
     <el-table-column label="操作" min-width="160">
@@ -203,6 +203,11 @@ export default {
                                               }).catch(function(err){
                                                 console.log(err)
                                               })
+      this.$store.dispatch("getStudentScoreList").then(function(){
+                                              }).catch(function(err){
+                                                console.log(err)
+                                                console.log("出了严重的错误")
+                                              })
     },
     handleEdit(index, row) {
         if(this.isOneEdit === false){
@@ -225,11 +230,6 @@ export default {
                                 row.usualGrade = this.setunsualScore
                                 row.documentScore = this.setDocumentScore
                                 this.isOneEdit = false
-                                this.$store.dispatch("getStudentScoreList").then(function(){
-    }).catch(function(err){
-      console.log(err)
-      console.log("出了严重的错误")
-    })
                                 alert("success")
                               }).catch(()=>{
                                       alert("failed")
@@ -301,5 +301,8 @@ export default {
 }
 .pass {
   color:green;
+}
+.excellent {
+  color: rgb(39,194,76);
 }
 </style>
