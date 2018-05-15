@@ -3,7 +3,7 @@
     <nav class="level">
       <div class="level-item has-text-centered">
         <div class="control  has-icons-left">
-          <input class="input is-primary" type="text" placeholder="Primary input" v-model="attended">
+          <input class="input is-primary" type="text" v-model = "attended" :placeholder = "this.getstandard.attend">
           <span class=" icon is-left">
             <span style = "font-size:14px;">考勤</span>
           </span>
@@ -12,7 +12,7 @@
 
         <div class="level-item has-text-centered">
         <div class="control has-icons-left">
-          <input class="input is-primary" type="text" placeholder="Primary input" v-model = "usualGrade">
+          <input class="input is-primary" type="text" v-model = "usualGrade"  :placeholder = "this.getstandard.usually">
           <span class=" icon is-left">
             <span style = "font-size:14px;">平时</span>
           </span>
@@ -21,7 +21,7 @@
 
       <div class="level-item has-text-centered">
         <div class="control  has-icons-left">
-          <input class="input is-primary" type="text" placeholder="Primary input" v-model="documents">
+          <input class="input is-primary" type="text" v-model = "documents"  :placeholder = "this.getstandard.document">
           <span class=" icon is-left">
             <span style = "font-size:14px;">文档</span>
           </span>
@@ -30,7 +30,7 @@
 
       <div class="level-item has-text-centered">
         <div class="control has-icons-left">
-          <input class="input is-primary" type="text" placeholder="Primary input" v-model="inGroup">
+          <input class="input is-primary" type="text" v-model = "inGroup"  :placeholder = "this.getstandard.ingroup">
           <span class=" icon is-left">
             <span style = "font-size:14px;">组内</span>
           </span>
@@ -39,7 +39,7 @@
 
       <div class="level-item has-text-centered">
         <div class="control has-icons-left">
-          <input class="input is-primary" type="text" placeholder="Primary input" v-model = "betweenGroup">
+          <input class="input is-primary" type="text" v-model = "betweenGroup"  :placeholder = "this.getstandard.betweenGroup">
           <span class=" icon is-left">
             <span style = "font-size:14px;">组间</span>
           </span>
@@ -47,11 +47,11 @@
       </div>
 
       <div class="level-item has-text-centered">
-        <a class="button is-primary">设置比重</a>
+        <a class="button is-primary" @click = "setStandards">设置比重</a>
       </div>
 
     </nav>
-    
+   
     <el-table
     :data="result"
     style="width: 100%"
@@ -96,9 +96,9 @@
     </el-table-column>
     <el-table-column
       label="平时成绩"
-      min-width="60">
+      min-width="80">
       <template slot-scope="scope">
-            <span v-if = "!scope.row.editFlag">{{ scope.row.unsualScore }}</span>
+            <span v-if = "!scope.row.editFlag">{{ scope.row.usuallyScore }}</span>
             <input type = "text" class = "input is-success" v-if = "scope.row.editFlag" v-model="setunsualScore">
       </template>
     </el-table-column>
@@ -106,12 +106,12 @@
       label="组内互评"
       min-width="80">
       <template slot-scope="scope">
-            <span>{{ scope.row.inGrouScore }}</span>    
+            <span>{{ scope.row.inGroupScore }}</span>    
       </template>
     </el-table-column>
     <el-table-column
       label="组间互评"
-      min-width="160">
+      min-width="100">
       <template slot-scope="scope">
             <span >{{ scope.row.betweenGroupScore }}</span>
       </template>
@@ -128,7 +128,7 @@
       label="总分"
       min-width="80">
       <template slot-scope="scope">
-            <span >123</span>
+            <span :class = "scope.row.sum <= 60 ? 'nopass' : 'pass' ">{{scope.row.sum}}</span>
        </template>
     </el-table-column>
     <el-table-column label="操作" min-width="160">
@@ -154,19 +154,20 @@ export default {
   name: 'Statistics',
   data(){
     return {
-      attended:10,
-      usualGrade: 0,
-      documents: 0,
-      inGroup:0,
-      betweenGroup: 0,
+      attended:'',
+      usualGrade: '',
+      documents: '',
+      inGroup:'',
+      betweenGroup: '',
       setDocumentScore:0,
       setunsualScore:0,
       isOneEdit:false,
-      index:-1
+      index:-1,
+
     }
   },
   computed:{
-    ...mapGetters(['getStudentInfo','getScoreList']),
+    ...mapGetters(['getStudentInfo','getScoreList','getstandard']),
     total(){
       return Number(this.attended) + Number(this.usualGrade) + Number(this.documents) + Number(this.inGroup) + Number(this.betweenGroup)
     },
@@ -187,11 +188,21 @@ export default {
     }
   },
   methods:{
-    checkTotal(){
+    setStandards(){
       if(this.total != 100){
         alert("总分必须为100")
         return
       }
+      this.$store.dispatch('setStandards',{  attend: Number(this.attended),
+                                              usually:Number(this.usualGrade),
+                                              document:Number(this.documents),
+                                              inGroup:Number(this.inGroup),
+                                              betweenGroup:Number(this.betweenGroup)
+                                              }) .then (function(){
+
+                                              }).catch(function(err){
+                                                console.log(err)
+                                              })
     },
     handleEdit(index, row) {
         if(this.isOneEdit === false){
@@ -199,7 +210,7 @@ export default {
             row.editFlag = true
             this.index = index
         }else{
-          alert("已有一个学生签到处于编辑编辑状态，请点击完成后在执行该操作！")
+          alert("已有一个学生成绩处于编辑编辑状态，请点击保存后再执行该操作！")
           return
         }
     },
@@ -208,11 +219,17 @@ export default {
         this.$store.dispatch('saveScore',{
                             document:this.setDocumentScore,
                             usually:this.setunsualScore,
-                            index:index
+                            index:index,
+                          
                             }).then(()=>{
-                                row.unsualScore = this.setunsualScore
+                                row.usualGrade = this.setunsualScore
                                 row.documentScore = this.setDocumentScore
                                 this.isOneEdit = false
+                                this.$store.dispatch("getStudentScoreList").then(function(){
+    }).catch(function(err){
+      console.log(err)
+      console.log("出了严重的错误")
+    })
                                 alert("success")
                               }).catch(()=>{
                                       alert("failed")
@@ -220,22 +237,29 @@ export default {
               row.editFlag = false
         return
         }else{
-          alert("您还有未学生未保存的学生成绩")
+          alert("请点击保存")
           return 
         }
       }
   },
   beforeCreate () {
     this.$store.dispatch("getStudentScoreList").then(function(){
-      console.log("chengg ")
     }).catch(function(err){
       console.log(err)
       console.log("出了严重的错误")
     })
+    this.$store.dispatch('setStandardItem').then(function(){
+                  console.log("aaaaaaa")
+            }).catch(function(err){
+              console.log("我显示是因为数据库中我存在")
+              console.log(err)
+            })
+  },
+  created () {
+
   },
   mounted () {
-  console.log('mounted')
-  console.log(this.getScoreList)
+
   }
 }
 </script>
@@ -271,9 +295,11 @@ export default {
 .control input {
   position: relative;
   width: 80%;
-
 }
-
+.nopass {
+  color:red;
+}
+.pass {
+  color:green;
+}
 </style>
-
-

@@ -35,28 +35,28 @@
       label="学号"
       min-width="200">
       <template slot-scope="scope">
-        <span style="margin-left: 10px" class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{scope.row.StudentId}}</span>
+        <span style="margin-left: 10px" class = "span">{{scope.row.StudentId}}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="姓名"
       min-width="200">
       <template slot-scope="scope">
-          <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.username }}</span>
+          <span class = "span">{{ scope.row.username }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="班级"
       min-width="100">
       <template slot-scope="scope">
-            <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.grade }}</span>
+            <span class = "span">{{ scope.row.grade }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="小组"
       min-width="100">
       <template slot-scope="scope">
-            <span class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.teamname }}</span>
+            <span class = "span">{{ scope.row.teamname }}</span>
       </template>
     </el-table-column>
     <el-table-column
@@ -194,7 +194,7 @@ export default {
   .signin {
     position: relative;
     line-height: 100%;
-    color: green;
+    color: rgb(39,194,76);
     font-weight: bold;
     font-weight:normal;
   }

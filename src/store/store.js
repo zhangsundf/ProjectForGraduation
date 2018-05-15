@@ -22,7 +22,7 @@ const state = {
     signinList: [],
     dateArray: [],
     scoreList:[],
-    // inGroupScoreList:[],
+    standard:{},
     gradeList:[],
     AllGradNameList: []
 }
@@ -38,7 +38,7 @@ const getters = {
     getSigninList: (state) => state.signinList,
     getDate: (state) => state.dateArray,
     getScoreList: (state) => state.scoreList,
-    // getinGroupScoreList: (state) => state.inGroupScoreList,
+    getstandard: (state) => state.standard,
     getGradeList: (state) => state.gradeList,
     getAllGradNameList: (state) => state.AllGradNameList
 }
@@ -332,9 +332,69 @@ const actions = {
           })
       })
     },
+    setStandards ({commit},param) {
+      return new Promise(function(resolve,reject){
+        state.standard = {}
+        let queryTeacherStandard = new AV.Query('setStandard')
+        queryTeacherStandard.equalTo('TeacherID',state.userInfo.id)
+
+        queryTeacherStandard.find().then(function(standardItem){
+          console.log(standardItem)
+            var todo = AV.Object.createWithoutData('setStandard',standardItem[0].id)
+            // 修改属性
+            todo.set('setAttend',param.attend)
+            todo.set('setDocument',param.document)
+            todo.set('setIngroup',param.inGroup)
+            todo.set('setBetweenGroup',param.betweenGroup)
+            todo.set('setUsually',param.usually)
+            todo.save().then (function(){
+              state.standard = Object.assign({},{'attend':param.attend,
+                                              'usually':param.usually,
+                                              'document':param.document,
+                                              'ingroup':param.inGroup,
+                                              'betweenGroup':param.betweenGroup})
+              resolve()
+            },function(){
+              console.log("保存到云端的考勤成绩更新失败")
+               reject()
+            })
+        })
+      })
+    },
+    setStandardItem ({commit}) {
+      return new Promise (function(resolve,reject)  {
+        let queryTeacherStandard = new AV.Query('setStandard')
+        queryTeacherStandard.equalTo('TeacherID',state.userInfo.id)
+        queryTeacherStandard.find().then(function(standardItem){
+
+          if(standardItem.length === 0) {
+            let CreateItem = AV.Object.extend('setStandard')
+            let instance = new CreateItem()
+            instance.set('TeacherID',state.userInfo.id)
+            instance.save().then(function(){
+               state.standard = Object.assign({},{'attend':20,
+                                              'usually':20,
+                                              'document':20,
+                                              'ingroup':20,
+                                              'betweenGroup':20})
+              resolve()
+            },function(){
+              reject()
+            })
+          }
+          state.standard = Object.assign({},{'attend':standardItem[0].attributes.setAttend,
+                                              'usually':standardItem[0].attributes.setUsually,
+                                              'document':standardItem[0].attributes.setDocument,
+                                              'ingroup':standardItem[0].attributes.setIngroup,
+                                              'betweenGroup':standardItem[0].attributes.setBetweenGroup})
+           resovle()
+        })
+      })
+    },
     getStudentScoreList ({commit}) {
 
       return new Promise((resolve,reject) => {
+        let sum = 0
         state.scoreList = []
         for (let i = 0; i < state.studentinfo.length; i ++) {
           let studentId = state.studentinfo[i].id
@@ -345,7 +405,7 @@ const actions = {
           queryAttend.find().then (function(signinList){
             for (let k = 0; k < signinList.length; k ++) {
                 if(signinList[k].attributes.isSignin === true) {
-                  score += 100
+                  score += 10
                 }
             }
             let queryScore = new AV.Query('scoreList') 
@@ -358,12 +418,13 @@ const actions = {
                 instance.set('userID',studentId)
                 instance.set('attendScore',score)
                 instance.save().then(function(){
-                  console.log("创建远端的学生考勤成绩成功")
-                  state.scoreList.push({'userID':studentId,'attendScore':score})
-                 resolve()
+                  state.scoreList.push({'userID':studentId,'attendScore':score,
+                                        'documentScore':0,'usuallyScore':0,
+                                        'betweenGroupSore':0,
+                                        'inGroupScore':0,'sum':score})
+                 
                 },function(){
-                  console.log("创建远端的学生考勤成绩失败")
-                  // reject()
+                   reject()
                 })
               }
 
@@ -372,20 +433,30 @@ const actions = {
                 // 修改属性
                 todo.set('attendScore', score)
                 todo.save().then (function(){
-                  state.scoreList.push({'userID':studentId,'attendScore':score})
-                  console.log("保存到云端的考勤成绩更新成功")
-                  resolve()
+                  let documentScore = scoreItem[0].attributes.documentScore
+                  let usuallyScore = scoreItem[0].attributes.usuallyScore
+                  let betweenGroupScore = scoreItem[0].attributes.betweenGroupScore
+                  let inGroupScore = scoreItem[0].attributes.inGroupScore
+                  let sum = score * (state.standard.attend)/100 + documentScore * state.standard.document/100
+                          + usuallyScore * state.standard.usually/100 + betweenGroupScore * state.standard.betweenGroup/100
+                          + inGroupScore * state.standard.ingroup
+                  state.scoreList.push({'userID':studentId,'attendScore':score,
+                                        'documentScore':documentScore,
+                                        'usuallyScore':usuallyScore,
+                                        'betweenGroupScore':betweenGroupScore,
+                                        'inGroupScore':inGroupScore,
+                                        'sum': sum
+                                      })
+                  
                 },function(){
                   console.log("保存到云端的考勤成绩更新失败")
-                  // reject()
+                   reject()
                 })
               }
             })
-       
-             
           })
+          resolve()
         }
-        // reject()
       })
   
     },
