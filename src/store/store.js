@@ -264,7 +264,6 @@ const actions = {
       })
     },
     changeAttendStatus ({commit}, param) {
-      console.log(param)
       return new Promise ((resolve,reject) =>{
                 var todo = AV.Object.createWithoutData('SigninList', param.row.signId);
                 todo.set('isSignin', param.status);
@@ -300,7 +299,6 @@ const actions = {
         queryTeacherStandard.equalTo('TeacherID',state.userInfo.id)
 
         queryTeacherStandard.find().then(function(standardItem){
-          console.log(standardItem)
             var todo = AV.Object.createWithoutData('setStandard',standardItem[0].id)
             // 修改属性
             todo.set('setAttend',param.attend)
@@ -361,6 +359,8 @@ const actions = {
           let score = 0 
           let score2 = 0
           let result = 0
+          let betweenResult = 0
+          let betweenScore = 0
           let queryAttend = new AV.Query('SigninList')
           queryAttend.equalTo('userID',studentId)
   
@@ -370,68 +370,102 @@ const actions = {
                   score += 10
                 }
             }
+          })
+        let userId = state.studentinfo[i].id
+        let query = new AV.Query('InTeamComment')
+        query.equalTo('targetUserID',userId).find().then(function(item){
+          let itemLength = item.length
+          if (!itemLength) result = 0
+          else{
+            for (let j = 0; j < itemLength; j ++) {
+              score2 += item[j].attributes.score
+            }
+            result = Math.ceil(score2/itemLength)
+            }
+        })
 
-       let userId = state.studentinfo[i].id
-       let query = new AV.Query('InTeamComment')
-       query.equalTo('targetUserID',userId).find().then(function(item){
-         let itemLength = item.length
-         if (!itemLength) result = 0
-         else{
-          for (let j = 0; j < itemLength; j ++) {
-            score2 += item[j].attributes.score
-          }
-          result = Math.ceil(score2/itemLength)
-          }
-       })
-            let queryScore = new AV.Query('scoreList') 
-            queryScore.equalTo('userID',studentId)
-  
-            queryScore.find().then (function(scoreItem) {
-              if (scoreItem.length === 0) {
-                let CreateItem = AV.Object.extend('scoreList')
-                let instance = new CreateItem()
-                instance.set('userID',studentId)
-                instance.set('attendScore',score)
-                instance.set('inGroupScore',result)
-                instance.save().then(function(){
-                  state.scoreList.push({'userID':studentId,'attendScore':score,
-                                        'documentScore':0,'usuallyScore':0,
-                                        'betweenGroupSore':0,
-                                        'inGroupScore':result,'sum':score})
-                 
-                },function(){
-                   reject()
-                })
-              }
+        let grade = state.studentinfo[i].attributes.grade
+        let teamname = state.studentinfo[i].attributes.teamname
 
-              if(scoreItem.length !== 0) {
-                var todo = AV.Object.createWithoutData('scoreList',scoreItem[0].id)
-                // 修改属性
-                todo.set('attendScore', score)
-                todo.set('inGroupScore',result)
-                todo.save().then (function(){
-                  let documentScore = scoreItem[0].attributes.documentScore
-                  let usuallyScore = scoreItem[0].attributes.usuallyScore
-                  let betweenGroupScore = scoreItem[0].attributes.betweenGroupScore
-                  let inGroupScore = scoreItem[0].attributes.inGroupScore
-                  let sum = score * (state.standard.attend)/100 + documentScore * state.standard.document/100
-                          + usuallyScore * state.standard.usually/100 + betweenGroupScore * state.standard.betweenGroup/100
-                          + inGroupScore * state.standard.ingroup/100
-                  state.scoreList.push({'userID':studentId,'attendScore':score,
-                                        'documentScore':documentScore,
-                                        'usuallyScore':usuallyScore,
-                                        'betweenGroupScore':betweenGroupScore,
-                                        'inGroupScore':result,
-                                        'sum': sum
-                                      })
+        let queryGrade = new AV.Query('GradeTable')
+        queryGrade.equalTo('createGrade',grade)
+
+        queryGrade.find().then(function(gradeItem) {
+          let queryTeamId = new AV.Query('Team')
+          queryTeamId.equalTo('GradeID',gradeItem[0].id)
+
+          let queryOnlyTeam = new AV.Query('Team')
+          queryOnlyTeam.equalTo('teamname',teamname)
+
+          let queryOneTeam = AV.Query.and(queryTeamId,queryOnlyTeam)
+
+          queryOneTeam.find().then (function(teamItem){
+            let queryBetweenGroupScore = new AV.Query('BetweenTeamComment')
+            queryBetweenGroupScore.equalTo('targetTeamID',teamItem[0].id) 
+
+            queryBetweenGroupScore.find().then (function(commentItem){
+              if (commentItem.length === 0) betweenResult = 0
+              else {
                   
-                },function(){
-                  console.log("保存到云端的考勤成绩更新失败")
-                   reject()
-                })
+                  for(let p = 0; p < commentItem.length; p ++) {
+                    betweenScore += Number(commentItem[p].attributes.rating)
+                  }
+                
+                  betweenResult = Number(betweenScore/commentItem.length)
               }
+                  let queryScore = new AV.Query('scoreList') 
+                  queryScore.equalTo('userID',studentId)
+        
+                  queryScore.find().then (function(scoreItem) {
+                    if (scoreItem.length === 0) {
+                      let CreateItem = AV.Object.extend('scoreList')
+                      let instance = new CreateItem()
+                      instance.set('userID',studentId)
+                      instance.set('attendScore',score)
+                      instance.set('inGroupScore',result)
+                      instance.save().then(function(){
+                        state.scoreList.push({'userID':studentId,'attendScore':score,
+                                              'documentScore':0,'usuallyScore':0,
+                                              'betweenGroupSore':betweenResult,
+                                              'inGroupScore':result,'sum':score})
+                       
+                      },function(){
+                         reject()
+                      })
+                    }
+      
+                    if(scoreItem.length !== 0) {
+                      var todo = AV.Object.createWithoutData('scoreList',scoreItem[0].id)
+                      // 修改属性
+                      todo.set('attendScore', score)
+                      todo.set('inGroupScore',result)
+                      todo.set('betweenGroupScore',betweenResult)
+                      todo.save().then (function(){
+                        let documentScore = scoreItem[0].attributes.documentScore
+                        let usuallyScore = scoreItem[0].attributes.usuallyScore
+                        let betweenGroupScore = scoreItem[0].attributes.betweenGroupScore
+                        let inGroupScore = scoreItem[0].attributes.inGroupScore
+                        let sum = score * (state.standard.attend)/100 + documentScore * state.standard.document/100
+                                + usuallyScore * state.standard.usually/100 + betweenGroupScore * state.standard.betweenGroup/100
+                                + inGroupScore * state.standard.ingroup/100
+                        state.scoreList.push({'userID':studentId,'attendScore':score,
+                                              'documentScore':documentScore,
+                                              'usuallyScore':usuallyScore,
+                                              'betweenGroupScore':betweenResult,
+                                              'inGroupScore':result,
+                                              'sum': sum
+                                            })
+                        
+                      },function(){
+                        console.log("保存到云端的考勤成绩更新失败")
+                         reject()
+                      })
+                    }
+                  })
             })
           })
+
+        })   
           resolve()
         }
       })
@@ -633,12 +667,10 @@ const actions = {
   saveScore ({commit},param) {
     return new Promise ((resolve,reject) => {
       let studentId = state.studentinfo[param.index].id
-      console.log(param.index +','+ param.usually + ',' + param.document +','+studentId)
       let query = new AV.Query('scoreList')
       query.equalTo('userID',studentId)
 
       query.find().then(function(scoreItem) {
-        console.log(scoreItem)
         var todo = AV.Object.createWithoutData('scoreList',scoreItem[0].id)
         // 修改属性
         todo.set('documentScore',Number(param.document))
@@ -653,13 +685,11 @@ const actions = {
           let sum = attendscore * (state.standard.attend)/100 + documentScore * state.standard.document/100
                   + usuallyScore * state.standard.usually/100 + betweenGroupScore * state.standard.betweenGroup/100
                   + inGroupScore * state.standard.ingroup/100
-          // console.log("meigaizhiqian :"+state.scoreList[i].sum )
           for(let i = 0; i < state.scoreList.length; i++) {
             if(state.scoreList[i].userID === studentId) {
               state.scoreList[i].documentScore = Number(param.document)
               state.scoreList[i].usuallyScore = Number(param.usually)
               state.scoreList[i].sum = sum
-              // console.log("after :"+  state.scoreList[i].documentScore + ',' +  state.scoreList[i].usuallyScore +','+state.scoreList[i].sum )
             }
           }
           console.log("保存到云端的考勤成绩更新成功")

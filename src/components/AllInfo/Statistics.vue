@@ -103,6 +103,14 @@
       </template>
     </el-table-column>
     <el-table-column
+      label="文档"
+      min-width="80">
+      <template slot-scope="scope">
+            <span v-if = "!scope.row.editFlag">{{ scope.row.documentScore }}</span>
+             <input type = "text" class = "input is-success" v-if = "scope.row.editFlag" v-model="setDocumentScore">
+      </template>
+    </el-table-column>
+    <el-table-column
       label="组内互评"
       min-width="80">
       <template slot-scope="scope">
@@ -117,18 +125,10 @@
       </template>
     </el-table-column>
     <el-table-column
-      label="文档"
-      min-width="80">
-      <template slot-scope="scope">
-            <span v-if = "!scope.row.editFlag">{{ scope.row.documentScore }}</span>
-             <input type = "text" class = "input is-success" v-if = "scope.row.editFlag" v-model="setDocumentScore">
-      </template>
-    </el-table-column>
-    <el-table-column
       label="总分"
       min-width="80">
       <template slot-scope="scope">
-            <span :class = "scope.row.sum <= 60 ? 'nopass' :  'pass' ">{{scope.row.sum}}</span>
+            <span :class = "scope.row.sum <= 60 ? 'nopass' : scope.row.sum >= 75? 'excellent' : 'pass' ">{{scope.row.sum}}</span>
        </template>
     </el-table-column>
     <el-table-column label="操作" min-width="160">
@@ -206,7 +206,6 @@ export default {
       this.$store.dispatch("getStudentScoreList").then(function(){
                                               }).catch(function(err){
                                                 console.log(err)
-                                                console.log("出了严重的错误")
                                               })
     },
     handleEdit(index, row) {
@@ -246,7 +245,6 @@ export default {
     this.$store.dispatch("getStudentScoreList").then(function(){
     }).catch(function(err){
       console.log(err)
-      console.log("出了严重的错误")
     })
     this.$store.dispatch('setStandardItem').then(function(){
                   console.log("aaaaaaa")
@@ -255,12 +253,6 @@ export default {
               console.log(err)
             })
   },
-  created () {
-
-  },
-  mounted () {
-
-  }
 }
 </script>
 <style scoped>
@@ -297,12 +289,12 @@ export default {
   width: 80%;
 }
 .nopass {
-  color:red;
+  color:rgb(211, 9, 9);
 }
 .pass {
-  color:green;
+  color:rgb(9, 107, 22);
 }
 .excellent {
-  color: rgb(39,194,76);
+  color:rgb(38, 226, 21);
 }
 </style>
