@@ -7,7 +7,7 @@
           <div class = "login login1">
             <div class="field">
               <div class="control">
-                <input class="input is-primary" type="password" placeholder="输入原始密码" v-model = "oldPass">
+                <input class="input is-primary" type="password" placeholder="输入手机号" v-model = "oldPass">
             
               </div>
             </div>
@@ -25,7 +25,7 @@
             </div>
             <div class="field">
               <div class="control">
-                <a class="button is-primary changePass" @click="changePass(newpass,repass)">确认修改</a>
+                <a class="button is-primary changePass" @click="changePass(oldPass,newpass,repass)">确认修改</a>
               </div>
             </div>
           </div>
@@ -43,12 +43,20 @@ export default {
     }
   },
   methods: {
-    changePass (pass, repass) {
-      if (pass !== repass) {
+    changePass (old,pass, repass) {
+      if (pass.trim() !== repass.trim()) {
         alert("两次密码输入不一致！")
       }
       else {
-        this.$store.dispatch ("changePassWord",pass)
+        this.$store.dispatch ("changePassWord",{old:old.trim(),new:pass.trim()}).then(function(){
+          alert("密码修改成功")
+        
+        }).catch(function(){
+          alert("预留手机号不正确")
+        })
+          this.oldPass = ''
+          this.newpass = ''
+          this.repass = ''
       }
     }
   }

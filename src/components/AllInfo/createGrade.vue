@@ -159,9 +159,6 @@ export default {
                                         this.chooseGrade = ''
     },
     deleteRow (index,row) {
-      console.log(row)
-
-        console.log(row.groupList[index].groupName)
            this.$store.dispatch("deleteGroupByGroupName",{
                                               gradeName:row.gradeName,
                                               groupName:row.groupList[index].groupName,

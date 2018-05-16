@@ -37,6 +37,7 @@
           </router-link>
         </li>
       </ul>
+      <span class = "quit" @click = "quit" >退出系统</span>
    </div>
    <keep-alive><router-view class = "showView"></router-view></keep-alive>
 </div>
@@ -51,16 +52,20 @@ export default {
     }
   },
   methods:{
-
     changeShow(index){
         this.toggleClass("link",index,"is-active")
+    },
+    quit () {
+        this.$router.push({path:'/'})
+        this.$store.dispatch('quitSystem').then (function(){
+        alert("退出成功")
+        }).catch(function(){
+          alert("退出失败")
+        })
     }
   },
   beforeCreate () {
      this.$store.dispatch ("getDateArray")
-  },
-  mounted() {
-    console.log(this.$store.state.getDate)
   }
 }
 </script>
@@ -123,6 +128,14 @@ export default {
 .showView::-webkit-scrollbar-thumb {
   background-color: #ccc;
   border-radius: 10px;
+}
+.quit {
+  position: relative;
+  color:#fff;
+  margin-top:100px;
+  font-size:14px;
+  display: inline-block;
+
 }
 
 

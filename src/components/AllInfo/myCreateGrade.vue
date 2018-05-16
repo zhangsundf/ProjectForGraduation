@@ -132,9 +132,7 @@ export default {
               alert("删除失败")
           })
           this.$store.dispatch('deleteGroupsByGrade',row).then(function(){
-                  // alert("更新远端的小组表成功")
                 }).catch(function(err){
-                  // alert("更新远端的小组表失败")
                   console.log(err)
                 })
           this.$store.dispatch('deleteStudentByGrade',row.grades).then(function(){
@@ -169,9 +167,6 @@ export default {
     },
     beforeCreate() {
          this.$store.dispatch("getAllInfoList")
-    },
-    mounted () {
-      console.log(this.getGradeList) 
     }
 
 }

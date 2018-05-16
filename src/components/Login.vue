@@ -26,7 +26,7 @@
             </div>
             <div class="field">
               <div class="control has-icons-left">
-                <input class="input is-info" type="password" placeholder="Info input" v-model = "password">
+                <input class="input is-info" type="password" placeholder="Password input" v-model = "password">
                 <span class=" icon is-left">
                   <span style = "font-size:14px;">密码</span>
                 </span>
@@ -64,19 +64,19 @@
         <div class = "content">
           <label for = "username">你的名字</label>
           <br/>
-          <input type = "text" placeholder="真实姓名或常用昵称" class = "loginName">
+          <input type = "text" placeholder="真实姓名或常用昵称" class = "input is-success loginName" v-model="name">
           <br/>
           <label for = "tel">手机号</label>
           <br/>
-          <input type = "text" placeholder="11位手机号" class = "loginTel">
+          <input type = "text" placeholder="11位手机号" class = "input is-success loginTel" v-model = 'tel'>
           <br/>
-          <label for = "email">邮箱</label>
+          <label for = "email">课设开始时间</label>
           <br/>
-          <input type = "text" placeholder="常用邮箱" class = "loginEmail">
+          <input type = "date"  class = "input is-success loginEmail" v-model = 'date'>
           <br/>
           <label for = "pass">密码</label>
           <br/>
-          <input type = "password" placeholder="6为以上的密码" class = "loginPass">
+          <input type = "password" placeholder="6位以上的密码" class = "success is-primary loginPass" v-model = 'pass'>
           <br/>
         </div>
         <span slot="footer" class="dialog-footer">
@@ -98,7 +98,11 @@ export default {
       password: '',
       error: false,
       dialogVisible: false,
-      tab:1
+      tab:1,
+      name:'',
+      pass:'',
+      date:'',
+      tel:''
     }
   },
   computed: {
@@ -130,17 +134,23 @@ export default {
           .catch(_ => {});
     },
     signup () {
-      let name = document.getElementsByClassName("loginName")[0].value
-      let tel = document.getElementsByClassName("loginTel")[0].value
-      let email = document.getElementsByClassName("loginEmail")[0].value
-      let pass = document.getElementsByClassName("loginPass")[0].value
+    
       this.$store.dispatch('signUp',{
-          name:name,
-          tel:tel,
-          email:email,
-          pass:pass,
+          name:this.name,
+          tel:this.tel,
+          date:this.date,
+          pass:this.pass,
           isteacher:true
+      }).then(function(){
+        alert("注册成功")
+      }).catch(function(){
+        alert("注册失败！\n可能原因：1.用户名已被注册;\n 2.手机号已被注册或无效；\n 3.信息填写不完整")
       })
+         this.name = ''
+         this.tel = ''
+         this.email = ''
+         this.pass = '',
+         this.date = ''
     },
     changeLoginMethods(index) {
       this.tab = index

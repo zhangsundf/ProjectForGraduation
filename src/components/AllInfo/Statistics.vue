@@ -128,7 +128,7 @@
       label="总分"
       min-width="80">
       <template slot-scope="scope">
-            <span :class = "scope.row.sum <= 60 ? 'nopass' : scope.row.sum >= 75? 'excellent' : 'pass' ">{{scope.row.sum}}</span>
+            <span :class = "scope.row.sum <= 60 ? 'nopass' : scope.row.sum >= 75? 'excellent' : 'pass' ">{{scope.row.sum | toFixed}}</span>
        </template>
     </el-table-column>
     <el-table-column label="操作" min-width="160">
@@ -190,7 +190,7 @@ export default {
   methods:{
     setStandards(){
       if(this.total != 100){
-        alert("总分必须为100")
+        alert("占比总分必须为100")
         return
       }
       this.$store.dispatch('setStandards',{  attend: Number(this.attended),
@@ -213,6 +213,8 @@ export default {
             this.isOneEdit = true
             row.editFlag = true
             this.index = index
+            this.setDocumentScore = row.documentScore
+            this.setunsualScore = row.usuallyScore
         }else{
           alert("已有一个学生成绩处于编辑编辑状态，请点击保存后再执行该操作！")
           return
@@ -241,15 +243,19 @@ export default {
         }
       }
   },
+  filters: {
+    toFixed(val) {
+      return val.toFixed(1)
+    }
+  },
   beforeCreate () {
     this.$store.dispatch("getStudentScoreList").then(function(){
     }).catch(function(err){
       console.log(err)
     })
     this.$store.dispatch('setStandardItem').then(function(){
-                  console.log("aaaaaaa")
+               
             }).catch(function(err){
-              console.log("我显示是因为数据库中我存在")
               console.log(err)
             })
   },

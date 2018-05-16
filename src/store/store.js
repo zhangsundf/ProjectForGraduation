@@ -44,9 +44,7 @@ const getters = {
 }
 
 const mutations = {
-  [types.QUIT_LOGIN](state){
-      AV.User.logOut();
-  },
+
    [types.SET_STUDENT_LIST](state){
       let gradeArray = []
      let queryTeacherId = new AV.Query("GradeTable")
@@ -102,16 +100,17 @@ const mutations = {
           state.signinList.push ({'userID':userId,'isSignin':signin[0].attributes.isSignin,'date':param,'signId':signin[0].id})
         }
          if(signin.length === 0) {
-           let query = new AV.Object('SigninList')
-           query.set('userID',userId)
-           query.set ('date',param)
-           query.set ('isSignin',false)
-           query.save()
-           state.signinList.push({'userID':userId,'isSignin':false,'date':param}) 
+           for (let i = 0; i < state.dateArray.length; i ++) {
+            let query = new AV.Object('SigninList')
+            query.set('userID',userId)
+            query.set ('date',state.dateArray[i])
+            query.set ('isSignin',false)
+            query.save()
+            state.signinList.push({'userID':userId,'isSignin':false,'date':param}) 
+           }
          }
       })
      }
-    //  return result
    },
    [types.GET_DATE_LIST] (state) {
     let beginDate = state.userInfo.attributes.startDate
@@ -211,6 +210,15 @@ const mutations = {
 }
 
 const actions = {
+    quitSystem ({commit}, param) {
+    return new Promise((resolve,reject)=>{
+      AV.User.logOut().then(function(){
+        resolve()
+      },function(){
+        reject()
+      })
+    })
+    },
     checkLogin ({state,commit},param) {
       return new Promise((resolve, reject) => {
 
@@ -235,17 +243,21 @@ const actions = {
       commit(types.SET_STUDENT_LIST)
     },
     signUp ({commit},param){
-      var user = new AV.User();
-      user.setUsername(param.name);
-      user.setPassword(param.pass);
-      user.setEmail(param.email);
-      user.setMobilePhoneNumber(param.tel)
-      user.signUp().then(function (loginedUser) {
-        alert("注册成功")
-      }, (function (error) {
-          alert(JSON.stringify(error));
-          
-      }));
+      return new Promise((resolve,reject) =>{
+        var user = new AV.User();
+        user.set('username',param.name);
+        user.set('password',param.pass);
+        user.set('startDate',param.date)
+        user.set('mobilePhoneNumber',param.tel)
+        user.set('isTeacher',param.isteacher)
+        user.signUp().then(function (loginedUser) {
+          alert("注册成功")
+          resolve()
+        },function (error) {
+          reject()   
+        })
+      })
+     
     },
     changeInfo ({commit}, param) {
       return new Promise((resolve,reject) => {
@@ -427,13 +439,12 @@ const actions = {
                         state.scoreList.push({'userID':studentId,'attendScore':score,
                                               'documentScore':0,'usuallyScore':0,
                                               'betweenGroupSore':betweenResult,
-                                              'inGroupScore':result,'sum':score})
+                                              'inGroupScore':result,'sum':0})
                        
                       },function(){
                          reject()
                       })
                     }
-      
                     if(scoreItem.length !== 0) {
                       var todo = AV.Object.createWithoutData('scoreList',scoreItem[0].id)
                       // 修改属性
@@ -445,9 +456,9 @@ const actions = {
                         let usuallyScore = scoreItem[0].attributes.usuallyScore
                         let betweenGroupScore = scoreItem[0].attributes.betweenGroupScore
                         let inGroupScore = scoreItem[0].attributes.inGroupScore
-                        let sum = score * (state.standard.attend)/100 + documentScore * state.standard.document/100
+                        let sum = (score * (state.standard.attend)/100 + documentScore * state.standard.document/100
                                 + usuallyScore * state.standard.usually/100 + betweenGroupScore * state.standard.betweenGroup/100
-                                + inGroupScore * state.standard.ingroup/100
+                                + inGroupScore * state.standard.ingroup/100)
                         state.scoreList.push({'userID':studentId,'attendScore':score,
                                               'documentScore':documentScore,
                                               'usuallyScore':usuallyScore,
@@ -455,7 +466,6 @@ const actions = {
                                               'inGroupScore':result,
                                               'sum': sum
                                             })
-                        
                       },function(){
                         console.log("保存到云端的考勤成绩更新失败")
                          reject()
@@ -490,7 +500,24 @@ const actions = {
       commit (types.GET_GRADE_LIST)
     },
     changePassWord ({commit}, param) {
-      commit (types.CHANGR_PASS,param)
+      return new Promise(function(resolve,reject) {
+        let userID = state.userInfo.id
+        let queryUser = new AV.Query('_User')
+        queryUser.get(userID).then(function(item) {
+          let pass = item.get('mobilePhoneNumber')
+          if (param.old === pass){
+              item.set('password',param.new)
+              item.save().then(function(){
+                resolve()
+              },function(){
+                reject()
+              })
+          }
+          else {
+            reject()
+          }
+        })
+      })
     },
     createMyGrade ({commit}, param) {
       commit (types.CREATE_MY_GRADE,param)
@@ -565,7 +592,6 @@ const actions = {
               todos.forEach(function(todo) {
                 var todo = AV.Object.createWithoutData('Team', todo.id)
                 todo.destroy().then(function (success) {
-                 console.log("删除成功")
                 }, function (error) {
                  reject()
                 });
@@ -579,129 +605,129 @@ const actions = {
           reject()
         })
     })
-  },
-  deleteGroupByGroupName ({commit},param) {
-    return new Promise (function(resolve,reject) {
-      let queryGrade = new AV.Query('GradeTable')
-          queryGrade.equalTo('createGrade',param.gradeName)
-          queryGrade.find().then(function(gradeItem) {
-            let queryGroup1 = new AV.Query('Team')
-                queryGroup1.equalTo('GradeID',gradeItem[0].id)
+    },
+    deleteGroupByGroupName ({commit},param) {
+      return new Promise (function(resolve,reject) {
+        let queryGrade = new AV.Query('GradeTable')
+            queryGrade.equalTo('createGrade',param.gradeName)
+            queryGrade.find().then(function(gradeItem) {
+              let queryGroup1 = new AV.Query('Team')
+                  queryGroup1.equalTo('GradeID',gradeItem[0].id)
 
-            let queryGroup2 = new AV.Query('Team')
-                queryGroup2.equalTo('teamname',param.groupName)
+              let queryGroup2 = new AV.Query('Team')
+                  queryGroup2.equalTo('teamname',param.groupName)
 
-            let query = AV.Query.and(queryGroup1,queryGroup2)
-                query.find().then(function(todo) {
-                  var todo = AV.Object.createWithoutData('Team', todo[0].id)
-                  todo.destroy().then(function (success) {
-                    
-                    resolve()
-                  }, function (error) {
-                   reject()
-                  });
-                })
-          })
+              let query = AV.Query.and(queryGroup1,queryGroup2)
+                  query.find().then(function(todo) {
+                    var todo = AV.Object.createWithoutData('Team', todo[0].id)
+                    todo.destroy().then(function (success) {
+                      
+                      resolve()
+                    }, function (error) {
+                    reject()
+                    });
+                  })
+            })
 
-    })
-  },
-  updategradeAndGroup ({commit}, param) {
-    return new Promise(function(resolve,reject) {
-      for(let i = 0; i < state.AllGradNameList.length; i++) {
-        let grade = state.AllGradNameList[i] 
-              if(grade.grades === param.gradeName ){
-                for(let j = 0; j < grade.groups.length; j++) {
-                  if (grade.groups[j].groupName === param.groupName) {
-                     grade.groups.splice(j,1)
-                     resolve()
-                  }  
-              }
-          }
-        }
-      reject()
-    })
-  },
-  deleteStudentByGrade ({commit},param) {
-    return new Promise(function(resolve,reject){
-      let querystudent1 = new AV.Query('_User')
-      querystudent1.equalTo('grade',param)
-  
-      querystudent1.find().then(function(stuList){
-        stuList.forEach(function(todo) {
-          var todo = AV.Object.createWithoutData('_User', todo.id)
-          todo.destroy().then(function (success) {
-           console.log("删除成功")
-          }, function (error) {
-           reject()
-          })
-        })
-        commit(types.SET_STUDENT_LIST)
-        return AV.Object.saveAll(stuList)
       })
-    })
-    
-  },
-  deleteStudentByGroup ({commit},param) {
-    return new Promise(function(resolve,reject){
-      let querystudent1 = new AV.Query('_User')
-      querystudent1.equalTo('grade',param.gradeName)
-  
-      let querystudent2 = new AV.Query('_User')
-      querystudent2.equalTo('teamname',param.groupName)
-  
-      let query = AV.Query.and(querystudent1,querystudent2)
-      query.find().then(function(stuList){
-        stuList.forEach(function(todo) {
-          var todo = AV.Object.createWithoutData('_User', todo.id)
-          todo.destroy().then(function (success) {
-           commit(types.GRADE_AND_GROUP)
-          }, function (error) {
-           reject()
-          })
-        })
-        commit(types.SET_STUDENT_LIST)
-        return AV.Object.saveAll(stuList)
-      })
-    })
-  },
-  saveScore ({commit},param) {
-    return new Promise ((resolve,reject) => {
-      let studentId = state.studentinfo[param.index].id
-      let query = new AV.Query('scoreList')
-      query.equalTo('userID',studentId)
-
-      query.find().then(function(scoreItem) {
-        var todo = AV.Object.createWithoutData('scoreList',scoreItem[0].id)
-        // 修改属性
-        todo.set('documentScore',Number(param.document))
-        todo.set('usuallyScore',Number(param.usually))
-
-        todo.save().then (function(){
-          let attendscore = scoreItem[0].attributes.attendScore
-          let documentScore = Number(param.document)
-          let usuallyScore = Number(param.usually)
-          let betweenGroupScore = scoreItem[0].attributes.betweenGroupScore
-          let inGroupScore = scoreItem[0].attributes.inGroupScore
-          let sum = attendscore * (state.standard.attend)/100 + documentScore * state.standard.document/100
-                  + usuallyScore * state.standard.usually/100 + betweenGroupScore * state.standard.betweenGroup/100
-                  + inGroupScore * state.standard.ingroup/100
-          for(let i = 0; i < state.scoreList.length; i++) {
-            if(state.scoreList[i].userID === studentId) {
-              state.scoreList[i].documentScore = Number(param.document)
-              state.scoreList[i].usuallyScore = Number(param.usually)
-              state.scoreList[i].sum = sum
+    },
+    updategradeAndGroup ({commit}, param) {
+      return new Promise(function(resolve,reject) {
+        for(let i = 0; i < state.AllGradNameList.length; i++) {
+          let grade = state.AllGradNameList[i] 
+                if(grade.grades === param.gradeName ){
+                  for(let j = 0; j < grade.groups.length; j++) {
+                    if (grade.groups[j].groupName === param.groupName) {
+                      grade.groups.splice(j,1)
+                      resolve()
+                    }  
+                }
             }
           }
-          console.log("保存到云端的考勤成绩更新成功")
-          resolve()
-        },function(){
-          console.log("保存到云端的考勤成绩更新失败")
-           reject()
-        })
-      
+        reject()
       })
-    })
-  }
+    },
+    deleteStudentByGrade ({commit},param) {
+      return new Promise(function(resolve,reject){
+        let querystudent1 = new AV.Query('_User')
+        querystudent1.equalTo('grade',param)
+    
+        querystudent1.find().then(function(stuList){
+          stuList.forEach(function(todo) {
+            var todo = AV.Object.createWithoutData('_User', todo.id)
+            todo.destroy().then(function (success) {
+            console.log("删除成功")
+            }, function (error) {
+            reject()
+            })
+          })
+          commit(types.SET_STUDENT_LIST)
+          return AV.Object.saveAll(stuList)
+        })
+      })
+      
+    },
+    deleteStudentByGroup ({commit},param) {
+      return new Promise(function(resolve,reject){
+        let querystudent1 = new AV.Query('_User')
+        querystudent1.equalTo('grade',param.gradeName)
+    
+        let querystudent2 = new AV.Query('_User')
+        querystudent2.equalTo('teamname',param.groupName)
+    
+        let query = AV.Query.and(querystudent1,querystudent2)
+        query.find().then(function(stuList){
+          stuList.forEach(function(todo) {
+            var todo = AV.Object.createWithoutData('_User', todo.id)
+            todo.destroy().then(function (success) {
+            commit(types.GRADE_AND_GROUP)
+            }, function (error) {
+            reject()
+            })
+          })
+          commit(types.SET_STUDENT_LIST)
+          return AV.Object.saveAll(stuList)
+        })
+      })
+    },
+    saveScore ({commit},param) {
+      return new Promise ((resolve,reject) => {
+        let studentId = state.studentinfo[param.index].id
+        let query = new AV.Query('scoreList')
+        query.equalTo('userID',studentId)
+
+        query.find().then(function(scoreItem) {
+          var todo = AV.Object.createWithoutData('scoreList',scoreItem[0].id)
+          // 修改属性
+          todo.set('documentScore',Number(param.document))
+          todo.set('usuallyScore',Number(param.usually))
+
+          todo.save().then (function(){
+            let attendscore = scoreItem[0].attributes.attendScore
+            let documentScore = Number(param.document)
+            let usuallyScore = Number(param.usually)
+            let betweenGroupScore = scoreItem[0].attributes.betweenGroupScore
+            let inGroupScore = scoreItem[0].attributes.inGroupScore
+            let sum = attendscore * (state.standard.attend)/100 + documentScore * state.standard.document/100
+                    + usuallyScore * state.standard.usually/100 + betweenGroupScore * state.standard.betweenGroup/100
+                    + inGroupScore * state.standard.ingroup/100
+            for(let i = 0; i < state.scoreList.length; i++) {
+              if(state.scoreList[i].userID === studentId) {
+                state.scoreList[i].documentScore = Number(param.document)
+                state.scoreList[i].usuallyScore = Number(param.usually)
+                state.scoreList[i].sum = sum
+              }
+            }
+            console.log("保存到云端的考勤成绩更新成功")
+            resolve()
+          },function(){
+            console.log("保存到云端的考勤成绩更新失败")
+            reject()
+          })
+        
+        })
+      })
+    }
 }
 
 export default new Vuex.Store({
