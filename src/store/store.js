@@ -85,8 +85,8 @@ const mutations = {
   },
    
    [types.GET_SIGN_LIST] (state,param) {
+     console.log(param)
      state.signinList = []
-    //  let result = []
      for (let i = 0; i < state.studentinfo.length; i++) {
        let userId = state.studentinfo[i].id
        let queryUser = new AV.Query('SigninList')
@@ -218,6 +218,32 @@ const actions = {
         reject()
       })
     })
+    },
+    forgotPass ({commit},param) {
+      return new Promise ((resolve,reject) => {
+        let queryName = new AV.Query('_User')
+            queryName.equalTo('username',param.name)
+
+        let queryTel = new AV.Query('_User')
+            queryTel.equalTo('mobilePhoneNumber',param.tel)
+        
+        let query = AV.Query.and(queryName,queryTel)
+        query.find().then((item) => {
+          if(item.length === 0) {
+            reject()
+          }
+          else{
+            item[0].set('password',param.pass)
+            item[0].save().then(() => {
+              resolve()
+            },function(){
+              reject()
+            })
+        }
+        },function(){
+          reject()
+        })
+      })
     },
     checkLogin ({state,commit},param) {
       return new Promise((resolve, reject) => {

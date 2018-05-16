@@ -21,7 +21,7 @@
               <input class="input is-primary" type="text" placeholder="输入小组名" v-model="groupName">
             </p>
             <p class="control">
-              <button class="button is-primary" @click = "addGroup(groupName)">
+              <button class="button is-primary" @click = "addGroup(chooseGrade,groupName)">
                 创建小组
               </button>
             </p>
@@ -130,7 +130,7 @@ export default {
        }
   },
   methods: {
-    addGroup (name) {
+    addGroup (gradeName,name) {
        let groupName =  name.trim()
         if (!groupName) {
           alert("小组名不能为空")
@@ -139,10 +139,12 @@ export default {
         }
        for(let i = 0; i < this.getAllGradNameList.length; i++) {
          let grade = this.getAllGradNameList[i]
-          for (let j = 1; j < grade.groups.length; j++) {
-            if (grade.groups[j].groupName === groupName) {
-              alert("小组名已经存在不能重复创建")
-              return 
+         if (grade.grades === gradeName){
+            for (let j = 0; j < grade.groups.length; j++) {
+              if (grade.groups[j].groupName === groupName) {
+                alert("小组名已经存在不能重复创建")
+                return 
+              }
             }
           }
        }
@@ -150,11 +152,12 @@ export default {
                                       gradeName:this.chooseGrade,
                                       groupName:name
                                       }).then (function (){
-                                        alert("创建班级成功")
-                                        
+                                        alert("创建小组成功")
+                                      
                                       },function(){
-                                        alert("创建班级失败")
+                                        alert("创建小组失败")
                                       })
+                                        this.$store.dispatch('getGradeAndGroup')
                                         this.groupName = ''
                                         this.chooseGrade = ''
     },

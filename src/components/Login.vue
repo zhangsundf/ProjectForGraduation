@@ -53,12 +53,12 @@
         </div>
      </div>
      <div class = "signup">
-        <el-button type="text" @click="dialogVisible = true">忘记密码?</el-button>
-        <el-button type="text" @click="dialogVisible = true">立即注册</el-button>
+        <el-button type="text" @click="dialogVisible1 = true">忘记密码?</el-button>
+        <el-button type="text" @click="dialogVisible2 = true">立即注册</el-button>
       </div>
     <el-dialog
         title="注册"
-        :visible.sync="dialogVisible"
+        :visible.sync="dialogVisible2"
         width="38%"
         :before-close="handleClose">
         <div class = "content">
@@ -80,8 +80,35 @@
           <br/>
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false" size = "mini">取 消</el-button>
+          <el-button @click="dialogVisible2 = false" size = "mini">取 消</el-button>
           <el-button type="primary" @click="signup" size = "mini">注册</el-button>
+        </span>
+    </el-dialog>
+     <el-dialog
+        title="找回密码"
+        :visible.sync="dialogVisible1"
+        width="38%"
+        :before-close="handleClose">
+        <div class = "content">
+           <label for = "tel">账号</label>
+          <br/>
+           <input type = "text" placeholder="用户名" class = "input is-success" v-model = 'name2'>
+          <label for = "tel">手机号</label>
+          <br/>
+          <input type = "text" placeholder="11位手机号" class = "input is-success" v-model = 'tel2'>
+          <br/>
+          <label for = "newPass">新密码</label>
+          <br/>
+          <input type = "password" placeholder="6位以上的密码" class = "success is-primary" v-model = 'newpass'>
+          <br/>
+          <label for = "pass">密码</label>
+          <br/>
+          <input type = "password" placeholder="6位以上的密码" class = "success is-primary" v-model = 'repass'>
+          <br/>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible1 = false" size = "mini">取 消</el-button>
+          <el-button type="primary" @click = "changePass(name2,tel2,newpass,repass)" size = "mini">修改密码</el-button>
         </span>
     </el-dialog>
   </div>
@@ -97,12 +124,17 @@ export default {
       username: '',
       password: '',
       error: false,
-      dialogVisible: false,
+      dialogVisible2: false,
+      dialogVisible1: false,
       tab:1,
       name:'',
       pass:'',
       date:'',
-      tel:''
+      tel:'',
+      tel2:'',
+      newpass:'',
+      repass:'',
+      name2:''
     }
   },
   computed: {
@@ -143,14 +175,30 @@ export default {
           isteacher:true
       }).then(function(){
         alert("注册成功")
+        
       }).catch(function(){
         alert("注册失败！\n可能原因：1.用户名已被注册;\n 2.手机号已被注册或无效；\n 3.信息填写不完整")
       })
+      this.dialogVisible2 = false 
          this.name = ''
          this.tel = ''
          this.email = ''
          this.pass = '',
          this.date = ''
+    },
+    changePass (name,tel,pass, repass) {
+      if (pass!== repass) {
+        alert("两次密码输入不一致！")
+      }
+      else {
+        this.$store.dispatch ("forgotPass",{name:name.trim(),tel:tel.trim(),pass:pass.trim()}).then(function(){
+          alert("密码修改成功")
+          this.dialogVisible1 = false 
+        }).catch(function(){
+          alert("用户名和预留手机号不匹配")
+        })
+         
+      }
     },
     changeLoginMethods(index) {
       this.tab = index
