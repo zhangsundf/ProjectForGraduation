@@ -146,10 +146,18 @@
       </template>
     </el-table-column>
   </el-table>
+  <transition name = "fade2">
+    <toggle-hander v-if = "!showRightEcharts" :showRightHander = "showRightEcharts" @toggleHander = "toggleHander"></toggle-hander>
+  </transition>
+   <transition name="fade2">
+  <statstic-echarts v-if = "showRightEcharts" :showRightEcharts = "showRightEcharts" @showEcharts = "showEcharts" :result = "result"></statstic-echarts>
+  </transition>
 </div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import toggleHander from '../../common/toggleHander'
+import statsticEcharts from '../../common/statsticEcharts'
 export default {
   name: 'Statistics',
   data(){
@@ -163,8 +171,12 @@ export default {
       setunsualScore:0,
       isOneEdit:false,
       index:-1,
-
+      showRightEcharts:false
     }
+  },
+  components: {
+    toggleHander,
+    statsticEcharts
   },
   computed:{
     ...mapGetters(['getStudentInfo','getScoreList','getstandard']),
@@ -188,6 +200,12 @@ export default {
     }
   },
   methods:{
+    toggleHander (val) {
+      this.showRightEcharts = val
+    },
+     showEcharts (val) {
+      this.showRightEcharts = val
+    },
     setStandards(){
       if(this.total != 100){
         alert("占比总分必须为100")
@@ -303,4 +321,23 @@ export default {
 .excellent {
   color:rgb(38, 226, 21);
 }
+ .fade2-enter{
+    opacity:0;
+    width:0px;
+  }
+  .fade2-enter-active{
+    transition:all 1.5s;
+  }
+  .fade2-leave {
+      opacity:1;
+      width:300px;
+  }
+  .fade2-leave-active{
+    transition:all 1.5s;
+  }
+ .fade2-leave-to{
+    width:0px;
+    opacity:0;
+  }
+
 </style>

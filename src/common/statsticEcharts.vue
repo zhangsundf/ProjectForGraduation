@@ -1,8 +1,8 @@
 <template>
     <div class = "rightEcharts" @mouseout = "showRight">
-        <div class = "todaySign">
+        <div class = "abstract">
         </div>
-        <div class = "signByGrade"></div>
+        <div class = "gradeScore"></div>
     </div>
 </template>
 
@@ -12,11 +12,15 @@ export default {
     data () {
         return {
             subshowRightEcharts: this.showRightEcharts,
-            sign:0,
-            noSign:0,
-            gradeList:[],
-            nosignList:[],
-            issignList:[]
+            excellent: 0,
+            medium:0,
+            general:0,
+            failed:0,
+            excellentList: [],
+            mediumList:[],
+            generalList: [],
+            failedList: [],
+            gradeList: []
         }
     },
     props: {
@@ -24,62 +28,77 @@ export default {
             type:Boolean,
             require:true
         },
-        'signList': {
+        'result': {
             type:Array,
             require:true
         }
-        },
+    },
     methods: {
-        caculateSign () {
-            for (let i = 0; i < this.signList.length; i++) {
-                if (this.signList[i].isSignin == true) {
-                    this.sign += 1
+        ratingGrade() {
+            for (let i = 0 ; i < this.result.length; i++) {
+                if (this.result[i].sum >= 85) {
+                    this.excellent ++
                 }
-                if (this.signList[i].isSignin == false) {
-                    this.noSign += 1
+                if ( this.result[i].sum >= 70 && this.result[i].sum < 85) {
+                    this.medium ++
+                }
+                if ( this.result[i].sum >= 60 && this.result[i].sum < 70) {
+                    this.general ++
+                }
+                if ( this.result[i].sum < 60) {
+                    this.failed ++
                 }
             }
         },
-        caculateSignByGrade () {
-            for (let i = 0; i < this.signList.length; i ++ ) {
-                if (this.gradeList.indexOf(this.signList[i].grade) === -1) {
-                    this.gradeList.push(this.signList[i].grade)
+        ratingGradeByClass () {
+            for (let i = 0; i < this.result.length; i ++ ) {
+                if (this.gradeList.indexOf(this.result[i].grade) === -1) {
+                    this.gradeList.push(this.result[i].grade)
                 } 
             }
             for (let j = 0; j < this.gradeList.length; j ++) {
-                let sign = 0
-                let noSign = 0
-                for (let k = 0; k < this.signList.length; k ++) {
-                    if (this.gradeList[j] === this.signList[k].grade) {
-                        if (this.signList[k].isSignin == true) {
-                            sign ++
+                let excellent = 0
+                let medium = 0
+                let general = 0
+                let failed = 0
+                for (let k = 0; k < this.result.length; k ++) {
+                    if (this.gradeList[j] === this.result[k].grade) {
+                        if (this.result[k].sum >= 85) {
+                            excellent ++
                         }
-                        else {
-                            noSign ++
+                        if ( this.result[k].sum >= 70 && this.result[k].sum < 85) {
+                            medium ++
+                        }
+                        if ( this.result[k].sum >= 60 && this.result[k].sum < 70) {
+                            general ++
+                        }
+                        if ( this.result[k].sum < 60) {
+                            failed ++
                         }
                     }  
                 }
-                this.issignList.push (sign)
-                this.nosignList.push (noSign)
+                this.excellentList.push (excellent)
+                this.mediumList.push (medium)
+                this.generalList.push(general)
+                this.failedList.push(failed)
             }
-            
         },
         showRight (){
             this.subshowRightEcharts = !this.showRightEcharts
             this.$emit('showEcharts',this.subshowRightEcharts)
         },
         drawCircle () {
-            this.caculateSign()
-            var myecharts=this.$echarts.init(document.getElementsByClassName("todaySign")[0]);
+            this.ratingGrade()
+            var myecharts=this.$echarts.init(document.getElementsByClassName("abstract")[0]);
             var option=({
                 title:{
-                    text:this.signList[0].date,//主标题文本，支持\n换行
+                    text: '成绩统计情况',//主标题文本，支持\n换行
                     x:'center'
                 },
                 legend: {
                     orient: 'vertical',
-                    // left: 'center',
-                    data: ['签到','未签到']
+                    left: 'left',
+                    data: ['优秀','中等','良好','不及格']
                 },
                 textStyle: {
                             color: 'rgb(0, 0, 0)'//文字的颜色
@@ -87,15 +106,18 @@ export default {
                 tooltip : {
                     trigger: 'item',
                     formatter: "{b} : {c}"
-    },
+                },
                 series : [
                     {
-                        name: '签到情况',
+                        name: '成绩分布',
                         type: 'pie',//每个系列，通过type决定自己的系列型号
                         radius: '50%',
+                        center: ['50%', '70%'],
                         data:[
-                            {value:this.sign, name:'签到人数'},
-                            {value:this.noSign, name:'未签到人数'}
+                            {value:this.excellent, name:'优秀'},
+                            {value:this.medium, name:'中等'},
+                            {value:this.general, name:'良好'},
+                            {value:this.failed, name:'不及格'}
                         ],
                         itemStyle: {//图形样式 normal，emphasis
                             emphasis: {
@@ -117,15 +139,14 @@ export default {
                                 }
                             }
                         }
-
                     }
                 ]
             });
             myecharts.setOption(option);
         },
         drawBar() {
-            this.caculateSignByGrade()
-            var signByGrade = this.$echarts.init(document.getElementsByClassName('signByGrade')[0])
+            this.ratingGradeByClass()
+            var signByGrade = this.$echarts.init(document.getElementsByClassName('gradeScore')[0])
             var labelOption = {
             normal: {
                 show: true,
@@ -137,10 +158,10 @@ export default {
                     }
                 }
             }
-        };
+        }
 
        let  option = {
-            color: ['green', 'yellow'],
+            color: ['#00FF7F', '#FFD700','#FFA500','#FF0000'],
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
@@ -148,7 +169,7 @@ export default {
                 }
             },
             legend: {
-                data: ['签到','未签到']
+                data: ['优秀','中等','良好','不及格']
             },
             calculable: true,
             xAxis: [
@@ -165,27 +186,40 @@ export default {
             ],
             series: [
                 {
-                    name: '签到',
+                    name: '优秀',
                     type: 'bar',
                     barGap: 0,
                     label: labelOption,
-                    data: this.issignList
+                    data: this.excellentList
                 },
                 {
-                    name: '未签到',
+                    name: '中等',
                     type: 'bar',
                     label: labelOption,
-                    data:this.nosignList
+                    data:this.mediumList
+                },
+               {
+                    name: '良好',
+                    type: 'bar',
+                    barGap: 0,
+                    label: labelOption,
+                    data: this.generalList
+                },
+                {
+                    name: '不及格',
+                    type: 'bar',
+                    label: labelOption,
+                    data:this.failedList
                 }
             ]
                 }
-                signByGrade.setOption(option);
+            signByGrade.setOption(option);
             } 
         },
-    mounted() {
-        this.drawCircle()
-        this.drawBar()
-    }
+        mounted () {
+            this.drawCircle()
+            this.drawBar()
+        }
 }
 </script>
 
@@ -200,13 +234,14 @@ export default {
         background-color: grey;
         padding-top:5%;
     }
-    .todaySign {
+    .abstract {
         position:relative;
         width:100%;
         height:45%;
     }
-    .signByGrade {
+    .gradeScore {
         position:relative;
+        margin-top:10%;
         width:100%;
         height:45%;
     }

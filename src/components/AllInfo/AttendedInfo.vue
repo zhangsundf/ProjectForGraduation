@@ -89,9 +89,7 @@
     </el-table-column>
   </el-table>
   <transition name = "fade2">
-    <div v-if = "!showRightEcharts" class = "rightHandle" @mouseover="showRightEcharts = true" >
-      <span> < </span>
-    </div>
+    <toggle-hander v-if = "!showRightEcharts" :showRightHander = "showRightEcharts" @toggleHander = "toggleHander"><</toggle-hander>
   </transition>
    <transition name="fade2">
   <right-echarts v-if = "showRightEcharts" :showRightEcharts = "showRightEcharts" @showEcharts = "showEcharts" :signList = "getSigninList"></right-echarts>
@@ -101,6 +99,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import rightEcharts from '../../common/rightEcharts'
+import toggleHander from '../../common/toggleHander'
 export default {
   name: 'AttendedInfo',
   data(){
@@ -115,7 +114,8 @@ export default {
     }
   },
   components: {
-    rightEcharts
+    rightEcharts,
+    toggleHander
   },
   computed: {
     ...mapGetters(['getStudentInfo','getSigninList','getDate','getScoreList']),
@@ -139,6 +139,9 @@ export default {
   },
   methods: {
     showEcharts (val) {
+      this.showRightEcharts = val
+    },
+    toggleHander (val) {
       this.showRightEcharts = val
     },
     handleEdit(index, row) {
@@ -226,20 +229,7 @@ export default {
     color:red;
     font-weight:normal;
   }
-  .rightHandle {
-    position: fixed;
-    right: 0px;
-    width:50px;
-    height:100px; 
-    border-radius:50px 0px 0px 50px; /* 左上、右上、右下、左下 */
-    top:50%;
-    background-color: #b9b5b5;
-    color: #ffffff;
-    text-align: center;
-    line-height: 100px;
-    font-size: 50px;
-    font-weight: bold;
-  }
+ 
   .fade2-enter{
     opacity:0;
     width:0px;
