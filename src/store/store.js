@@ -85,31 +85,39 @@ const mutations = {
   },
    
    [types.GET_SIGN_LIST] (state,param) {
-     console.log(param)
      state.signinList = []
      for (let i = 0; i < state.studentinfo.length; i++) {
        let userId = state.studentinfo[i].id
-       let queryUser = new AV.Query('SigninList')
-       queryUser.equalTo("userID",userId)
-       let querySign = new AV.Query('SigninList')
-       querySign.equalTo("date",param)
-       
-       var query = AV.Query.and (queryUser,querySign)
-       query.find().then(function (signin) {
-        if(signin.length !== 0) {
-          state.signinList.push ({'userID':userId,'isSignin':signin[0].attributes.isSignin,'date':param,'signId':signin[0].id})
-        }
-         if(signin.length === 0) {
-           for (let i = 0; i < state.dateArray.length; i ++) {
-            let query = new AV.Object('SigninList')
-            query.set('userID',userId)
-            query.set ('date',state.dateArray[i])
-            query.set ('isSignin',false)
-            query.save()
-            state.signinList.push({'userID':userId,'isSignin':false,'date':param}) 
-           }
+      
+       let queryUserGrade = new AV.Query('_User')
+       queryUserGrade.get (userId).then (function(item) {
+
+        let queryUser = new AV.Query('SigninList')
+        queryUser.equalTo("userID",userId)
+        let querySign = new AV.Query('SigninList')
+        querySign.equalTo("date",param)
+        
+        var query = AV.Query.and (queryUser,querySign)
+        query.find().then(function (signin) {
+         if(signin.length !== 0) {
+           state.signinList.push ({'userID':userId,'isSignin':signin[0].attributes.isSignin,'date':param,
+                                  'signId':signin[0].id,
+                                  'grade':item.attributes.grade,'teamname':item.attributes.teamname})
          }
-      })
+          if(signin.length === 0) {
+            for (let i = 0; i < state.dateArray.length; i ++) {
+             let query = new AV.Object('SigninList')
+             query.set('userID',userId)
+             query.set ('date',state.dateArray[i])
+             query.set ('isSignin',false)
+             query.save()
+            }
+            state.signinList.push({'userID':userId,'isSignin':false,'date':param,
+                                  'grade':item.attributes.grade,'teamname':item.attributes.teamname}) 
+          }
+       })
+       })
+
      }
    },
    [types.GET_DATE_LIST] (state) {
@@ -307,6 +315,11 @@ const actions = {
                 todo.set('isSignin', param.status);
                 // 保存到云端
                 todo.save().then(function(){
+                  for (let i = 0; i < state.signinList.length; i ++) {
+                      if (param.row.userID === state.signinList[i].userID) {
+                        state.signinList[i].isSignin = param.status
+                      }
+                  }
                     resolve()
                 },function(err){
                   console.log(err)

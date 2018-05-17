@@ -88,10 +88,19 @@
       </template>
     </el-table-column>
   </el-table>
+  <transition name = "fade2">
+    <div v-if = "!showRightEcharts" class = "rightHandle" @mouseover="showRightEcharts = true" >
+      <span> < </span>
+    </div>
+  </transition>
+   <transition name="fade2">
+  <right-echarts v-if = "showRightEcharts" :showRightEcharts = "showRightEcharts" @showEcharts = "showEcharts" :signList = "getSigninList"></right-echarts>
+  </transition>
   </div>
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex'
+import rightEcharts from '../../common/rightEcharts'
 export default {
   name: 'AttendedInfo',
   data(){
@@ -101,8 +110,12 @@ export default {
       isOneEdit:false,
       siginState: [{'label':"签到成功",value:true},{'label':"未签到",value:false}],
       chooseStatus: '',
-      index:-1
+      index:-1,
+      showRightEcharts: false
     }
+  },
+  components: {
+    rightEcharts
   },
   computed: {
     ...mapGetters(['getStudentInfo','getSigninList','getDate','getScoreList']),
@@ -114,7 +127,9 @@ export default {
         for (let i = 0; i < this.tableData.length; i++){
           for (let j = 0; j < this.getSigninList.length; j++){
             if(this.tableData[i].id === this.getSigninList[j].userID){
-                result.push(Object.assign({'editFlag':false},this.getSigninList[j],this.tableData[i].attributes))
+                result.push(Object.assign({'editFlag':false},
+                            {'StudentId':this.tableData[i].attributes.StudentId,'username':this.tableData[i].attributes.username},
+                            this.getSigninList[j]))
                 break
             }
           }
@@ -123,6 +138,9 @@ export default {
     }
   },
   methods: {
+    showEcharts (val) {
+      this.showRightEcharts = val
+    },
     handleEdit(index, row) {
         if(this.isOneEdit === false){
             this.isOneEdit = true
@@ -146,7 +164,8 @@ export default {
                                       
                                       }).catch(function(){
                                         console.log("修改签到信息，重新计算签到次数失败啦！")
-              })
+                                      })
+                                      
                                       alert("success")
                                     }).catch(()=>{
                                       alert("failed")
@@ -156,6 +175,9 @@ export default {
         }else{
           return 
         }
+      },
+      getEcharts () {
+        this.showRightEcharts = true
       }
   },
  beforeCreate() {
@@ -204,6 +226,39 @@ export default {
     color:red;
     font-weight:normal;
   }
+  .rightHandle {
+    position: fixed;
+    right: 0px;
+    width:50px;
+    height:100px; 
+    border-radius:50px 0px 0px 50px; /* 左上、右上、右下、左下 */
+    top:50%;
+    background-color: #b9b5b5;
+    color: #ffffff;
+    text-align: center;
+    line-height: 100px;
+    font-size: 50px;
+    font-weight: bold;
+  }
+  .fade2-enter{
+    opacity:0;
+    width:0px;
+  }
+  .fade2-enter-active{
+    transition:all 1.5s;
+  }
+  .fade2-leave {
+      opacity:1;
+      width:300px;
+  }
+  .fade2-leave-active{
+    transition:all 1.5s;
+  }
+ .fade2-leave-to{
+    width:0px;
+    opacity:0;
+  }
+
 </style>
 
 
