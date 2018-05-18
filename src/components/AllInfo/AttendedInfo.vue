@@ -26,11 +26,11 @@
     </nav>
     </div>
     <el-table
-    :data="result"
+    :data="result.slice((currentPage-1)*pagesize,currentPage*pagesize)"
     style="width: 100%"
     border
     stripe
-     height="86%">
+     height="84%">
     <el-table-column
       label="学号"
       min-width="200">
@@ -88,8 +88,16 @@
       </template>
     </el-table-column>
   </el-table>
+  <el-pagination
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
+    :current-page="currentPage"
+    :page-size="pagesize"
+    layout="total, sizes, prev, pager, next, jumper"
+    :total="result.length">
+  </el-pagination>
   <transition name = "fade2">
-    <toggle-hander v-if = "!showRightEcharts" :showRightHander = "showRightEcharts" @toggleHander = "toggleHander"><</toggle-hander>
+    <toggle-hander v-if = "!showRightEcharts" :showRightHander = "showRightEcharts" @toggleHander = "toggleHander"> &lt; </toggle-hander>
   </transition>
    <transition name="fade2">
   <right-echarts v-if = "showRightEcharts" :showRightEcharts = "showRightEcharts" @showEcharts = "showEcharts" :signList = "getSigninList"></right-echarts>
@@ -110,7 +118,9 @@ export default {
       siginState: [{'label':"签到成功",value:true},{'label':"未签到",value:false}],
       chooseStatus: '',
       index:-1,
-      showRightEcharts: false
+      showRightEcharts: false,
+      pagesize: 10,
+      currentPage:1,
     }
   },
   components: {
@@ -138,6 +148,12 @@ export default {
     }
   },
   methods: {
+    handleSizeChange: function (size) {
+      this.pagesize = size;
+    },
+    handleCurrentChange: function(currentPage){
+      this.currentPage = currentPage;
+    },
     showEcharts (val) {
       this.showRightEcharts = val
     },
@@ -213,8 +229,7 @@ export default {
   .header {
     position: relative;
     width: 100%;
-    height: 12%;
-
+    height: 10%;
   }
   .signin {
     position: relative;

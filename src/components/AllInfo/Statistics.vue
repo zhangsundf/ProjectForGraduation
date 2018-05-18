@@ -53,11 +53,11 @@
     </nav>
    
     <el-table
-    :data="result"
+    :data="result.slice((currentPage-1)*pagesize,currentPage*pagesize)"
     style="width: 100%"
     border
     stripe
-     height="80%">
+     height="85%">
     <el-table-column
       label="学号"
       min-width="100">
@@ -146,6 +146,14 @@
       </template>
     </el-table-column>
   </el-table>
+  <el-pagination
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
+    :current-page="currentPage"
+    :page-size="pagesize"
+    layout="total, sizes, prev, pager, next, jumper"
+    :total="result.length">
+  </el-pagination>
   <transition name = "fade2">
     <toggle-hander v-if = "!showRightEcharts" :showRightHander = "showRightEcharts" @toggleHander = "toggleHander"></toggle-hander>
   </transition>
@@ -171,7 +179,9 @@ export default {
       setunsualScore:0,
       isOneEdit:false,
       index:-1,
-      showRightEcharts:false
+      showRightEcharts:false,
+      pagesize: 10,
+      currentPage:1,
     }
   },
   components: {
@@ -200,6 +210,12 @@ export default {
     }
   },
   methods:{
+    handleSizeChange: function (size) {
+      this.pagesize = size;
+    },
+    handleCurrentChange: function(currentPage){
+      this.currentPage = currentPage;
+    },
     toggleHander (val) {
       this.showRightEcharts = val
     },
@@ -284,25 +300,14 @@ export default {
 .setStandards{
   position: relative;
   width: 100%;
-  height: 6%; 
+  height: 5%; 
   bottom:-10px;
   display: flex;
-}
-
-.el-table{
-  position: relative;
-  width: 100%;
-  height: 85%;
-  top:30px;
-  overflow: hidden;
-  overflow-y: auto;
-  margin: 0 auto;
-  top:3%;
 }
 .level {
   position: relative;
   width: 100%;
-  height: 10%;
+  height: 5%;
 }
 .level-item {
   position: relative;

@@ -115,7 +115,7 @@ export default {
     left:18%;
     overflow-y: auto;
     padding:2%;
-    padding-top:5%;
+    padding-top:3%;
   }
 .showView::-webkit-scrollbar {
   width: 10px;

@@ -2,11 +2,11 @@
 
   <div class = "studentinfo">
     <el-table
-    :data="result"
+    :data="result.slice((currentPage-1)*pagesize,currentPage*pagesize)"
     style="width: 100%"
     border
     stripe
-     height="100%">
+     height="94%">
     <el-table-column
       label="学号"
       min-width="100">
@@ -92,7 +92,14 @@
       </template>
     </el-table-column>
   </el-table>
-    <!-- </virtual-list> -->
+  <el-pagination
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
+    :current-page="currentPage"
+    :page-size="pagesize"
+    layout="total, sizes, prev, pager, next, jumper"
+    :total="result.length">
+  </el-pagination>
     </div>
 </template>
 
@@ -108,10 +115,18 @@ export default {
       chooseGroup:'',
       groupList:[],
       isOneEdit:false,
-      index:-1
+      index:-1,
+      pagesize: 10,
+      currentPage:1,
       }
     },
     methods: {
+      handleSizeChange: function (size) {
+        this.pagesize = size;
+      },
+      handleCurrentChange: function(currentPage){
+        this.currentPage = currentPage;
+      },
       handleEdit(index, row) {
         if(this.isOneEdit === false){
             this.isOneEdit = true
