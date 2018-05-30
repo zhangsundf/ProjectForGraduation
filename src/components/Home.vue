@@ -1,8 +1,5 @@
 <template>
 <div class = "home">
-  
-  <!-- <left-nav  @getCurrentLink = "getCurrentLink"></left-nav>
-  <main-panel :curlink = "link"></main-panel> -->
 
    <div class = "menu">
 

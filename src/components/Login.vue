@@ -145,15 +145,13 @@ export default {
   },
   methods:{
     login(name,pass){
-     let result = this.$store.dispatch('checkLogin', {
+     this.$store.dispatch('checkLogin', {
             name: this.username,
             pass: this.password,
             login: true
-        }).then (() => {
-             
-              this.$store.dispatch("getUser")
-              this.$router.push({path:'/Home/StudentInfo'})
-
+        }).then (() => {       
+               this.$store.dispatch("getUser")
+               this.$router.push({path:'/Home/StudentInfo'})
         }).catch(() => {
           this.error = true
         })   
@@ -207,7 +205,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .container {
     position: relative;

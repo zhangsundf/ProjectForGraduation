@@ -39,8 +39,7 @@ Vue.prototype.$echarts = echarts
 
 router.beforeEach((to,from,next) => {   
     if(to.matched.some( m => m.meta.auth)){     
-    
-        if(store.state.isLogin===true) {        
+        if(store.getters.getIsLogin===true) {        
           next()     
         }else{       
         　 next({path:'/',query:{ Rurl: to.fullPath} })

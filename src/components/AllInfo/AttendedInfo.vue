@@ -135,10 +135,11 @@ export default {
     result () {
        let result = []
         for (let i = 0; i < this.tableData.length; i++){
+          let student = this.tableData[i]
           for (let j = 0; j < this.getSigninList.length; j++){
             if(this.tableData[i].id === this.getSigninList[j].userID){
                 result.push(Object.assign({'editFlag':false},
-                            {'StudentId':this.tableData[i].attributes.StudentId,'username':this.tableData[i].attributes.username},
+                            {'id':student.id,'StudentId':student.attributes.StudentId,'username':student.attributes.username},
                             this.getSigninList[j]))
                 break
             }
@@ -170,7 +171,7 @@ export default {
           return
         }
       },
-        complete (index,row) {
+      complete (index,row) {
         if(this.isOneEdit === true && this.index === index) {
               this.$store.dispatch('changeAttendStatus',{
                                     status:this.chooseStatus,
@@ -178,17 +179,18 @@ export default {
                                     }).then(()=>{
                                       row.isSignin = this.chooseStatus
                                       this.isOneEdit = false
-                                      this.$store.dispatch('getStudentScoreList').then (function(){
-                                        console.log("修改签到信息，重新计算签到次数")
-                                      
-                                      }).catch(function(){
-                                        console.log("修改签到信息，重新计算签到次数失败啦！")
-                                      })
-                                      
+                                    this.$store.dispatch('setStudentAttendScore',row).then (function(){
+                                        console.log("异步更新学生签到分数成功")
+                                      }).catch(function(err){
+                                        console.log(err)
+                                        console.log("异步更新学生签到分数失败！")
+                                      })                  
                                       alert("success")
                                     }).catch(()=>{
                                       alert("failed")
                                     })
+                   
+                      
               row.editFlag = false
         return
         }else{

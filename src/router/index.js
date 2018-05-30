@@ -10,6 +10,7 @@ import createGrade from '@/components/AllInfo/createGrade'
 import myCreateGrade from '@/components/AllInfo/myCreateGrade'
 import changePass from '@/components/AllInfo/changePass'
 import StudentActivities from '@/components/AllInfo/StudentActivities'
+import test from '@/components/AllInfo/test'
 Vue.use(Router)
 
 export default new Router({

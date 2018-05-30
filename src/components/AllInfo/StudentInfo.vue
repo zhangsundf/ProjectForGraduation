@@ -1,5 +1,4 @@
 <template>
-
   <div class = "studentinfo">
     <el-table
     :data="result.slice((currentPage-1)*pagesize,currentPage*pagesize)"
@@ -197,7 +196,6 @@ export default {
     teachersGrade () {
       return this.getCurUserInfo.attributes.createGrade
     }
-    
   },
   watch: {
     chooseGrade (){
