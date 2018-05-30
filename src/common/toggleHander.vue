@@ -1,6 +1,6 @@
 <template>
     <div class = "rightHandle" @mouseover="changeShow" >
-      <span> < </span>
+      <span> &lt;</span>
       </div>
 </template>
 <script>

@@ -1,4 +1,5 @@
 <template>
+
   <div class = "changePass">
     <div class = "panel">
     <div class = "header">
@@ -7,8 +8,10 @@
           <div class = "login login1">
             <div class="field">
               <div class="control">
-                <input class="input is-primary" type="password" placeholder="输入手机号" v-model = "oldPass">
-            
+                <input class="input is-primary" type="password" placeholder="输入旧密码" v-model = "oldPass">
+              </div>
+               <div class="control" v-if = "oldPasstip">
+                <span>旧密码错误</span>
               </div>
             </div>
             <div class="field">
@@ -20,7 +23,9 @@
             <div class="field">
               <div class="control">
                 <input class="input is-info" type="password" placeholder="再次输入密码" v-model = "repass">
-              
+              </div>
+              <div class="control" v-if = "newPasstip">
+                <span>两次密码输入不一致</span>
               </div>
             </div>
             <div class="field">
@@ -34,30 +39,42 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
       oldPass:'',
       repass:'',
-      newpass:''
+      newpass:'',
+      oldPasstip: false,
+      newPasstip: false
     }
+  },
+  computed: {
+    ...mapGetters(['getPass'])
   },
   methods: {
     changePass (old,pass, repass) {
-      if (pass.trim() !== repass.trim()) {
-        alert("两次密码输入不一致！")
+       this.oldPasstip = false
+        this.newPasstip = false
+      if (old.trim() !== this.getPass) {
+        this.oldPasstip = true
+        return
       }
-      else {
-        this.$store.dispatch ("changePassWord",{old:old.trim(),new:pass.trim()}).then(function(){
+      if (pass.trim() !== repass.trim()) {
+       this.newPasstip = true
+       return
+      }
+     
+        this.$store.dispatch ("changePassWord",{new:pass.trim()}).then(function(){
           alert("密码修改成功")
         
         }).catch(function(){
-          alert("预留手机号不正确")
+          alert("密码修改失败")
         })
           this.oldPass = ''
           this.newpass = ''
           this.repass = ''
-      }
     }
   }
   

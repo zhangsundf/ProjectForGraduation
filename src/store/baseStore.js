@@ -18,6 +18,7 @@ export default {
     },
     getters : {
         getUsername: (state) => state.user,
+        getPass: (state) => state.pass,
         getIsLogin: (state) => state.isLogin,
         getCurUserInfo: (state) => state.userInfo,
         getStudentInfo: (state) => state.studentinfo,
@@ -255,19 +256,17 @@ export default {
                 queryOnlyTeam.equalTo('teamname',teamname)
       
                 let queryOneTeam = AV.Query.and(queryTeamId,queryOnlyTeam)
-      
                 queryOneTeam.find().then (function(teamItem){
-                  let queryBetweenGroupScore = new AV.Query('BetweenTeamComment')
-                  queryBetweenGroupScore.equalTo('targetTeamID',teamItem[0].id) 
-      
-                  queryBetweenGroupScore.find().then (function(commentItem){
+                  
+                    let queryBetweenGroupScore = new AV.Query('BetweenTeamComment')
+                    queryBetweenGroupScore.equalTo('targetTeamID',teamItem[0].id) 
+                    queryBetweenGroupScore.find().then (function(commentItem){
                     if (commentItem.length === 0) betweenResult = 0
                     else {
                         
                         for(let p = 0; p < commentItem.length; p ++) {
                           betweenScore += Number(commentItem[p].attributes.rating)
                         }
-                      
                         betweenResult = Number(betweenScore/commentItem.length)
                     }
                         let queryScore = new AV.Query('scoreList') 
@@ -318,7 +317,6 @@ export default {
                                                     'sum': sum
                                                   })
                             },function(){
-                              console.log("保存到云端的考勤成绩更新失败")
                                reject()
                             })
                           }

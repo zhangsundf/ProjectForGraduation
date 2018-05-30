@@ -201,7 +201,7 @@ export default {
         for (let i = 0; i < this.studentInfo.length; i++){
               for (let j = 0; j < this.getScoreList.length; j++) {
                 if(this.studentInfo[i].id === this.getScoreList[j].userID){
-                  result.push(Object.assign({'editFlag':false},this.getScoreList[j],this.studentInfo[i].attributes))
+                  result.push(Object.assign({'editFlag':false,'index': i},this.getScoreList[j],this.studentInfo[i].attributes))
                   break
                 }
               }  
@@ -227,7 +227,7 @@ export default {
         alert("占比总分必须为100")
         return
       }
-      this.$store.dispatch('setStandards',{  attend: Number(this.attended),
+      this.$store.dispatch('setStandards',{ attend: Number(this.attended),
                                               usually:Number(this.usualGrade),
                                               document:Number(this.documents),
                                               inGroup:Number(this.inGroup),
@@ -237,7 +237,12 @@ export default {
                                               }).catch(function(err){
                                                 console.log(err)
                                               })
-      this.$store.dispatch("getStudentScoreList").then(function(){
+      this.$store.dispatch("resetSum",{ attend: Number(this.attended),
+                                        usually:Number(this.usualGrade),
+                                        document:Number(this.documents),
+                                        inGroup:Number(this.inGroup),
+                                        betweenGroup:Number(this.betweenGroup)
+                                        }).then(function(){
                                               }).catch(function(err){
                                                 console.log(err)
                                               })
@@ -259,8 +264,7 @@ export default {
         this.$store.dispatch('saveScore',{
                             document:this.setDocumentScore,
                             usually:this.setunsualScore,
-                            index:index,
-                          
+                            index:row.index
                             }).then(()=>{
                                 row.usualGrade = this.setunsualScore
                                 row.documentScore = this.setDocumentScore

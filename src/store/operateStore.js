@@ -24,7 +24,7 @@ export default {
         }
     },
     actions : {
-         quitSystem ({state,commit}, param) {
+        quitSystem ({state,commit}, param) {
          return new Promise((resolve,reject)=>{
            AV.User.logOut().then(function(){
              resolve()
@@ -167,7 +167,6 @@ export default {
                 },function(err){
                     reject(err)
                 })
-              
             })
          },
          setStandards ({state,commit},param) {
@@ -204,19 +203,14 @@ export default {
              let userID = moduleA.state.userInfo.id
              let queryUser = new AV.Query('_User')
              queryUser.get(userID).then(function(item) {
-               let pass = item.get('mobilePhoneNumber')
-               if (param.old === pass){
                    item.set('password',param.new)
                    item.save().then(function(){
                      resolve()
-                   },function(){
-                     reject()
                    })
-               }
-               else {
-                 reject()
-               }
-             })
+                },function(){
+                    reject()
+                })
+       
            })
          },
          createMyGrade ({state,commit}, param) {
@@ -247,7 +241,6 @@ export default {
                },function(){
                  reject()
                })
-     
              })
            })
          },
@@ -325,7 +318,6 @@ export default {
                          });
                        })
                  })
-     
            })
          },
          updategradeAndGroup ({state,commit}, param) {
@@ -424,6 +416,24 @@ export default {
              
              })
            })
-         }
+        },
+        resetSum ({state,commit},param) {
+            return new Promise ((resolve,reject) => {
+                let attend = Number(param.attend/100)
+                let document = Number(param.document/100)
+                let usually = Number(param.usually/100)
+                let betweenGroup = Number(param.betweenGroup/100)
+                let inGroup = Number(param.inGroup/100)
+                // for (let i = 0; i < moduleA.state.studentinfo.length; i ++) {
+                    for (let j = 0; j < moduleA.state.scoreList.length; j ++) {
+                        moduleA.state.scoreList[j].sum  =   moduleA.state.scoreList[j].attendScore * attend + 
+                                                            moduleA.state.scoreList[j].documentScore * document +
+                                                            moduleA.state.scoreList[j].usuallyScore * usually +
+                                                            moduleA.state.scoreList[j].inGroupScore * inGroup +
+                                                            moduleA.state.scoreList[j].betweenGroupScore * betweenGroup
+                    }
+                // }
+            })
         }
+    }
 }

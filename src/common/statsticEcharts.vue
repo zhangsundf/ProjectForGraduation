@@ -114,10 +114,10 @@ export default {
                         radius: '50%',
                         center: ['50%', '70%'],
                         data:[
-                            {value:this.excellent, name:'优秀'},
-                            {value:this.medium, name:'中等'},
-                            {value:this.general, name:'良好'},
-                            {value:this.failed, name:'不及格'}
+                            {value:this.excellent, name:'优秀',itemStyle:{color:'#00FF7F'}},
+                            {value:this.medium, name:'中等',itemStyle:{color:'#FFD700'}},
+                            {value:this.general, name:'良好',itemStyle:{color:'#FFA500'}},
+                            {value:this.failed, name:'不及格',itemStyle:{color:'#FF0000'}}
                         ],
                         itemStyle: {//图形样式 normal，emphasis
                             emphasis: {
@@ -229,9 +229,9 @@ export default {
         top:0px;
         right:0px;
         height: 100%;
-        width:26%;
+        width:24%;
         z-index: 999;
-        background-color: grey;
+        background-color:rgb(199, 193, 193);
         padding-top:5%;
     }
     .abstract {

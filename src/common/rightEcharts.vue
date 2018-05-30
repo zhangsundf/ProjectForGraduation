@@ -77,8 +77,8 @@ export default {
                     x:'center'
                 },
                 legend: {
-                    orient: 'vertical',
-                    // left: 'center',
+                    orient: 'axis',
+                    left: 'left',
                     data: ['签到','未签到']
                 },
                 textStyle: {
@@ -87,15 +87,18 @@ export default {
                 tooltip : {
                     trigger: 'item',
                     formatter: "{b} : {c}"
-    },
+                },
                 series : [
                     {
                         name: '签到情况',
                         type: 'pie',//每个系列，通过type决定自己的系列型号
                         radius: '50%',
+
                         data:[
-                            {value:this.sign, name:'签到人数'},
-                            {value:this.noSign, name:'未签到人数'}
+                            {value:this.sign, name:'签到',itemStyle:{color:'#00FF7F'}},
+                            {value:this.noSign, name:'未签到',itemStyle:{color:'#FFD700'}},
+                            // {value:30, name:'良好',itemStyle:{color:'#FFA500'}},
+                            // {value:30, name:'不及格',itemStyle:{color:'#FF0000'}}
                         ],
                         itemStyle: {//图形样式 normal，emphasis
                             emphasis: {
@@ -117,7 +120,6 @@ export default {
                                 }
                             }
                         }
-
                     }
                 ]
             });
@@ -195,9 +197,9 @@ export default {
         top:0px;
         right:0px;
         height: 100%;
-        width:26%;
+        width:24%;
         z-index: 999;
-        background-color: grey;
+        background-color:rgb(199, 193, 193);
         padding-top:5%;
     }
     .todaySign {
