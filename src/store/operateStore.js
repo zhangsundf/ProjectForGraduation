@@ -197,7 +197,7 @@ export default {
              })
            })
          },
-     
+         
          changePassWord ({state,commit}, param) {
            return new Promise(function(resolve,reject) {
              let userID = moduleA.state.userInfo.id
@@ -215,6 +215,25 @@ export default {
          },
          createMyGrade ({state,commit}, param) {
            commit (types.CREATE_MY_GRADE,param)
+         },
+         deleteStudentUpdateGrade({state,commit},param){
+            return new Promise((resolve,reject) => {
+              for (let i = 0; i < moduleA.state.AllGradNameList.length; i++ ) {
+                let grade = moduleA.state.AllGradNameList[i]
+                if( grade.grades === param.grade) {
+                  for(let j = 0; j < grade.groups.length; j++ ) {
+                    let group =grade.groups[j]
+                    if( group.groupName === param.group) {
+                      grade.gradeStuNumber -= 1
+                      group.groupStuNumber -= 1
+                      resolve()
+                      return
+                    }
+                  }
+                }
+              }
+              reject()
+            })
          },
          addGroup ({state,commit},param) {
            return new Promise (function(resolve,reject) {
@@ -354,7 +373,6 @@ export default {
                return AV.Object.saveAll(stuList)
              })
            })
-           
          },
          deleteStudentByGroup ({state,commit},param) {
            return new Promise(function(resolve,reject){
@@ -424,7 +442,6 @@ export default {
                 let usually = Number(param.usually/100)
                 let betweenGroup = Number(param.betweenGroup/100)
                 let inGroup = Number(param.inGroup/100)
-                // for (let i = 0; i < moduleA.state.studentinfo.length; i ++) {
                     for (let j = 0; j < moduleA.state.scoreList.length; j ++) {
                         moduleA.state.scoreList[j].sum  =   moduleA.state.scoreList[j].attendScore * attend + 
                                                             moduleA.state.scoreList[j].documentScore * document +
@@ -432,7 +449,6 @@ export default {
                                                             moduleA.state.scoreList[j].inGroupScore * inGroup +
                                                             moduleA.state.scoreList[j].betweenGroupScore * betweenGroup
                     }
-                // }
             })
         }
     }

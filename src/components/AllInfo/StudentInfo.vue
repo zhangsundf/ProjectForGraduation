@@ -79,15 +79,15 @@
       <template slot-scope="scope">
         <el-button
           size="mini"
-          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          @click="handleEdit(scope.row)">编辑</el-button>
         <el-button
           size="mini"
           type="danger"
-         @click.native.prevent="deleteRow(scope.$index,result)">删除</el-button>
+         @click.native.prevent="deleteRow(scope.row,result)">删除</el-button>
         <el-button
           size="mini"
           type="success"
-          @click="complete(scope.$index,scope.row)">完成</el-button>
+          @click="complete(scope.row)">完成</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -126,26 +126,32 @@ export default {
       handleCurrentChange: function(currentPage){
         this.currentPage = currentPage;
       },
-      handleEdit(index, row) {
+      handleEdit(row) {
         if(this.isOneEdit === false){
             this.isOneEdit = true
             this.chooseGrade = row.grade
             row.editFlag = true
-            this.index = index
+            this.index = row.index
         }else{
           alert("已有一个学生信息处于编辑编辑状态，请点击完成后在执行该操作！")
           return
         }
       
       },
-      deleteRow(index,rows) {
+      deleteRow(row,rows) {
         var r = confirm("确认将此学生从你管理的班级移除？")
         if (r) {
-          this.$store.dispatch("deleteStudent",index).then(function(){
+          this.$store.dispatch("deleteStudent",row.index).then(()=>{
+                   this.$store.dispatch('deleteStudentUpdateGrade',{
+                      grade:row.grade,group:row.teamname})
+                      .then (()=>{
+                                rows.splice(row.index, 1)
+                      }).catch(function(err){
+                        console.log(err)
+                      })
               alert("删除成功")
-              this.$store.dispatch('getGradeAndGroup')
-              rows.splice(index, 1);
-          }).catch(()=>{
+          }).catch((err)=>{
+            console.log(err)
               alert("删除失败")
           })
         }
@@ -153,13 +159,14 @@ export default {
           return
         }
 
+             
       },
-      complete (index,row) {
-        if(this.isOneEdit === true && this.index === index) {
+      complete (row) {
+        if(this.isOneEdit === true && this.index === row.index) {
               this.$store.dispatch('changeInfo',{
                                     grade:this.chooseGrade,
                                     group:this.chooseGroup,
-                                    index:index
+                                    index:row.index
                                     }).then(()=>{
                                       row.grade = this.chooseGrade
                                       row.teamname = this.chooseGroup
@@ -188,7 +195,7 @@ export default {
     result () {
        let result = []
         for (let i = 0; i < this.studentList.length; i++){
-          result[i] = this.studentList[i].attributes
+          result[i] = Object.assign({'index':i},this.studentList[i].attributes)
           this.$set(result[i],'editFlag',false)
         }
         return result
