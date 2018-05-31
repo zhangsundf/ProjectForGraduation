@@ -11,7 +11,7 @@
         <div class="level-item">
 
           <div class="field has-addons">
-              <el-select  v-model="chooseDate" :placeholder= "dateList[dateList.length-1]">
+              <el-select  v-model="chooseDate">
                   <el-option
                     v-for="(item,index) in dateList"
                     :key="index"
@@ -65,7 +65,7 @@
       <template slot-scope="scope">
             <span v-if = "!scope.row.editFlag" class = "span"  :class = "scope.row.isSignin === true ? 'signin' :'nosignin'">{{ scope.row.isSignin | fommatSign}}</span>
             <div v-if = "scope.row.editFlag" class = "field">
-                <el-select v-model="chooseStatus" :placeholder= "scope.row.isSignin | fommatSign" >
+                <el-select v-model="chooseStatus" >
                   <el-option
                     v-for="(item,index) in siginState"
                     :key="index"
@@ -166,6 +166,11 @@ export default {
             this.isOneEdit = true
             row.editFlag = true
             this.index = index
+            for (let i = 0; i < this.siginState.length; i++) {
+              if (this.siginState[i].value === row.isSignin) {
+                this.chooseStatus = this.siginState[i].label
+              }
+            }
         }else{
           alert("已有一个学生签到处于编辑编辑状态，请点击完成后在执行该操作！")
           return
@@ -179,6 +184,7 @@ export default {
                                     }).then(()=>{
                                       row.isSignin = this.chooseStatus
                                       this.isOneEdit = false
+                                    
                                     this.$store.dispatch('setStudentAttendScore',row).then (function(){
                                         console.log("异步更新学生签到分数成功")
                                       }).catch(function(err){
@@ -201,14 +207,14 @@ export default {
         this.showRightEcharts = true
       }
   },
- beforeCreate() {
-    var now=new Date();
-    let getMonth = now.getMonth() + 1 < 10 ? '0'+(now.getMonth() + 1):now.getMonth() + 1
-    let getDate = now.getDate() < 10 ? '0' + now.getDate() : now.getDate() 
-    var curDate = now.getFullYear()+"-"+getMonth +"-"+getDate
+//  beforeCreate() {
+//     var now=new Date();
+//     let getMonth = now.getMonth() + 1 < 10 ? '0'+(now.getMonth() + 1):now.getMonth() + 1
+//     let getDate = now.getDate() < 10 ? '0' + now.getDate() : now.getDate() 
+//     var curDate = now.getFullYear()+"-"+getMonth +"-"+getDate
 
-    this.$store.dispatch ("getIsSign",curDate)
-  },
+//     this.$store.dispatch ("getIsSign",curDate)
+//   },
   watch: {
     chooseDate() {
        this.$store.dispatch ("getIsSign",this.chooseDate)
@@ -216,6 +222,7 @@ export default {
   },
   mounted () {
     this.dateList = this.getDate
+    this.chooseDate = this.dateList[this.dateList.length-1]
   },
   filters:{
     fommatSign(val){
