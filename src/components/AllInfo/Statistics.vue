@@ -114,14 +114,14 @@
       label="组内互评"
       min-width="80">
       <template slot-scope="scope">
-            <span>{{ scope.row.inGroupScore }}</span>    
+            <span>{{ scope.row.inGroupScore | toFixed }}</span>    
       </template>
     </el-table-column>
     <el-table-column
       label="组间互评"
       min-width="80">
       <template slot-scope="scope">
-            <span >{{ scope.row.betweenGroupScore }}</span>
+            <span >{{ scope.row.betweenGroupScore | toFixed }}</span>
       </template>
     </el-table-column>
     <el-table-column

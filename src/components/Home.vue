@@ -34,7 +34,8 @@
           </router-link>
         </li>
       </ul>
-      <span class = "quit" @click = "quit" >退出系统</span>
+      <span class = "operate" @click = "quit" >退出系统</span>
+      <span class = "operate" @click = "destory">注销</span>
    </div>
    <keep-alive><router-view class = "showView"></router-view></keep-alive>
 </div>
@@ -53,12 +54,28 @@ export default {
         this.toggleClass("link",index,"is-active")
     },
     quit () {
-        this.$router.push({path:'/'})
-        this.$store.dispatch('quitSystem').then (function(){
-        alert("退出成功")
+      
+        this.$store.dispatch('quitSystem').then (() =>{
+          this.$router.push({path:'/'})
+          alert("退出成功")
         }).catch(function(){
           alert("退出失败")
         })
+    },
+    destory () {
+        var r = confirm("注销此账号将清除掉与你关联的所有班级以及学生，确认注销？") 
+        if (r) {
+          this.$store.dispatch('destoryInfo').then(()=>{
+            alert("清除班级和学生成功")
+            this.$router.push({path:'/'})
+          }).catch(function(err){
+            alert("删除失败")
+            console.log(err)
+          })
+        } else {
+          return 
+        }
+
     }
   },
   beforeCreate () {
@@ -125,15 +142,15 @@ export default {
     background-color: #ccc;
     border-radius: 10px;
   }
-  .quit {
+  .operate {
     position: relative;
     color:#fff;
-    margin-top:100px;
+    top:100px;
     font-size:14px;
     display: inline-block;
   }
 
-  .quit:hover{
+  .operate:hover{
     cursor: pointer;
   }
 

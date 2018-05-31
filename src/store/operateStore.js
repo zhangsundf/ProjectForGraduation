@@ -18,6 +18,35 @@ export default {
            })
          })
          },
+         destoryInfo ({state,commit,dispatch}) {
+          return new Promise ((resolve,reject) =>{
+            let deleteGroup = []
+            let deleteStudent = []
+            let deleteGrade = []
+            for (let i = 0; i < moduleA.state.AllGradNameList.length; i++) {
+              let gradeName = moduleA.state.AllGradNameList[i].grades
+              deleteGrade[i] = dispatch('deleteGrade',{gradeName:gradeName})
+              deleteGroup[i] = dispatch('deleteGroupsByGrade', {grades:gradeName})
+              deleteStudent[i] = dispatch('deleteStudentByGrade',gradeName)
+            }
+
+            var todo = AV.Object.createWithoutData('_User', moduleA.state.userInfo.id);
+            let deleteUser = todo.destroy().then(function (success) {
+              // 删除成功
+               resolve()
+            }, function (error) {
+              // 删除失败
+              reject()
+            });
+            let arrA = deleteGroup.concat(deleteStudent)
+            let arrB = arrA.concat(deleteUser)
+            let promise = Promise.all(arrB.concat(deleteGrade)).then (()=>{
+              resolve()
+            },function(){
+              reject()
+            })
+          })
+         },
          forgotPass ({state,commit},param) {
            return new Promise ((resolve,reject) => {
              let queryName = new AV.Query('_User')
@@ -113,7 +142,6 @@ export default {
            })
          },
          setStudentAttendScore ({state,commit}, param) {
-             console.log("enter commit")
             return new Promise((resolve,reject)=>{
                 let id = param.id
                 let signScore = 0
@@ -125,11 +153,9 @@ export default {
                             signScore += 10
                         }
                     }
-                    console.log(signScore)
                     for (let j = 0; j < moduleA.state.scoreList.length; j ++) {
                         if (id === moduleA.state.scoreList[j].userID) {
                             let diffAttendScore = signScore - moduleA.state.scoreList[j].attendScore
-                            console.log("diffAttendScore:"+diffAttendScore)
                             let diffattendStandard = diffAttendScore * (moduleA.state.standard.attend/100) 
                             moduleA.state.scoreList[j].attendScore = signScore
                             moduleA.state.scoreList[j].sum += diffattendStandard
