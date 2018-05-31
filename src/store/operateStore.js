@@ -6,21 +6,6 @@ export default {
         [types.CHANGR_PASS] (state,param) {
           let userId = moduleA.state.userInfo.attributes.password
            alert(userId)
-        },
-        [types.CREATE_MY_GRADE] (state,param) {
-             let TeacherId = moduleA.state.userInfo.id
-             let CreateItem = AV.Object.extend('GradeTable')
-             let instance = new CreateItem()
-             instance.set('TeacherId',TeacherId)
-             instance.set('createGrade',param)
-             instance.save().then(function(){
-                moduleA.state.AllGradNameList.push({'grades':param,
-                              'groups':[],'gradeStuNumber':0,
-                             'updatedAt':new Date(),'createdAt':new Date()})
-               alert("创建成功")
-             },function(){
-               alert("创建失败")
-             }) 
         }
     },
     actions : {
@@ -214,8 +199,24 @@ export default {
            })
          },
          createMyGrade ({state,commit}, param) {
-           commit (types.CREATE_MY_GRADE,param)
+           return new Promise ((resolve,reject) => {
+            let TeacherId = moduleA.state.userInfo.id
+            let CreateItem = AV.Object.extend('GradeTable')
+            let instance = new CreateItem()
+            instance.set('TeacherId',TeacherId)
+            instance.set('createGrade',param)
+            instance.save().then(function(){
+               moduleA.state.AllGradNameList.push({'grades':param,
+                             'groups':[],'gradeStuNumber':0,
+                            'updatedAt':new Date(),'createdAt':new Date()})
+               moduleA.state.userInfo.attributes.createGrade.push(param)
+              resolve()
+            },function(){
+              reject()
+            }) 
+           })
          },
+
          deleteStudentUpdateGrade({state,commit},param){
             return new Promise((resolve,reject) => {
               for (let i = 0; i < moduleA.state.AllGradNameList.length; i++ ) {
@@ -256,6 +257,7 @@ export default {
                        break
                  }
                }
+              
                resolve()
                },function(){
                  reject()
@@ -278,9 +280,9 @@ export default {
                    let deleteGrade = moduleA.state.AllGradNameList[k].grades
                    if(deleteGrade === param.gradeName) {
                      moduleA.state.AllGradNameList.splice(k,1)
+                     moduleA.state.userInfo.attributes.createGrade.splice(moduleA.state.userInfo.attributes.createGrade.indexOf(param.gradeName),1)
+                     }
                    }
-                 }
-                  resolve()
                }, function (error) {
                 reject()
                });

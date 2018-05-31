@@ -114,10 +114,13 @@ export default {
             alert("班级已经存在，不能重复创建")
             return 
         }
-        this.$store.dispatch ("createMyGrade",gradeName)
-        this.gradeName = ''
-        // this.$store.dispatch('getUser')
-        alert("创建成功！快去小组管理创建班级小组吧")
+        this.$store.dispatch ("createMyGrade",gradeName).then (()=>{
+          this.gradeName = ''
+          alert("创建成功！快去小组管理创建班级小组吧")
+        }).catch (function(err){
+          alert("创建小组失败！")
+        })
+       
       },
       deleteRow(index,rows,row) {
         var r = confirm("确认将此班级从你管理的班级移除？此操作会删除该班级下所以有的小组以及成员")
@@ -125,7 +128,7 @@ export default {
           this.$store.dispatch("deleteGrade",{
                                               id:index,
                                               gradeName:row.grades
-          }).then(function(){
+          }).then(()=>{
               alert("删除成功")
               rows.splice(index, 1);
           }).catch(()=>{

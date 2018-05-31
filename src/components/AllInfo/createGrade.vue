@@ -151,15 +151,14 @@ export default {
       this.$store.dispatch('addGroup',{
                                       gradeName:this.chooseGrade,
                                       groupName:name
-                                      }).then (function (){
+                                      }).then (()=>{
                                         alert("创建小组成功")
-                                      
+                                        this.groupName = ''
+                                        this.chooseGrade = ''                                     
                                       },function(){
                                         alert("创建小组失败")
                                       })
-                                        this.$store.dispatch('getGradeAndGroup')
-                                        this.groupName = ''
-                                        this.chooseGrade = ''
+
     },
     deleteRow (index,row) {
            this.$store.dispatch("deleteGroupByGroupName",{
@@ -213,7 +212,7 @@ export default {
         return Str
       }
   
-}
+  }
 }
 </script>
 

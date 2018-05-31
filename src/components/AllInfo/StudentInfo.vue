@@ -163,6 +163,13 @@ export default {
       },
       complete (row) {
         if(this.isOneEdit === true && this.index === row.index) {
+          if (this.chooseGroup == undefined) {
+            alert("该班级下还没有小组哦，请在该班级下创建小组")
+            this.chooseGrade = ''
+            row.editFlag = false
+            this.isOneEdit = false
+            return
+          }
               this.$store.dispatch('changeInfo',{
                                     grade:this.chooseGrade,
                                     group:this.chooseGroup,
@@ -206,6 +213,7 @@ export default {
   },
   watch: {
     chooseGrade (){
+        
         this.groupList = []
            for(let i = 0; i < this.getAllGradNameList.length; i++) {
             if (this.getAllGradNameList[i].grades === this.chooseGrade) {
