@@ -22,8 +22,8 @@
             </div>
             <nav class="level is-mobile">
             <div class="level-left">
-                <a class="level-item">
-                <span class="icon is-small heart"  @click = "support"> <font-awesome-icon :icon = "['fas','heart']"/></span>
+                <a class="level-item"  @click = "support(index)">
+                <span class="icon is-small heart" > <font-awesome-icon :icon = "['fas','heart']"/></span>
                 </a>
                 <a class="level-item">
                 <span class="icon is-small reply"> <font-awesome-icon :icon = "['fas','reply-all']"/></span>
@@ -43,8 +43,8 @@
         </article>
         <!-- </a> -->
     </div>
-    <div class = "footer" style = "height:30px">
-        <span style = "color:grey">已加载全部</span>
+    <div class = "footer" style = "backgroundColor:#fff">
+        <span>已加载全部</span>
     </div>
 </div>
 </template>
@@ -66,8 +66,7 @@ export default {
             for(let j = 0; j < this.getstudentComment.length; j++){
                 let commentItem = this.getstudentComment[j]
                 if (student.id === commentItem.attributes.userID){
-
-                    result.push(Object.assign({},commentItem.attributes,student.attributes))
+                    result.push(Object.assign({'index':i},commentItem.attributes,student.attributes))
                 }
             }
         }
@@ -78,8 +77,14 @@ export default {
      this.$store.dispatch ("getStudentActivities")
  },
  methods: {
-     support () {
-         
+     support (index) {
+        let hearts = document.getElementsByClassName('heart')
+        if(hearts[index].style.color === "red") {
+            hearts[index].style.color = "grey"
+        }
+        else {
+            hearts[index].style.color = "red"
+        }
      }
  }
 }
@@ -110,37 +115,37 @@ export default {
       font-family: cursive;
       color: rgb(112, 109, 109);
   }
-  .level-right {
-    font-size: 10px;
-    color:brown;
-  }
-  .heart {
-      color: grey;
-  }
-  .media-right {
-    font-size: 14px;
-    font-weight:bold;
-    color: rgb(52, 168, 139);
-  }
-  .image {
-      color: #fff;
-      overflow: hidden;
-      font-weight:bold;
-      border-radius:32px;
-      background-color: rgb(122, 233, 164);
-      line-height: 64px;
-      text-align: center;
-  }
-  .content {
-      border-bottom: 2px solid #f5f4f4;
-  }
-  .info {
-      color:rgb(112, 115, 116);
-      font-size: 14px;
-      margin-left:15%;
-  }
-  .group {
-      margin:2%;
-      color:rgb(150, 155, 156);
-  }
+    .level-right {
+        font-size: 10px;
+        color:brown;
+    }
+    .heart {
+        color: grey;
+    }
+    .media-right {
+        font-size: 14px;
+        font-weight:bold;
+        color: rgb(52, 168, 139);
+    }
+    .image {
+        color: #fff;
+        overflow: hidden;
+        font-weight:bold;
+        border-radius:32px;
+        background-color: rgb(122, 233, 164);
+        line-height: 64px;
+        text-align: center;
+    }
+    .content {
+        border-bottom: 2px solid #f5f4f4;
+    }
+    .info {
+        color:rgb(112, 115, 116);
+        font-size: 14px;
+        margin-left:15%;
+    }
+    .group {
+        margin:2%;
+        color:rgb(150, 155, 156);
+    }
 </style>

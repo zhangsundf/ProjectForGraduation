@@ -77,9 +77,9 @@ export default {
                     x:'center'
                 },
                 legend: {
-                    orient: 'axis',
-                    left: 'left',
-                    data: ['签到','未签到']
+                    left: 'center',
+                    data: ['签到','未签到'],
+                    top: 40, 
                 },
                 textStyle: {
                             color: 'rgb(0, 0, 0)'//文字的颜色
@@ -93,12 +93,10 @@ export default {
                         name: '签到情况',
                         type: 'pie',//每个系列，通过type决定自己的系列型号
                         radius: '50%',
-
+                        center: ['50%', '70%'],
                         data:[
                             {value:this.sign, name:'签到',itemStyle:{color:'#00FF7F'}},
-                            {value:this.noSign, name:'未签到',itemStyle:{color:'#FFD700'}},
-                            // {value:30, name:'良好',itemStyle:{color:'#FFA500'}},
-                            // {value:30, name:'不及格',itemStyle:{color:'#FF0000'}}
+                            {value:this.noSign, name:'未签到',itemStyle:{color:'#FF0000'}},
                         ],
                         itemStyle: {//图形样式 normal，emphasis
                             emphasis: {
@@ -109,14 +107,14 @@ export default {
                         label: {//饼形图上的文本标签
                             normal: {
                                 textStyle: {
-                                    color:'#f7f7f7'
+                                    color:'#000000'
                                 }
                             }
                         },
                         labelLine: {//标签的视觉引导线
                             normal: {
                                 lineStyle: {
-                                    color:'#f7f7f7'
+                                    color:'#e0a629'
                                 }
                             }
                         }
@@ -142,16 +140,14 @@ export default {
         };
 
        let  option = {
-            color: ['green', 'yellow'],
+            color: ['#00FF7F', '#FF0000'],
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
                     type: 'shadow'
                 }
             },
-            legend: {
-                data: ['签到','未签到']
-            },
+
             calculable: true,
             xAxis: [
                 {
@@ -199,8 +195,9 @@ export default {
         height: 100%;
         width:24%;
         z-index: 999;
-        background-color:rgb(199, 193, 193);
+        background-color: #ffffff;
         padding-top:5%;
+        border:1px solid rgb(185, 179, 179);
     }
     .todaySign {
         position:relative;

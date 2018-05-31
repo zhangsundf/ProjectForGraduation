@@ -97,12 +97,11 @@ export default {
      line-height: 30px;
      margin-top: 10px;
   }
-  li:hover, a:hover{
+  a:hover{
     color:  #fff;
     background-color: #1890ff;
   }
   .is-active{
-    color: #fff;
     background-color:  #1890ff;
   }
   .showView {
@@ -114,26 +113,29 @@ export default {
     padding:2%;
     padding-top:3%;
   }
-.showView::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.showView::-webkit-scrollbar-track {
-  background-color: #f5f5f5;
-  border-radius: 10px;
-}
-.showView::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 10px;
-}
-.quit {
-  position: relative;
-  color:#fff;
-  margin-top:100px;
-  font-size:14px;
-  display: inline-block;
+  .showView::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .showView::-webkit-scrollbar-track {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+  }
+  .showView::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+  }
+  .quit {
+    position: relative;
+    color:#fff;
+    margin-top:100px;
+    font-size:14px;
+    display: inline-block;
+  }
 
-}
+  .quit:hover{
+    cursor: pointer;
+  }
 
 
 </style>

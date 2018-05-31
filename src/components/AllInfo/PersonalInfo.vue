@@ -49,10 +49,11 @@
   }
   .routerChange {
     position: relative;
-    min-height: 87%;
+    height: 87%;
     width: 100%;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
   }
   .active {
     color:rgb(20, 196, 202);

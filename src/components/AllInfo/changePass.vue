@@ -9,23 +9,19 @@
             <div class="field">
               <div class="control">
                 <input class="input is-primary" type="password" placeholder="输入旧密码" v-model = "oldPass">
-              </div>
-               <div class="control" v-if = "oldPasstip">
-                <span>旧密码错误</span>
+                <span v-if = "oldPasstip">*旧密码错误</span>
               </div>
             </div>
             <div class="field">
               <div class="control">
                 <input class="input is-info" type="password" placeholder="输入新密码" v-model = "newpass">
-              
+                <span  v-if = "noAllowEmpty">*密码不能为空</span>
               </div>
             </div>
             <div class="field">
               <div class="control">
                 <input class="input is-info" type="password" placeholder="再次输入密码" v-model = "repass">
-              </div>
-              <div class="control" v-if = "newPasstip">
-                <span>两次密码输入不一致</span>
+                <span  v-if = "newPasstip">*两次密码输入不一致</span>
               </div>
             </div>
             <div class="field">
@@ -47,7 +43,8 @@ export default {
       repass:'',
       newpass:'',
       oldPasstip: false,
-      newPasstip: false
+      newPasstip: false,
+      noAllowEmpty:false
     }
   },
   computed: {
@@ -57,6 +54,7 @@ export default {
     changePass (old,pass, repass) {
        this.oldPasstip = false
         this.newPasstip = false
+        this.noAllowEmpty = false
       if (old.trim() !== this.getPass) {
         this.oldPasstip = true
         return
@@ -65,7 +63,10 @@ export default {
        this.newPasstip = true
        return
       }
-     
+      if (pass.trim() === ''){
+        this.noAllowEmpty = true
+        return
+      }
         this.$store.dispatch ("changePassWord",{new:pass.trim()}).then(function(){
           alert("密码修改成功")
         
@@ -85,25 +86,43 @@ export default {
 
 .panel {
   position: relative;
-  padding:5%;
-  width: 50%;
+  padding:10%;
+  width: 70%;
   height: 70;
-  margin: 0 auto;
+  left: 36%;
   overflow: hidden;
 }
 .header {
   position: relative;
-  background-color: whitesmoke;
-  width: 100%;
+  width: 78%;
   height:40px;
   margin-bottom: 20px;
   line-height: 40px;
+  
 }
 .changePass {
   position: relative;
-  width: 100%;
+  width: 78%;
+  float: left;
+  overflow: hidden;
 }
-.field {
+.contorl {
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.control span {
+  position: relative;
+  display: inline-block;
+  color: red;
+  font-size: 12px;
+  font-family: 'Courier New';
+  flex: 1;
+  width:20%;
+}
+.input {
+  position: relative;
+  width: 78%;
 }
 </style>

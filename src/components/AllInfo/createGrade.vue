@@ -221,7 +221,6 @@ nav {
   position: relative;
   box-sizing: border-box;
   padding-top: 3%;
-  flex:1;
 }
 .level-left {
   padding-left:6%;
@@ -229,7 +228,7 @@ nav {
  .el-table {
     position: relative;
     width: 100%;
-    height:60%
+    height:60%;
  }
  .content-rowspan div {
     position: relative;

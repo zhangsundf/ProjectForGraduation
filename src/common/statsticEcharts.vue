@@ -96,8 +96,7 @@ export default {
                     x:'center'
                 },
                 legend: {
-                    orient: 'vertical',
-                    left: 'left',
+                    top:40,
                     data: ['优秀','中等','良好','不及格']
                 },
                 textStyle: {
@@ -111,7 +110,7 @@ export default {
                     {
                         name: '成绩分布',
                         type: 'pie',//每个系列，通过type决定自己的系列型号
-                        radius: '50%',
+                        radius: '55%',
                         center: ['50%', '70%'],
                         data:[
                             {value:this.excellent, name:'优秀',itemStyle:{color:'#00FF7F'}},
@@ -128,14 +127,14 @@ export default {
                         label: {//饼形图上的文本标签
                             normal: {
                                 textStyle: {
-                                    color:'#f7f7f7'
+                                    color:'#000000'
                                 }
                             }
                         },
                         labelLine: {//标签的视觉引导线
                             normal: {
                                 lineStyle: {
-                                    color:'#f7f7f7'
+                                    color:'#e0a629'
                                 }
                             }
                         }
@@ -150,7 +149,6 @@ export default {
             var labelOption = {
             normal: {
                 show: true,
-            
                 fontSize: 16,
                 rich: {
                     name: {
@@ -168,9 +166,6 @@ export default {
                     type: 'shadow'
                 }
             },
-            legend: {
-                data: ['优秀','中等','良好','不及格']
-            },
             calculable: true,
             xAxis: [
                 {
@@ -185,6 +180,7 @@ export default {
                 }
             ],
             series: [
+                
                 {
                     name: '优秀',
                     type: 'bar',
@@ -231,8 +227,9 @@ export default {
         height: 100%;
         width:24%;
         z-index: 999;
-        background-color:rgb(199, 193, 193);
+        background-color:#ffffff;
         padding-top:5%;
+        border-left: 2px solid rgb(45, 197, 146);
     }
     .abstract {
         position:relative;

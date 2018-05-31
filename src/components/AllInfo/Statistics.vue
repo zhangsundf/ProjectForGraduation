@@ -82,7 +82,7 @@
     </el-table-column>
     <el-table-column
       label="小组"
-      min-width="90">
+      min-width="100">
       <template slot-scope="scope">
             <span >{{ scope.row.teamname }}</span>
            </template>
@@ -104,7 +104,7 @@
     </el-table-column>
     <el-table-column
       label="文档"
-      min-width="80">
+      min-width="60">
       <template slot-scope="scope">
             <span v-if = "!scope.row.editFlag">{{ scope.row.documentScore }}</span>
              <input type = "text" class = "input is-success" v-if = "scope.row.editFlag" v-model="setDocumentScore">
@@ -119,14 +119,14 @@
     </el-table-column>
     <el-table-column
       label="组间互评"
-      min-width="100">
+      min-width="80">
       <template slot-scope="scope">
             <span >{{ scope.row.betweenGroupScore }}</span>
       </template>
     </el-table-column>
     <el-table-column
       label="总分"
-      min-width="80">
+      min-width="60">
       <template slot-scope="scope">
             <span :class = "scope.row.sum <= 60 ? 'nopass' : scope.row.sum >= 75? 'excellent' : 'pass' ">{{scope.row.sum | toFixed}}</span>
        </template>
